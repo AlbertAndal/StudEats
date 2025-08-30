@@ -1,0 +1,250 @@
+@extends('layouts.app')
+
+@section('title', 'Dashboard')
+
+@section('content')
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Welcome Section -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Welcome back, {{ $user->name }}! 👋</h1>
+        <p class="mt-2 text-gray-600">Here's your personalized meal planning dashboard</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                            <span class="text-green-600">🍽️</span>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Today's Meals</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ $todayMeals->count() }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                            <span class="text-blue-600">💰</span>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Daily Budget</dt>
+                            <dd class="text-lg font-medium text-gray-900">₱{{ $user->daily_budget ?? 'Not set' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
+                            <span class="text-yellow-600">🔥</span>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Weekly Calories</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ number_format($weeklySummary['totalCalories']) }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center">
+                            <span class="text-purple-600">📊</span>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Weekly Meals</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ $weeklySummary['mealCount'] }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Featured Meal of the Day -->
+        <div class="lg:col-span-2">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Featured Meal of the Day</h2>
+                </div>
+                <div class="p-6">
+                    @if($featuredMeal)
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-1/3 mb-4 md:mb-0">
+                                <div class="bg-gray-200 rounded-lg h-48 flex items-center justify-center">
+                                    @if($featuredMeal->image_path)
+                                        <img src="{{ $featuredMeal->image_path }}" alt="{{ $featuredMeal->name }}" class="w-full h-full object-cover rounded-lg">
+                                    @else
+                                        <span class="text-4xl">🍽️</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="md:w-2/3 md:pl-6">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ $featuredMeal->name }}</h3>
+                                <p class="text-gray-600 mb-4">{{ $featuredMeal->description }}</p>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div class="bg-green-50 p-3 rounded-lg">
+                                        <div class="text-sm text-green-600 font-medium">Calories</div>
+                                        <div class="text-lg font-bold text-green-700">{{ $featuredMeal->nutritionalInfo->calories ?? 'N/A' }}</div>
+                                    </div>
+                                    <div class="bg-blue-50 p-3 rounded-lg">
+                                        <div class="text-sm text-blue-600 font-medium">Cost</div>
+                                        <div class="text-lg font-bold text-blue-700">₱{{ $featuredMeal->cost ?? 'N/A' }}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex space-x-3">
+                                    <a href="{{ route('recipes.show', $featuredMeal) }}" 
+                                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                                        View Recipe
+                                    </a>
+                                    <a href="{{ route('meal-plans.create') }}?meal_id={{ $featuredMeal->id }}" 
+                                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                        Add to Plan
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <span class="text-4xl mb-4 block">🍽️</span>
+                            <p class="text-gray-500">No featured meal available today</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Meals -->
+        <div class="lg:col-span-1">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Today's Meals</h2>
+                </div>
+                <div class="p-6">
+                    @if($todayMeals->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($todayMeals as $mealPlan)
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-green-600 text-sm font-medium">
+                                                {{ strtoupper(substr($mealPlan->meal_type, 0, 1)) }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-gray-900">{{ $mealPlan->meal->name }}</div>
+                                            <div class="text-sm text-gray-500 capitalize">{{ $mealPlan->meal_type }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        @if($mealPlan->is_completed)
+                                            <span class="text-green-600 text-sm">✓ Done</span>
+                                        @else
+                                            <form method="POST" action="{{ route('meal-plans.toggle', $mealPlan) }}" class="inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="text-gray-400 hover:text-green-600">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="mt-4">
+                            <a href="{{ route('meal-plans.index') }}" 
+                               class="block w-full text-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                View All Meals
+                            </a>
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <span class="text-4xl mb-4 block">📅</span>
+                            <p class="text-gray-500 mb-4">No meals planned for today</p>
+                            <a href="{{ route('meal-plans.create') }}" 
+                               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                                Plan Your Meals
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personalized Suggestions -->
+    <div class="mt-8">
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Personalized Meal Suggestions</h2>
+                <p class="text-sm text-gray-600 mt-1">Based on your preferences and budget</p>
+            </div>
+            <div class="p-6">
+                @if($suggestedMeals->count() > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($suggestedMeals as $meal)
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-semibold text-gray-900">{{ $meal->name }}</h3>
+                                    <span class="text-sm text-gray-500">₱{{ $meal->cost }}</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-3">{{ Str::limit($meal->description, 80) }}</p>
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500">
+                                        {{ $meal->nutritionalInfo->calories ?? 'N/A' }} cal
+                                    </div>
+                                    <a href="{{ route('recipes.show', $meal) }}" 
+                                       class="text-sm text-green-600 hover:text-green-700 font-medium">
+                                        View Recipe →
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mt-6 text-center">
+                        <a href="{{ route('recipes.index') }}" 
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Browse All Recipes
+                        </a>
+                    </div>
+                @else
+                    <div class="text-center py-8">
+                        <span class="text-4xl mb-4 block">🍽️</span>
+                        <p class="text-gray-500">No meal suggestions available</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
