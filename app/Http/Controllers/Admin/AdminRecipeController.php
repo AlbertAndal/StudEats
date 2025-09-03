@@ -99,10 +99,24 @@ class AdminRecipeController extends Controller
         ]);
 
         DB::transaction(function () use ($validated, $request) {
-            // Handle image upload
+            // Handle image upload with enhanced validation
             $imagePath = null;
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('meals', 'public');
+                $image = $request->file('image');
+                
+                // Additional validation
+                if ($image->isValid()) {
+                    // Generate unique filename
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $imagePath = $image->storeAs('meals', $filename, 'public');
+                    
+                    // Verify the file was stored successfully
+                    if (!Storage::disk('public')->exists($imagePath)) {
+                        throw new \Exception('Failed to store image file');
+                    }
+                } else {
+                    throw new \Exception('Invalid image file uploaded');
+                }
             }
 
             // Create meal
@@ -208,14 +222,29 @@ class AdminRecipeController extends Controller
         }
 
         DB::transaction(function () use ($validated, $request, $recipe, $ingredients, $localAlternatives) {
-            // Handle image upload
+            // Handle image upload with enhanced validation
             if ($request->hasFile('image')) {
-                // Delete old image
-                if ($recipe->image_path) {
-                    Storage::disk('public')->delete($recipe->image_path);
+                $image = $request->file('image');
+                
+                if ($image->isValid()) {
+                    // Delete old image
+                    if ($recipe->image_path && Storage::disk('public')->exists($recipe->image_path)) {
+                        Storage::disk('public')->delete($recipe->image_path);
+                    }
+                    
+                    // Store new image with unique filename
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $imagePath = $image->storeAs('meals', $filename, 'public');
+                    
+                    // Verify the file was stored successfully
+                    if (Storage::disk('public')->exists($imagePath)) {
+                        $validated['image_path'] = $imagePath;
+                    } else {
+                        throw new \Exception('Failed to store image file');
+                    }
+                } else {
+                    throw new \Exception('Invalid image file uploaded');
                 }
-                $imagePath = $request->file('image')->store('meals', 'public');
-                $validated['image_path'] = $imagePath;
             }
 
             // Update meal

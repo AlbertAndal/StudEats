@@ -57,6 +57,15 @@ class Recipe extends Model
      */
     public function getFormattedInstructionsAttribute(): array
     {
-        return explode("\n", $this->instructions);
+        if (empty($this->instructions)) {
+            return [];
+        }
+        
+        $steps = explode("\n", $this->instructions);
+        
+        // Filter out empty lines and trim whitespace
+        return array_filter(array_map('trim', $steps), function($step) {
+            return !empty($step);
+        });
     }
 }

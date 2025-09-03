@@ -232,7 +232,19 @@
                             <textarea name="ingredients" 
                                       rows="8"
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('ingredients') border-red-500 @enderror"
-                                      placeholder="Enter ingredients (one per line)...">{{ old('ingredients', is_array($recipe->recipe->ingredients ?? []) ? implode("\n", $recipe->recipe->ingredients) : $recipe->recipe->ingredients ?? '') }}</textarea>
+                                      placeholder="Enter ingredients (one per line)...">{{ old('ingredients', $recipe->recipe ? collect($recipe->recipe->ingredients)->map(function($ingredient) {
+                                          if (is_array($ingredient) && isset($ingredient['name'])) {
+                                              $text = $ingredient['name'];
+                                              if (isset($ingredient['amount'])) {
+                                                  $text .= ' - ' . $ingredient['amount'];
+                                                  if (isset($ingredient['unit'])) {
+                                                      $text .= ' ' . $ingredient['unit'];
+                                                  }
+                                              }
+                                              return $text;
+                                          }
+                                          return is_string($ingredient) ? $ingredient : '';
+                                      })->join("\n") : '') }}</textarea>
                             <p class="text-sm text-gray-600 mt-1">Enter one ingredient per line</p>
                             @error('ingredients')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -245,7 +257,19 @@
                             <textarea name="local_alternatives" 
                                       rows="8"
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('local_alternatives') border-red-500 @enderror"
-                                      placeholder="Enter local ingredient alternatives (one per line)...">{{ old('local_alternatives', is_array($recipe->recipe->local_alternatives ?? []) ? implode("\n", $recipe->recipe->local_alternatives) : $recipe->recipe->local_alternatives ?? '') }}</textarea>
+                                      placeholder="Enter local ingredient alternatives (one per line)...">{{ old('local_alternatives', $recipe->recipe ? collect($recipe->recipe->local_alternatives)->map(function($alternative) {
+                                          if (is_array($alternative) && isset($alternative['original'])) {
+                                              $text = $alternative['original'];
+                                              if (isset($alternative['alternative'])) {
+                                                  $text .= ' → ' . $alternative['alternative'];
+                                              }
+                                              if (isset($alternative['notes'])) {
+                                                  $text .= ' (' . $alternative['notes'] . ')';
+                                              }
+                                              return $text;
+                                          }
+                                          return is_string($alternative) ? $alternative : '';
+                                      })->join("\n") : '') }}</textarea>
                             <p class="text-sm text-gray-600 mt-1">Suggest local Filipino alternatives for imported ingredients</p>
                             @error('local_alternatives')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

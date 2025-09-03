@@ -27,13 +27,13 @@
             <form action="{{ route('meal-plans.store') }}" method="POST" id="meal-plan-form">
                 @csrf
                 
-                <div class="bg-white shadow rounded-lg mb-6">
+                <div class="bg-white shadow rounded-lg mb-6 relative schedule-details-container">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <h2 class="text-lg font-semibold text-gray-900">Schedule Details</h2>
+                            <h2 class="text-lg font-semibold text-gray-900 text-left">Schedule Details</h2>
                         </div>
                     </div>
                     
@@ -48,7 +48,7 @@
                                     Date
                                 </label>
                                 <input type="date" id="scheduled_date" name="scheduled_date" required
-                                       class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition-all duration-200 @error('scheduled_date') border-red-300 focus:ring-red-500 focus:border-red-300 @enderror"
+                                       class="block w-full px-4 py-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition-all duration-200 @error('scheduled_date') border-red-300 focus:ring-red-500 focus:border-red-300 @enderror"
                                        value="{{ request('date', now()->format('Y-m-d')) }}">
                                 @error('scheduled_date')
                                     <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -68,7 +68,10 @@
                                     Time (Optional)
                                 </label>
                                 <input type="time" id="scheduled_time" name="scheduled_time"
-                                       class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition-all duration-200">
+                                       class="block w-full px-4 py-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition-all duration-200 hover:border-gray-400 focus:outline-none"
+                                       placeholder="Select time"
+                                       aria-label="Select scheduled time"
+                                       data-tooltip="Choose a specific time for your meal (optional)">
                             </div>
                         </div>
 
@@ -208,6 +211,58 @@
                         </a>
                     </div>
                 </div>
+                
+                <!-- BMI Status -->
+                @if(isset($bmiStatus) && $bmiStatus['bmi'])
+                <div class="bg-white shadow rounded-lg mt-6">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4"/>
+                            </svg>
+                            Your Health Profile
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-600">BMI Score</span>
+                                <span class="text-lg font-bold text-gray-900">{{ $bmiStatus['bmi'] }}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-600">Category</span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border {{ $bmiStatus['colors'][0] }} {{ $bmiStatus['colors'][1] }} {{ $bmiStatus['colors'][2] }}">
+                                    {{ $bmiStatus['category_label'] }}
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-600">Daily Calories</span>
+                                <span class="text-lg font-bold text-green-600">{{ number_format($bmiStatus['daily_calories']) }}</span>
+                            </div>
+                            
+                            <div class="pt-3 border-t border-gray-200">
+                                <div class="flex items-start">
+                                    <svg class="w-4 h-4 text-blue-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="text-xs text-gray-600">{{ $bmiStatus['recommendation'] }}</p>
+                                        @if($bmiStatus['calorie_multiplier'] != 1)
+                                            <p class="text-xs text-blue-600 mt-1">
+                                                Meals are adjusted 
+                                                {{ $bmiStatus['calorie_multiplier'] > 1 ? '+' : '' }}{{ round(($bmiStatus['calorie_multiplier'] - 1) * 100) }}% 
+                                                for your health goals.
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -268,11 +323,24 @@
                                     <!-- Meal Stats -->
                                     <div class="grid grid-cols-2 gap-3 mb-4">
                                         <div class="bg-gray-50 group-hover:bg-green-50 rounded-lg p-3 transition-colors duration-300">
-                                            <div class="flex items-center justify-center text-gray-500 group-hover:text-green-600">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                                </svg>
-                                                <span class="text-xs font-medium">{{ $meal->nutritionalInfo->calories ?? 'N/A' }} cal</span>
+                                            <div class="flex flex-col items-center justify-center text-gray-500 group-hover:text-green-600">
+                                                <div class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                                    </svg>
+                                                    @if(isset($bmiStatus) && $bmiStatus['calorie_multiplier'] != 1)
+                                                        @php
+                                                            $originalCalories = $meal->nutritionalInfo->calories ?? 0;
+                                                            $adjustedCalories = round($originalCalories * $bmiStatus['calorie_multiplier']);
+                                                        @endphp
+                                                        <span class="text-xs font-medium">{{ $adjustedCalories }} cal</span>
+                                                    @else
+                                                        <span class="text-xs font-medium">{{ $meal->nutritionalInfo->calories ?? 'N/A' }} cal</span>
+                                                    @endif
+                                                </div>
+                                                @if(isset($bmiStatus) && $bmiStatus['calorie_multiplier'] != 1)
+                                                    <span class="text-xs text-gray-400 line-through">{{ $meal->nutritionalInfo->calories ?? 'N/A' }}</span>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="bg-gray-50 group-hover:bg-green-50 rounded-lg p-3 transition-colors duration-300">
@@ -371,6 +439,63 @@ document.addEventListener('DOMContentLoaded', function() {
     mealTypeInputs.forEach(input => {
         input.addEventListener('change', validateForm);
     });
+    
+    // Enhanced time input functionality
+    const timeInput = document.getElementById('scheduled_time');
+    
+    // Add common meal times for quick selection
+    function addTimeQuickSelect() {
+        const timeContainer = timeInput.parentElement;
+        const quickTimesDiv = document.createElement('div');
+        quickTimesDiv.className = 'mt-2 flex flex-wrap gap-2';
+        
+        const commonTimes = [
+            { label: 'Breakfast', time: '08:00', icon: '🌅' },
+            { label: 'Lunch', time: '12:00', icon: '☀️' },
+            { label: 'Dinner', time: '18:00', icon: '🌙' },
+            { label: 'Snack', time: '15:00', icon: '🍎' }
+        ];
+        
+        commonTimes.forEach(timeOption => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'inline-flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200';
+            button.innerHTML = `${timeOption.icon} ${timeOption.label} (${timeOption.time})`;
+            button.addEventListener('click', () => {
+                timeInput.value = timeOption.time;
+                timeInput.dispatchEvent(new Event('change'));
+            });
+            quickTimesDiv.appendChild(button);
+        });
+        
+        timeContainer.appendChild(quickTimesDiv);
+    }
+    
+    // Add quick time selection if on desktop
+    if (window.innerWidth >= 768) {
+        addTimeQuickSelect();
+    }
+    
+    // Enhanced mobile touch handling
+    timeInput.addEventListener('focus', function() {
+        if (window.innerWidth < 768) {
+            // Scroll input into view on mobile
+            setTimeout(() => {
+                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+    });
+    
+    // Time input validation and formatting
+    timeInput.addEventListener('change', function() {
+        if (this.value) {
+            // Provide visual feedback when time is selected
+            this.classList.add('border-green-300', 'bg-green-50');
+            setTimeout(() => {
+                this.classList.remove('border-green-300', 'bg-green-50');
+            }, 1000);
+        }
+    });
 
     function updateMealPreview() {
         if (selectedMealId) {
@@ -448,7 +573,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mealPreview.classList.add('hidden');
         validateForm();
     }
-
+    
     // Make clearSelection globally available
     window.clearSelection = clearSelection;
 
@@ -491,6 +616,102 @@ style.textContent = `
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+    }
+    
+    /* Fix for Schedule Details positioning */
+    #scheduled_date, #scheduled_time {
+        position: relative !important;
+        transform: none !important;
+        left: auto !important;
+        top: auto !important;
+        margin: 0 !important;
+    }
+    
+    /* Ensure form container is properly positioned */
+    #meal-plan-form {
+        position: relative;
+    }
+    
+    /* Schedule Details container fix */
+    .schedule-details-container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Enhanced time input styling */
+    #scheduled_time {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0Z' /%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px 16px;
+        padding-right: 40px;
+    }
+    
+    /* Mobile optimization for time input */
+    @media (max-width: 768px) {
+        #scheduled_time {
+            font-size: 16px; /* Prevents zoom on iOS */
+            padding: 12px 40px 12px 16px;
+        }
+        
+        #scheduled_date {
+            font-size: 16px; /* Prevents zoom on iOS */
+            padding: 12px 16px;
+        }
+    }
+    
+    /* Enhanced focus states */
+    #scheduled_time:focus,
+    #scheduled_date:focus {
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        border-color: #22c55e;
+        outline: none;
+    }
+    
+    /* Hover effects */
+    #scheduled_time:hover:not(:focus),
+    #scheduled_date:hover:not(:focus) {
+        border-color: #9ca3af;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+    
+    /* Time picker enhancement for webkit browsers */
+    #scheduled_time::-webkit-calendar-picker-indicator {
+        background: transparent;
+        bottom: 0;
+        color: transparent;
+        cursor: pointer;
+        height: auto;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: auto;
+    }
+    
+    /* Custom styling for time input in different browsers */
+    #scheduled_time::-webkit-datetime-edit-fields-wrapper {
+        padding: 0;
+    }
+    
+    #scheduled_time::-webkit-datetime-edit-text {
+        color: #6b7280;
+        padding: 0 2px;
+    }
+    
+    #scheduled_time::-webkit-datetime-edit-hour-field,
+    #scheduled_time::-webkit-datetime-edit-minute-field {
+        background-color: transparent;
+        border: none;
+        color: #374151;
+        font-weight: 500;
+    }
+    
+    /* Accessibility improvements */
+    #scheduled_time:focus-visible,
+    #scheduled_date:focus-visible {
+        outline: 2px solid #22c55e;
+        outline-offset: 2px;
     }
 `;
 document.head.appendChild(style);

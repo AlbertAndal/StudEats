@@ -25,7 +25,9 @@ class DatabaseSeeder extends Seeder
 
         // Seed Filipino cuisine meals
         $this->call([
-            FilipinoCuisineSeeder::class
+            FilipinoCuisineSeeder::class,
+            FilipinoMealPlanSeeder::class,
+            FilipinoWeeklyMealPlanSeeder::class
         ]);
     }
 }

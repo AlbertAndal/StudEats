@@ -209,13 +209,27 @@
                 <div class="p-6">
                     <ul class="space-y-2">
                         @foreach(is_array($recipe->recipe->ingredients) ? $recipe->recipe->ingredients : explode("\n", $recipe->recipe->ingredients) as $ingredient)
-                            @if(trim($ingredient))
-                                <li class="flex items-start">
-                                    <svg class="w-5 h-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <span>{{ trim($ingredient) }}</span>
-                                </li>
+                            @if(is_array($ingredient))
+                                @if(trim($ingredient['name'] ?? ''))
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <div>
+                                            <span class="font-medium">{{ trim($ingredient['name']) }}</span>
+                                            <span class="text-gray-500 ml-2">{{ $ingredient['amount'] }} {{ $ingredient['unit'] }}</span>
+                                        </div>
+                                    </li>
+                                @endif
+                            @else
+                                @if(trim($ingredient))
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span>{{ trim($ingredient) }}</span>
+                                    </li>
+                                @endif
                             @endif
                         @endforeach
                     </ul>
@@ -231,15 +245,30 @@
                     <p class="text-sm text-gray-600 mt-1">Filipino ingredient substitutes</p>
                 </div>
                 <div class="p-6">
-                    <ul class="space-y-2">
+                    <ul class="space-y-3">
                         @foreach(is_array($recipe->recipe->local_alternatives) ? $recipe->recipe->local_alternatives : explode("\n", $recipe->recipe->local_alternatives) as $alternative)
-                            @if(trim($alternative))
-                                <li class="flex items-start">
-                                    <svg class="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/>
-                                    </svg>
-                                    <span>{{ trim($alternative) }}</span>
+                            @if(is_array($alternative))
+                                <li class="bg-gray-50 p-3 rounded-lg">
+                                    <div class="flex items-start justify-between mb-1">
+                                        <span class="font-medium text-gray-900">{{ $alternative['original'] }}</span>
+                                        <svg class="w-4 h-4 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"/>
+                                        </svg>
+                                    </div>
+                                    <div class="text-blue-600 font-medium mb-1">{{ $alternative['alternative'] }}</div>
+                                    @if(isset($alternative['notes']))
+                                        <div class="text-xs text-gray-600">{{ $alternative['notes'] }}</div>
+                                    @endif
                                 </li>
+                            @else
+                                @if(trim($alternative))
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/>
+                                        </svg>
+                                        <span>{{ trim($alternative) }}</span>
+                                    </li>
+                                @endif
                             @endif
                         @endforeach
                     </ul>

@@ -95,16 +95,24 @@
                 </div>
                 <div class="p-6">
                     <div class="space-y-4">
-                        @foreach($meal->recipe->formatted_instructions as $index => $instruction)
-                            <div class="flex">
-                                <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-4">
-                                    <span class="text-sm font-medium text-green-600">{{ $index + 1 }}</span>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-gray-700">{{ $instruction }}</p>
-                                </div>
+                        @if($meal->recipe->formatted_instructions && is_array($meal->recipe->formatted_instructions))
+                            @foreach($meal->recipe->formatted_instructions as $index => $instruction)
+                                @if(!empty($instruction) && is_string($instruction))
+                                    <div class="flex">
+                                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                            <span class="text-sm font-medium text-green-600">{{ $index + 1 }}</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-gray-700">{{ $instruction }}</p>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        @else
+                            <div class="text-gray-500 text-center py-4">
+                                <p>No cooking instructions available.</p>
                             </div>
-                        @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
@@ -127,7 +135,12 @@
                                 <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                 </svg>
-                                <span class="text-gray-700">{{ $ingredient }}</span>
+                                <div class="text-gray-700">
+                                    <span class="font-medium">{{ $ingredient['name'] ?? $ingredient }}</span>
+                                    @if(is_array($ingredient) && isset($ingredient['amount']))
+                                        <span class="text-gray-500 ml-2">{{ $ingredient['amount'] }} {{ $ingredient['unit'] ?? '' }}</span>
+                                    @endif
+                                </div>
                             </li>
                         @endforeach
                     </ul>
@@ -210,11 +223,29 @@
                     <p class="text-sm text-gray-600">Budget-friendly substitutes</p>
                 </div>
                 <div class="p-6">
-                    <ul class="space-y-2">
+                    <div class="space-y-4">
                         @foreach($meal->recipe->local_alternatives as $alternative)
-                            <li class="text-sm text-gray-700">• {{ $alternative }}</li>
+                            <div class="border-l-4 border-green-200 pl-4">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-900">
+                                            {{ $alternative['original'] ?? $alternative }}
+                                        </p>
+                                        @if(is_array($alternative) && isset($alternative['alternative']))
+                                            <p class="text-sm text-green-600 mt-1">
+                                                → {{ $alternative['alternative'] }}
+                                            </p>
+                                        @endif
+                                        @if(is_array($alternative) && isset($alternative['notes']))
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                {{ $alternative['notes'] }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         @endforeach
-                    </ul>
+                    </div>
                 </div>
             </div>
             @endif

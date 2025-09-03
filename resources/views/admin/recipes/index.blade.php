@@ -174,18 +174,30 @@
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
-                                        @if($recipe->image_path)
+                                        @if($recipe->image_path && $recipe->image_url)
                                             <img src="{{ $recipe->image_url }}" 
                                                  alt="{{ $recipe->name }}" 
-                                                 class="w-16 h-16 rounded-lg object-cover mr-4">
+                                                 class="w-16 h-16 rounded-lg object-cover mr-4"
+                                                 title="Image URL: {{ $recipe->image_url }}"
+                                                 onerror="console.error('Image failed to load:', '{{ $recipe->image_url }}'); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4" style="display:none;" title="Image failed to load">
+                                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
                                         @else
-                                            <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4" title="No image available">
                                                 {{ strtoupper(substr($recipe->name, 0, 2)) }}
                                             </div>
                                         @endif
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">{{ $recipe->name }}</div>
                                             <div class="text-sm text-gray-500">{{ Str::limit($recipe->description, 50) }}</div>
+                                            @if(config('app.debug') && $recipe->image_path)
+                                                <div class="text-xs text-gray-400 mt-1">
+                                                    Debug: {{ $recipe->image_url }}
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>

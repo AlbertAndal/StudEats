@@ -78,11 +78,17 @@ class MealPlanController extends Controller
     public function create()
     {
         $user = Auth::user();
+        $userBMICategory = $user->getBMICategory();
+        
         $meals = Meal::with(['nutritionalInfo', 'recipe'])
             ->withinBudget($user->daily_budget ?? 500)
+            ->forBMICategory($userBMICategory)
             ->get();
         
-        return view('meal-plans.create', compact('meals'));
+        // Get user's BMI status for display
+        $bmiStatus = $user->getBMIStatus();
+        
+        return view('meal-plans.create', compact('meals', 'bmiStatus'));
     }
 
     /**

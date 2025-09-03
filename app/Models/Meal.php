@@ -44,8 +44,17 @@ class Meal extends Model
             return $this->image_path;
         }
 
-        // Leverage Storage facade for public disk
-        return asset('storage/' . ltrim($this->image_path, '/'));
+        // Check if file exists before generating URL
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->image_path)) {
+            // Force use of correct URL with port 8000
+            $baseUrl = config('app.url');
+            if ($baseUrl === 'http://localhost') {
+                $baseUrl = 'http://localhost:8000';
+            }
+            return $baseUrl . '/storage/' . $this->image_path;
+        }
+
+        return null;
     }
 
     /**
@@ -118,5 +127,80 @@ class Meal extends Model
     public function getServingsAttribute(): int
     {
         return $this->recipe ? $this->recipe->servings : 1;
+    }
+    
+    /**
+     * Get adjusted calories for a specific user based on their BMI.
+     */
+    public function getAdjustedCaloriesForUser(User $user): int
+    {
+        $baseCalories = $this->nutritionalInfo->calories ?? $this->calories ?? 0;
+        return $user->getAdjustedMealCalories($baseCalories);
+    }
+    
+    /**
+     * Get adjusted serving size for a specific user based on their BMI.
+     */
+    public function getAdjustedServingForUser(User $user): float
+    {
+        $multiplier = $user->getCalorieMultiplier();
+        $baseServing = $this->getServingsAttribute();
+        return round($baseServing * $multiplier, 1);
+    }
+    
+    /**
+     * Get meal information adjusted for a specific user's BMI.
+     */
+    public function getPersonalizedMealInfo(User $user): array
+    {
+        $baseCalories = $this->nutritionalInfo->calories ?? $this->calories ?? 0;
+        $adjustedCalories = $this->getAdjustedCaloriesForUser($user);
+        $adjustedServing = $this->getAdjustedServingForUser($user);
+        $bmiStatus = $user->getBMIStatus();
+        
+        return [
+            'original_calories' => $baseCalories,
+            'adjusted_calories' => $adjustedCalories,
+            'calorie_difference' => $adjustedCalories - $baseCalories,
+            'original_serving' => $this->getServingsAttribute(),
+            'adjusted_serving' => $adjustedServing,
+            'serving_multiplier' => $user->getCalorieMultiplier(),
+            'bmi_category' => $bmiStatus['category'],
+            'recommendation' => $this->getBMIRecommendationText($bmiStatus['category'])
+        ];
+    }
+    
+    /**
+     * Get BMI-specific recommendation text for this meal.
+     */
+    private function getBMIRecommendationText(string $bmiCategory): string
+    {
+        return match($bmiCategory) {
+            'underweight' => 'Larger portion recommended for healthy weight gain.',
+            'normal' => 'Standard portion size for maintenance.',
+            'overweight' => 'Reduced portion recommended for gradual weight loss.',
+            'obese' => 'Smaller portion strongly recommended for weight management.',
+            default => 'Standard portion size.'
+        };
+    }
+    
+    /**
+     * Scope to get meals suitable for a user's BMI category.
+     */
+    public function scopeForBMICategory($query, string $bmiCategory)
+    {
+        // Adjust meal selection based on BMI category
+        return match($bmiCategory) {
+            'underweight' => $query->whereHas('nutritionalInfo', function($q) {
+                $q->where('calories', '>=', 400); // Higher calorie meals
+            }),
+            'obese' => $query->whereHas('nutritionalInfo', function($q) {
+                $q->where('calories', '<=', 350); // Lower calorie meals
+            }),
+            'overweight' => $query->whereHas('nutritionalInfo', function($q) {
+                $q->where('calories', '<=', 400); // Moderate calorie meals
+            }),
+            default => $query // Normal weight - all meals
+        };
     }
 }
