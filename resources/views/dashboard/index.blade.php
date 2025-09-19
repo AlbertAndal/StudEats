@@ -318,21 +318,23 @@
                         @if($todayMeals->count() > 0)
                             <div class="mt-6 pt-4 border-t border-gray-200">
                                 <div class="bg-gray-50 rounded-lg p-4">
-                                    <div class="flex items-center justify-between text-sm">
-                                        <div class="flex items-center space-x-6">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
+                                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                                             <div class="flex items-center">
                                                 <span class="font-medium text-gray-700">Daily Total:</span>
                                             </div>
-                                            <div class="flex items-center text-green-700">
-                                                <x-icon name="bolt" class="w-4 h-4 mr-1" variant="outline" />
-                                                <span class="font-semibold">{{ $todayMeals->sum('meal.nutritionalInfo.calories') ?? 0 }} cal</span>
-                                            </div>
-                                            <div class="flex items-center text-blue-700">
-                                                <x-icon name="currency-dollar" class="w-4 h-4 mr-1" variant="outline" />
-                                                <span class="font-semibold">₱{{ $todayMeals->sum('meal.cost') ?? 0 }}</span>
+                                            <div class="flex items-center gap-4">
+                                                <div class="flex items-center text-green-700">
+                                                    <x-icon name="bolt" class="w-4 h-4 mr-1" variant="outline" />
+                                                    <span class="font-semibold">{{ $todayMeals->sum('meal.nutritionalInfo.calories') ?? 0 }} cal</span>
+                                                </div>
+                                                <div class="flex items-center text-blue-700">
+                                                    <x-icon name="currency-dollar" class="w-4 h-4 mr-1" variant="outline" />
+                                                    <span class="font-semibold">₱{{ $todayMeals->sum('meal.cost') ?? 0 }}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="text-gray-500">
+                                        <div class="text-gray-500 text-sm">
                                             {{ $todayMeals->where('is_completed', true)->count() }}/{{ $todayMeals->count() }} completed
                                         </div>
                                     </div>
@@ -397,11 +399,11 @@
                         <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                             <!-- Recipe Image -->
                             <div class="aspect-w-16 aspect-h-9 bg-gray-200">
-                                @if($meal->image_path)
-                                    <img src="{{ $meal->image_path }}" alt="{{ $meal->name }}" class="w-full h-32 object-cover">
+                                @if($meal->image_url)
+                                    <img src="{{ $meal->image_url }}" alt="{{ $meal->name }}" class="w-full h-32 object-cover" loading="lazy">
                                 @else
-                                    <div class="w-full h-32 flex items-center justify-center">
-                                        <span class="text-2xl">🍽️</span>
+                                    <div class="w-full h-32 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                        <span class="text-4xl">🍽️</span>
                                     </div>
                                 @endif
                             </div>
@@ -445,228 +447,6 @@
             </div>
         </div>
     @endif
-
-    <!-- Chicken Marinade Menu -->
-    <div class="bg-white shadow rounded-lg mb-8">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center">
-                <span class="text-2xl mr-3">🍗</span>
-                <h3 class="text-lg font-semibold text-gray-900">Chicken Marinade Collection</h3>
-            </div>
-            <p class="text-sm text-gray-600 mt-1">Delicious and easy marinades for your chicken meals</p>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Lemon Herb Grilled Chicken Marinade -->
-                <div class="bg-gradient-to-br from-yellow-50 to-green-50 border border-yellow-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <span class="text-3xl mr-3">🍋</span>
-                        <h4 class="font-semibold text-gray-900">Lemon Herb Grilled Chicken</h4>
-                    </div>
-                    <div class="space-y-2 text-sm text-gray-700">
-                        <div class="flex justify-between">
-                            <span>Olive oil</span>
-                            <span class="font-medium">15g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Lemon juice</span>
-                            <span class="font-medium">15g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Garlic powder</span>
-                            <span class="font-medium">1g (1 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Dried oregano</span>
-                            <span class="font-medium">1g (1 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Salt & pepper</span>
-                            <span class="font-medium">to taste</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Garlic Ginger Chicken Marinade -->
-                <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <span class="text-3xl mr-3">🧄</span>
-                        <h4 class="font-semibold text-gray-900">Garlic Ginger Chicken</h4>
-                    </div>
-                    <div class="space-y-2 text-sm text-gray-700">
-                        <div class="flex justify-between">
-                            <span>Soy sauce (low-sodium)</span>
-                            <span class="font-medium">15g</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Rice vinegar</span>
-                            <span class="font-medium">15g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Honey</span>
-                            <span class="font-medium">15g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Garlic, minced</span>
-                            <span class="font-medium">6g (2 cloves)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Ginger, minced</span>
-                            <span class="font-medium">5g (1 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Sesame oil</span>
-                            <span class="font-medium">5g (1 tsp)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Spicy Southwest Chicken Marinade -->
-                <div class="bg-gradient-to-br from-red-50 to-orange-50 border border-red-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <span class="text-3xl mr-3">🌶️</span>
-                        <h4 class="font-semibold text-gray-900">Spicy Southwest Chicken</h4>
-                    </div>
-                    <div class="space-y-2 text-sm text-gray-700">
-                        <div class="flex justify-between">
-                            <span>Olive oil</span>
-                            <span class="font-medium">15g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Chili powder</span>
-                            <span class="font-medium">2g (1 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Paprika</span>
-                            <span class="font-medium">2g (1 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Cumin</span>
-                            <span class="font-medium">1g (1/2 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Cayenne pepper (optional)</span>
-                            <span class="font-medium">1g (1/2 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Salt & pepper</span>
-                            <span class="font-medium">to taste</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Greek Chicken Marinade -->
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <span class="text-3xl mr-3">🇬🇷</span>
-                        <h4 class="font-semibold text-gray-900">Greek Chicken</h4>
-                    </div>
-                    <div class="space-y-2 text-sm text-gray-700">
-                        <div class="flex justify-between">
-                            <span>Olive oil</span>
-                            <span class="font-medium">15g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Lemon juice</span>
-                            <span class="font-medium">15g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Dried oregano</span>
-                            <span class="font-medium">1g (1 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Garlic, minced</span>
-                            <span class="font-medium">6g (2 cloves)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Salt & pepper</span>
-                            <span class="font-medium">to taste</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Honey Mustard Chicken Marinade -->
-                <div class="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <span class="text-3xl mr-3">🍯</span>
-                        <h4 class="font-semibold text-gray-900">Honey Mustard Chicken</h4>
-                    </div>
-                    <div class="space-y-2 text-sm text-gray-700">
-                        <div class="flex justify-between">
-                            <span>Dijon mustard</span>
-                            <span class="font-medium">20g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Honey</span>
-                            <span class="font-medium">20g (1 tbsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Olive oil</span>
-                            <span class="font-medium">10g (2 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Apple cider vinegar</span>
-                            <span class="font-medium">5g (1 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Garlic powder</span>
-                            <span class="font-medium">1g (1 tsp)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Salt & pepper</span>
-                            <span class="font-medium">to taste</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Tips Card -->
-                <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <span class="text-3xl mr-3">💡</span>
-                        <h4 class="font-semibold text-gray-900">Marinating Tips</h4>
-                    </div>
-                    <div class="space-y-3 text-sm text-gray-700">
-                        <div class="flex items-start">
-                            <span class="text-green-600 mr-2">•</span>
-                            <span>Marinate for 30 minutes to 24 hours</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="text-green-600 mr-2">•</span>
-                            <span>Use glass or plastic containers</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="text-green-600 mr-2">•</span>
-                            <span>Refrigerate while marinating</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="text-green-600 mr-2">•</span>
-                            <span>Discard used marinade</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="text-green-600 mr-2">•</span>
-                            <span>Pat dry before cooking</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="mt-6 pt-6 border-t border-gray-200">
-                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="{{ route('recipes.index') }}" 
-                       class="inline-flex items-center justify-center px-6 py-3 border border-green-600 text-green-600 bg-white hover:bg-green-50 rounded-lg font-medium transition-colors duration-200">
-                        <x-icon name="book-open" class="w-5 h-5 mr-2" variant="outline" />
-                        View All Recipes
-                    </a>
-                    <a href="{{ route('meal-plans.create') }}" 
-                       class="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white hover:bg-green-700 rounded-lg font-medium transition-colors duration-200">
-                        <x-icon name="plus" class="w-5 h-5 mr-2" variant="outline" />
-                        Create Meal Plan
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Quick Actions -->
     <div class="bg-white shadow rounded-lg">

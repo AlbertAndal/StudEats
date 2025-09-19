@@ -95,24 +95,16 @@
                 </div>
                 <div class="p-6">
                     <div class="space-y-4">
-                        @if($meal->recipe->formatted_instructions && is_array($meal->recipe->formatted_instructions))
-                            @foreach($meal->recipe->formatted_instructions as $index => $instruction)
-                                @if(!empty($instruction) && is_string($instruction))
-                                    <div class="flex">
-                                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-4">
-                                            <span class="text-sm font-medium text-green-600">{{ $index + 1 }}</span>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="text-gray-700">{{ $instruction }}</p>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
-                        @else
-                            <div class="text-gray-500 text-center py-4">
-                                <p>No cooking instructions available.</p>
+                        @foreach($meal->recipe->formatted_instructions as $index => $instruction)
+                            <div class="flex">
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                    <span class="text-sm font-medium text-green-600">{{ $index + 1 }}</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-gray-700">{{ $instruction }}</p>
+                                </div>
                             </div>
-                        @endif
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -123,22 +115,22 @@
         <div class="lg:col-span-1">
             <!-- Ingredients -->
             @if($meal->recipe && $meal->recipe->ingredients)
-            <div class="bg-white shadow rounded-lg mb-6">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Ingredients</h3>
-                    <p class="text-sm text-gray-600">Serves {{ $meal->recipe->servings ?? 1 }} person(s)</p>
+            <div class="bg-gray-50 shadow rounded-lg mb-6 border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-300">
+                    <h3 class="text-lg font-semibold text-gray-700">Ingredients</h3>
+                    <p class="text-sm text-gray-500">Serves {{ $meal->recipe->servings ?? 1 }} person(s)</p>
                 </div>
                 <div class="p-6">
                     <ul class="space-y-3">
                         @foreach($meal->recipe->ingredients as $ingredient)
                             <li class="flex items-start">
-                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                 </svg>
                                 <div class="text-gray-700">
-                                    <span class="font-medium">{{ $ingredient['name'] ?? $ingredient }}</span>
+                                    <span class="font-medium text-gray-800">{{ $ingredient['name'] ?? $ingredient }}</span>
                                     @if(is_array($ingredient) && isset($ingredient['amount']))
-                                        <span class="text-gray-500 ml-2">{{ $ingredient['amount'] }} {{ $ingredient['unit'] ?? '' }}</span>
+                                        <span class="text-gray-600 ml-2">{{ $ingredient['amount'] }} {{ $ingredient['unit'] ?? '' }}</span>
                                     @endif
                                 </div>
                             </li>
@@ -150,40 +142,40 @@
 
             <!-- Nutritional Information -->
             @if($meal->nutritionalInfo)
-            <div class="bg-white shadow rounded-lg mb-6">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Nutritional Information</h3>
-                    <p class="text-sm text-gray-600">Per serving</p>
+            <div class="bg-gray-50 shadow rounded-lg mb-6 border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-300">
+                    <h3 class="text-lg font-semibold text-gray-700">Nutritional Information</h3>
+                    <p class="text-sm text-gray-500">Per serving</p>
                 </div>
                 <div class="p-6">
                     <div class="space-y-3">
                         <div class="flex justify-between">
                             <span class="text-gray-600">Calories</span>
-                            <span class="font-medium">{{ $meal->nutritionalInfo->calories ?? 'N/A' }}</span>
+                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->calories ?? 'N/A' }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Protein</span>
-                            <span class="font-medium">{{ $meal->nutritionalInfo->protein ?? 'N/A' }}g</span>
+                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->protein ?? 'N/A' }}g</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Carbohydrates</span>
-                            <span class="font-medium">{{ $meal->nutritionalInfo->carbs ?? 'N/A' }}g</span>
+                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->carbs ?? 'N/A' }}g</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Fat</span>
-                            <span class="font-medium">{{ $meal->nutritionalInfo->fats ?? 'N/A' }}g</span>
+                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->fats ?? 'N/A' }}g</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Fiber</span>
-                            <span class="font-medium">{{ $meal->nutritionalInfo->fiber ?? 'N/A' }}g</span>
+                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->fiber ?? 'N/A' }}g</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Sugar</span>
-                            <span class="font-medium">{{ $meal->nutritionalInfo->sugar ?? 'N/A' }}g</span>
+                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->sugar ?? 'N/A' }}g</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Sodium</span>
-                            <span class="font-medium">{{ $meal->nutritionalInfo->sodium ?? 'N/A' }}mg</span>
+                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->sodium ?? 'N/A' }}mg</span>
                         </div>
                     </div>
                 </div>
@@ -192,23 +184,23 @@
 
             <!-- Cooking Time -->
             @if($meal->recipe)
-            <div class="bg-white shadow rounded-lg mb-6">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Cooking Time</h3>
+            <div class="bg-gray-50 shadow rounded-lg mb-6 border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-300">
+                    <h3 class="text-lg font-semibold text-gray-700">Cooking Time</h3>
                 </div>
                 <div class="p-6">
                     <div class="space-y-3">
                         <div class="flex justify-between">
                             <span class="text-gray-600">Prep Time</span>
-                            <span class="font-medium">{{ $meal->recipe->prep_time ?? 'N/A' }} minutes</span>
+                            <span class="font-medium text-gray-800">{{ $meal->recipe->prep_time ?? 'N/A' }} minutes</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Cook Time</span>
-                            <span class="font-medium">{{ $meal->recipe->cook_time ?? 'N/A' }} minutes</span>
+                            <span class="font-medium text-gray-800">{{ $meal->recipe->cook_time ?? 'N/A' }} minutes</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Total Time</span>
-                            <span class="font-medium">{{ $meal->recipe->total_time ?? 'N/A' }} minutes</span>
+                            <span class="font-medium text-gray-800">{{ $meal->recipe->total_time ?? 'N/A' }} minutes</span>
                         </div>
                     </div>
                 </div>
@@ -217,27 +209,27 @@
 
             <!-- Local Alternatives -->
             @if($meal->recipe && $meal->recipe->local_alternatives)
-            <div class="bg-white shadow rounded-lg">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Local Alternatives</h3>
-                    <p class="text-sm text-gray-600">Budget-friendly substitutes</p>
+            <div class="bg-gray-50 shadow rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-300">
+                    <h3 class="text-lg font-semibold text-gray-700">Local Alternatives</h3>
+                    <p class="text-sm text-gray-500">Budget-friendly substitutes</p>
                 </div>
                 <div class="p-6">
                     <div class="space-y-4">
                         @foreach($meal->recipe->local_alternatives as $alternative)
-                            <div class="border-l-4 border-green-200 pl-4">
+                            <div class="border-l-4 border-gray-300 pl-4">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">
+                                        <p class="text-sm font-medium text-gray-800">
                                             {{ $alternative['original'] ?? $alternative }}
                                         </p>
                                         @if(is_array($alternative) && isset($alternative['alternative']))
-                                            <p class="text-sm text-green-600 mt-1">
+                                            <p class="text-sm text-green-700 mt-1">
                                                 → {{ $alternative['alternative'] }}
                                             </p>
                                         @endif
                                         @if(is_array($alternative) && isset($alternative['notes']))
-                                            <p class="text-xs text-gray-500 mt-1">
+                                            <p class="text-xs text-gray-600 mt-1">
                                                 {{ $alternative['notes'] }}
                                             </p>
                                         @endif
@@ -255,25 +247,25 @@
     <!-- Similar Recipes -->
     @if($similarMeals->count() > 0)
     <div class="mt-12">
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-900">Similar Recipes</h2>
+        <div class="bg-gray-50 shadow rounded-lg border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-300">
+                <h2 class="text-xl font-semibold text-gray-700">Similar Recipes</h2>
             </div>
             <div class="p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($similarMeals as $similarMeal)
-                        <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="bg-gray-100 rounded-lg p-4 border border-gray-200">
                             <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-semibold text-gray-900">{{ $similarMeal->name }}</h3>
-                                <span class="text-sm text-gray-500">₱{{ $similarMeal->cost }}</span>
+                                <h3 class="font-semibold text-gray-800">{{ $similarMeal->name }}</h3>
+                                <span class="text-sm text-gray-600">₱{{ $similarMeal->cost }}</span>
                             </div>
                             <p class="text-sm text-gray-600 mb-3">{{ Str::limit($similarMeal->description, 60) }}</p>
                             <div class="flex items-center justify-between">
-                                <div class="text-sm text-gray-500">
+                                <div class="text-sm text-gray-600">
                                     {{ $similarMeal->nutritionalInfo->calories ?? 'N/A' }} cal
                                 </div>
                                 <a href="{{ route('recipes.show', $similarMeal) }}" 
-                                   class="text-sm text-green-600 hover:text-green-700 font-medium">
+                                   class="text-sm text-green-700 hover:text-green-800 font-medium">
                                     View Recipe →
                                 </a>
                             </div>

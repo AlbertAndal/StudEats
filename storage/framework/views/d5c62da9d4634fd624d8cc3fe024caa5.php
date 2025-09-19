@@ -140,6 +140,68 @@
         </div>
     </div>
 
+    <!-- BMI Status Card -->
+    <?php if(isset($bmiStatus) && $bmiStatus['bmi']): ?>
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+                <div class="bg-blue-100 p-2 rounded-lg mr-4">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Your Health Profile</h3>
+                    <p class="text-sm text-gray-600">Personalized meal recommendations based on your BMI</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- BMI Value -->
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900"><?php echo e($bmiStatus['bmi']); ?></div>
+                <div class="text-sm text-gray-600">BMI Score</div>
+            </div>
+            
+            <!-- BMI Category -->
+            <div class="text-center">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border <?php echo e($bmiStatus['colors'][0]); ?> <?php echo e($bmiStatus['colors'][1]); ?> <?php echo e($bmiStatus['colors'][2]); ?>">
+                    <?php echo e($bmiStatus['category_label']); ?>
+
+                </span>
+                <div class="text-sm text-gray-600 mt-1">Category</div>
+            </div>
+            
+            <!-- Daily Calories -->
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600"><?php echo e(number_format($bmiStatus['daily_calories'])); ?></div>
+                <div class="text-sm text-gray-600">Daily Calories</div>
+            </div>
+            
+            <!-- Calorie Adjustment -->
+            <div class="text-center">
+                <div class="text-2xl font-bold <?php echo e($bmiStatus['calorie_multiplier'] > 1 ? 'text-blue-600' : ($bmiStatus['calorie_multiplier'] < 1 ? 'text-orange-600' : 'text-green-600')); ?>">
+                    <?php echo e($bmiStatus['calorie_multiplier'] > 1 ? '+' : ''); ?><?php echo e(round(($bmiStatus['calorie_multiplier'] - 1) * 100)); ?>%
+                </div>
+                <div class="text-sm text-gray-600">Calorie Adjustment</div>
+            </div>
+        </div>
+        
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                    <h4 class="text-sm font-medium text-gray-900 mb-1">Personalized Recommendation</h4>
+                    <p class="text-sm text-gray-600"><?php echo e($bmiStatus['recommendation']); ?></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <!-- Featured Meal -->
@@ -152,12 +214,15 @@
                     <?php if($featuredMeal): ?>
                         <div class="flex flex-col md:flex-row gap-6">
                             <div class="md:w-1/3">
-                                <div class="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg">
-                                    <?php if($featuredMeal->image_path): ?>
-                                        <img src="<?php echo e($featuredMeal->image_path); ?>" alt="<?php echo e($featuredMeal->name); ?>" class="w-full h-48 object-cover rounded-lg">
+                                <div class="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg overflow-hidden">
+                                    <?php if($featuredMeal->image_url): ?>
+                                        <img src="<?php echo e($featuredMeal->image_url); ?>" alt="<?php echo e($featuredMeal->name); ?>" class="w-full h-48 object-cover rounded-lg">
                                     <?php else: ?>
-                                        <div class="w-full h-48 flex items-center justify-center">
-                                            <span class="text-4xl">🍽️</span>
+                                        <div class="w-full h-48 flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
+                                            <div class="text-center">
+                                                <span class="text-4xl block mb-2">🍽️</span>
+                                                <span class="text-sm text-gray-600 font-medium"><?php echo e($featuredMeal->name); ?></span>
+                                            </div>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -491,13 +556,14 @@
                         <?php if($todayMeals->count() > 0): ?>
                             <div class="mt-6 pt-4 border-t border-gray-200">
                                 <div class="bg-gray-50 rounded-lg p-4">
-                                    <div class="flex items-center justify-between text-sm">
-                                        <div class="flex items-center space-x-6">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
+                                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                                             <div class="flex items-center">
                                                 <span class="font-medium text-gray-700">Daily Total:</span>
                                             </div>
-                                            <div class="flex items-center text-green-700">
-                                                <?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
+                                            <div class="flex items-center gap-4">
+                                                <div class="flex items-center text-green-700">
+                                                    <?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce262628e3a8d44dc38fd1f3965181bc = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon','data' => ['name' => 'bolt','class' => 'w-4 h-4 mr-1','variant' => 'outline']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon'); ?>
@@ -517,10 +583,10 @@
 <?php $component = $__componentOriginalce262628e3a8d44dc38fd1f3965181bc; ?>
 <?php unset($__componentOriginalce262628e3a8d44dc38fd1f3965181bc); ?>
 <?php endif; ?>
-                                                <span class="font-semibold"><?php echo e($todayMeals->sum('meal.nutritionalInfo.calories') ?? 0); ?> cal</span>
-                                            </div>
-                                            <div class="flex items-center text-blue-700">
-                                                <?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
+                                                    <span class="font-semibold"><?php echo e($todayMeals->sum('meal.nutritionalInfo.calories') ?? 0); ?> cal</span>
+                                                </div>
+                                                <div class="flex items-center text-blue-700">
+                                                    <?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce262628e3a8d44dc38fd1f3965181bc = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon','data' => ['name' => 'currency-dollar','class' => 'w-4 h-4 mr-1','variant' => 'outline']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon'); ?>
@@ -540,10 +606,11 @@
 <?php $component = $__componentOriginalce262628e3a8d44dc38fd1f3965181bc; ?>
 <?php unset($__componentOriginalce262628e3a8d44dc38fd1f3965181bc); ?>
 <?php endif; ?>
-                                                <span class="font-semibold">₱<?php echo e($todayMeals->sum('meal.cost') ?? 0); ?></span>
+                                                    <span class="font-semibold">₱<?php echo e($todayMeals->sum('meal.cost') ?? 0); ?></span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="text-gray-500">
+                                        <div class="text-gray-500 text-sm">
                                             <?php echo e($todayMeals->where('is_completed', true)->count()); ?>/<?php echo e($todayMeals->count()); ?> completed
                                         </div>
                                     </div>
@@ -665,11 +732,11 @@
                         <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                             <!-- Recipe Image -->
                             <div class="aspect-w-16 aspect-h-9 bg-gray-200">
-                                <?php if($meal->image_path): ?>
-                                    <img src="<?php echo e($meal->image_path); ?>" alt="<?php echo e($meal->name); ?>" class="w-full h-32 object-cover">
+                                <?php if($meal->image_url): ?>
+                                    <img src="<?php echo e($meal->image_url); ?>" alt="<?php echo e($meal->name); ?>" class="w-full h-32 object-cover" loading="lazy">
                                 <?php else: ?>
-                                    <div class="w-full h-32 flex items-center justify-center">
-                                        <span class="text-2xl">🍽️</span>
+                                    <div class="w-full h-32 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                        <span class="text-4xl">🍽️</span>
                                     </div>
                                 <?php endif; ?>
                             </div>

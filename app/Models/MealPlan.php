@@ -16,6 +16,9 @@ class MealPlan extends Model
         'scheduled_date',
         'meal_type',
         'is_completed',
+        'notes',
+        'servings',
+        'prep_reminder',
     ];
 
     protected function casts(): array

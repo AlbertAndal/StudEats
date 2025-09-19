@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminRecipeController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\MealPlanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecipeController;
@@ -25,16 +26,26 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'sendPasswordResetLink'])->name('password.email');
 });
 
+// Email verification routes (accessible to both guest and authenticated users)
+Route::prefix('email-verification')->name('email-verification.')->group(function () {
+    Route::get('/verify', [EmailVerificationController::class, 'show'])->name('show');
+    Route::post('/complete', [EmailVerificationController::class, 'complete'])->name('complete');
+    Route::post('/send-otp', [EmailVerificationController::class, 'sendOtp'])->name('send-otp');
+    Route::post('/verify-otp', [EmailVerificationController::class, 'verifyOtp'])->name('verify-otp');
+    Route::post('/resend-otp', [EmailVerificationController::class, 'resendOtp'])->name('resend-otp');
+    Route::get('/status', [EmailVerificationController::class, 'getOtpStatus'])->name('status');
+});
+
 // Logout route
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
 // Protected routes
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Meal Plans
     Route::get('/meal-plans', [MealPlanController::class, 'index'])->name('meal-plans.index');
     Route::get('/meal-plans/create', [MealPlanController::class, 'create'])->name('meal-plans.create');
@@ -46,12 +57,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/meal-plans/{mealPlan}', [MealPlanController::class, 'update'])->name('meal-plans.update');
     Route::delete('/meal-plans/{mealPlan}', [MealPlanController::class, 'destroy'])->name('meal-plans.destroy');
     Route::patch('/meal-plans/{mealPlan}/toggle', [MealPlanController::class, 'toggleCompletion'])->name('meal-plans.toggle');
-    
+
     // Recipes
     Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
     Route::get('/recipes/search', [RecipeController::class, 'search'])->name('recipes.search');
     Route::get('/recipes/{meal}', [RecipeController::class, 'show'])->name('recipes.show');
-    
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -65,7 +76,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Dashboard
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/system-health', [AdminDashboardController::class, 'systemHealth'])->name('system-health');
-    
+
     // User Management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
@@ -74,7 +85,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
     Route::patch('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.update-role');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
-    
+
     // Recipe Management
     Route::resource('recipes', AdminRecipeController::class);
     Route::post('recipes/{recipe}/toggle-featured', [AdminRecipeController::class, 'toggleFeatured'])->name('recipes.toggle-featured');

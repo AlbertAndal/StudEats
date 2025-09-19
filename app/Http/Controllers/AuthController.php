@@ -5,16 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Services\EmailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    protected EmailService $emailService;
+
+    public function __construct(EmailService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
     /**
      * Show the registration form.
      */
@@ -45,11 +52,29 @@ class AuthController extends Controller
             'weight_unit' => $validated['weight_unit'] ?? 'kg',
         ]);
 
-        Auth::login($user);
+        // Send OTP for email verification
+        try {
+            $otpService = app(\App\Services\OtpService::class);
+            $otpService->generateAndSendOtp($user->email, $request);
+
+            Log::info('Registration successful, OTP sent', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send verification OTP during registration', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Store user ID in session for OTP verification
+        session(['pending_verification_user_id' => $user->id]);
 
         return redirect()
-            ->route('dashboard')
-            ->with('success', 'Welcome to StudEats! Your account has been created successfully.');
+            ->route('email-verification.show')
+            ->with('success', 'Account created! Please check your email for the verification code.');
     }
 
     /**
@@ -72,7 +97,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            
+
             RateLimiter::clear($request->throttleKey());
 
             return redirect()
@@ -93,7 +118,7 @@ class AuthController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
-        
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -120,7 +145,7 @@ class AuthController extends Controller
         ]);
 
         // Rate limiting for password reset requests
-        $key = 'password-reset:' . $request->ip();
+        $key = 'password-reset:'.$request->ip();
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
             throw ValidationException::withMessages([

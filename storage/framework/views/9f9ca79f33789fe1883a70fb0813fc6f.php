@@ -29,12 +29,46 @@
                         <a href="#faq" class="text-gray-700 hover:text-green-600 text-sm font-medium">FAQ</a>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <a href="<?php echo e(route('login')); ?>" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium">
-                            Sign In
-                        </a>
-                        <a href="<?php echo e(route('register')); ?>" class="bg-green-600 hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 text-white px-4 py-2 rounded-md text-sm font-medium">
-                            Get Started
-                        </a>
+                        <?php if(auth()->guard()->check()): ?>
+                            <!-- Profile dropdown -->
+                            <div class="relative">
+                                <img id="avatarButton" type="button" data-dropdown-toggle="userDropdown" data-dropdown-placement="bottom-start" class="w-10 h-10 rounded-full cursor-pointer" src="/docs/images/people/profile-picture-5.jpg" alt="User dropdown">
+
+                                <!-- Dropdown menu -->
+                                <div id="userDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600 absolute right-0 mt-2">
+                                    <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                                        <div><?php echo e(Auth::user()->name ?? 'User'); ?></div>
+                                        <div class="font-medium truncate"><?php echo e(Auth::user()->email); ?></div>
+                                    </div>
+                                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="avatarButton">
+                                        <li>
+                                            <a href="<?php echo e(route('dashboard')); ?>" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
+                                        </li>
+                                    </ul>
+                                    <div class="py-1">
+                                        <form method="POST" action="<?php echo e(route('logout')); ?>">
+                                            <?php echo csrf_field(); ?>
+                                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                                                Sign out
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <a href="<?php echo e(route('login')); ?>" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium">
+                                Sign In
+                            </a>
+                            <a href="<?php echo e(route('register')); ?>" class="bg-green-600 hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                Get Started
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -563,6 +597,30 @@
     <!-- Accordion JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Profile Dropdown JavaScript
+            const avatarButton = document.getElementById('avatarButton');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (avatarButton && userDropdown) {
+                avatarButton.addEventListener('click', function() {
+                    userDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!avatarButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+
+                // Close dropdown when pressing Escape key
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+            }
+
             // Get all accordion toggles
             const accordionToggles = document.querySelectorAll('.accordion-toggle');
             
