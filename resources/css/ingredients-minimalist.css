@@ -1,0 +1,317 @@
+/* 
+ * Minimalist Ingredients Layout CSS
+ * 
+ * Custom CSS utilities and design tokens for the minimalist ingredient layout system.
+ * This file complements the Tailwind classes and provides additional refinements.
+ */
+
+/* Design System Tokens */
+:root {
+  /* Spacing Scale */
+  --ingredient-container-padding: 2rem;
+  --ingredient-item-padding: 1rem;
+  --ingredient-gap: 1rem;
+  
+  /* Typography Scale */
+  --ingredient-title-size: 1.25rem;
+  --ingredient-name-size: 1rem;
+  --ingredient-quantity-size: 1.125rem;
+  --ingredient-unit-size: 0.875rem;
+  --ingredient-meta-size: 0.75rem;
+  
+  /* Border Radius Scale */
+  --ingredient-container-radius: 1rem;
+  --ingredient-item-radius: 0.75rem;
+  --ingredient-badge-radius: 9999px;
+  
+  /* Color Palette */
+  --ingredient-bg-primary: #ffffff;
+  --ingredient-bg-secondary: #f9fafb;
+  --ingredient-bg-accent: #f3f4f6;
+  --ingredient-border-light: #f3f4f6;
+  --ingredient-border-medium: #e5e7eb;
+  --ingredient-text-primary: #111827;
+  --ingredient-text-secondary: #6b7280;
+  --ingredient-text-meta: #9ca3af;
+  --ingredient-accent-green: #059669;
+  --ingredient-accent-blue: #2563eb;
+  
+  /* Shadows */
+  --ingredient-shadow-light: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ingredient-shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  
+  /* Transitions */
+  --ingredient-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ingredient-transition-medium: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Component Base Classes */
+.ingredient-container {
+  background: var(--ingredient-bg-primary);
+  border: 1px solid var(--ingredient-border-light);
+  border-radius: var(--ingredient-container-radius);
+  box-shadow: var(--ingredient-shadow-light);
+  overflow: hidden;
+}
+
+.ingredient-header {
+  background: linear-gradient(135deg, var(--ingredient-bg-secondary) 0%, var(--ingredient-bg-primary) 100%);
+  border-bottom: 1px solid var(--ingredient-border-light);
+  padding: 1.5rem var(--ingredient-container-padding);
+}
+
+.ingredient-list {
+  padding: var(--ingredient-container-padding);
+}
+
+.ingredient-item {
+  padding: var(--ingredient-item-padding);
+  border-radius: var(--ingredient-item-radius);
+  transition: all var(--ingredient-transition-medium);
+}
+
+.ingredient-item:hover {
+  background: var(--ingredient-bg-secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--ingredient-shadow-medium);
+}
+
+/* Typography Classes */
+.ingredient-title {
+  font-size: var(--ingredient-title-size);
+  font-weight: 600;
+  color: var(--ingredient-text-primary);
+  letter-spacing: -0.025em;
+  line-height: 1.375;
+}
+
+.ingredient-name {
+  font-size: var(--ingredient-name-size);
+  font-weight: 500;
+  color: var(--ingredient-text-primary);
+  line-height: 1.5;
+}
+
+.ingredient-quantity {
+  font-size: var(--ingredient-quantity-size);
+  font-weight: 600;
+  color: var(--ingredient-accent-green);
+}
+
+.ingredient-unit {
+  font-size: var(--ingredient-unit-size);
+  font-weight: 500;
+  color: var(--ingredient-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ingredient-meta {
+  font-size: var(--ingredient-meta-size);
+  font-weight: 500;
+  color: var(--ingredient-text-meta);
+}
+
+/* Badge Components */
+.ingredient-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--ingredient-unit-size);
+  font-weight: 500;
+  border-radius: var(--ingredient-badge-radius);
+  transition: all var(--ingredient-transition-fast);
+}
+
+.ingredient-badge--quantity {
+  background: rgba(5, 150, 105, 0.1);
+  color: var(--ingredient-accent-green);
+}
+
+.ingredient-badge--unit {
+  background: var(--ingredient-bg-accent);
+  color: var(--ingredient-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Index Number Component */
+.ingredient-index {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ingredient-bg-accent);
+  border-radius: 50%;
+  font-size: var(--ingredient-unit-size);
+  font-weight: 600;
+  color: var(--ingredient-text-secondary);
+  transition: all var(--ingredient-transition-medium);
+}
+
+.ingredient-item:hover .ingredient-index {
+  background: rgba(5, 150, 105, 0.1);
+  color: var(--ingredient-accent-green);
+  transform: scale(1.1);
+}
+
+/* Icon Components */
+.ingredient-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--ingredient-accent-green);
+}
+
+.ingredient-icon--header {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--ingredient-accent-green);
+}
+
+.ingredient-check {
+  width: 1.5rem;
+  height: 1.5rem;
+  background: rgba(5, 150, 105, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--ingredient-transition-medium);
+}
+
+.ingredient-item:hover .ingredient-check {
+  opacity: 1;
+}
+
+.ingredient-check svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--ingredient-accent-green);
+}
+
+/* Grid System Enhancements */
+.ingredient-grid {
+  display: grid;
+  gap: var(--ingredient-gap);
+}
+
+.ingredient-grid--list {
+  grid-template-columns: 1fr;
+}
+
+.ingredient-grid--admin {
+  grid-template-columns: 7fr 2fr 3fr;
+  align-items: center;
+}
+
+/* Empty State */
+.ingredient-empty {
+  padding: 3rem var(--ingredient-item-padding);
+  text-align: center;
+  color: var(--ingredient-text-meta);
+}
+
+.ingredient-empty svg {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  color: #d1d5db;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  :root {
+    --ingredient-container-padding: 1rem;
+    --ingredient-item-padding: 0.75rem;
+    --ingredient-gap: 0.75rem;
+  }
+  
+  .ingredient-grid--admin {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .ingredient-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Focus States for Accessibility */
+.ingredient-item:focus-within {
+  outline: 2px solid var(--ingredient-accent-blue);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .ingredient-container {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  
+  .ingredient-item:hover {
+    background: transparent;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .ingredient-check {
+    opacity: 1;
+  }
+}
+
+/* Dark Mode Support (if needed) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ingredient-bg-primary: #1f2937;
+    --ingredient-bg-secondary: #374151;
+    --ingredient-bg-accent: #4b5563;
+    --ingredient-border-light: #374151;
+    --ingredient-border-medium: #4b5563;
+    --ingredient-text-primary: #f9fafb;
+    --ingredient-text-secondary: #d1d5db;
+    --ingredient-text-meta: #9ca3af;
+  }
+}
+
+/* Animation Utilities */
+@keyframes ingredient-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ingredient-animate-in {
+  animation: ingredient-fade-in var(--ingredient-transition-medium) ease-out;
+}
+
+/* Utility Classes */
+.ingredient-divider {
+  height: 1px;
+  background: var(--ingredient-border-light);
+  margin: 1rem 0;
+}
+
+.ingredient-spacer {
+  height: var(--ingredient-gap);
+}
+
+.ingredient-prose {
+  line-height: 1.6;
+  color: var(--ingredient-text-secondary);
+}
+
+.ingredient-prose strong {
+  color: var(--ingredient-text-primary);
+  font-weight: 600;
+}

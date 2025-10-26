@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('title', 'Register')
 
@@ -13,7 +13,6 @@
         </div>
         <div class="relative z-10 flex flex-col h-full">
             <div class="flex items-center gap-3 text-2xl font-semibold">
-                <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">🍽️</span>
                 StudEats
             </div>
             <div class="mt-auto">
@@ -33,8 +32,7 @@
     <!-- Form Side -->
     <div class="flex flex-col justify-center px-6 py-12 md:px-12 lg:px-20 bg-background">
         <div class="w-full max-w-md mx-auto">
-            <div class="md:hidden mb-8 flex items-center gap-2 justify-center">
-                <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-2xl">🍽️</span>
+            <div class="md:hidden mb-8 flex items-center justify-center">
                 <span class="text-xl font-semibold">StudEats</span>
             </div>
             
@@ -187,24 +185,50 @@
                     </div>
                     
                     <!-- Dietary Preferences Section -->
-                    <div class="space-y-3 pt-4 border-t border-border">
-                        <h3 class="text-sm font-semibold">Dietary Preferences <span class="text-xs font-normal text-muted-foreground">(Optional)</span></h3>
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 text-sm">
-                            @php($prefs = old('dietary_preferences', []))
-                            @foreach(['vegetarian'=>'Vegetarian','vegan'=>'Vegan','pescatarian'=>'Pescatarian','gluten_free'=>'Gluten Free','dairy_free'=>'Dairy Free','low_carb'=>'Low Carb','high_protein'=>'High Protein'] as $val=>$label)
-                                <label class="flex items-center gap-2 p-2 border border-border rounded-md hover:bg-accent transition-colors cursor-pointer group text-xs">
-                                    <input type="checkbox" name="dietary_preferences[]" value="{{ $val }}" class="h-3 w-3 rounded border border-input text-primary focus:ring-1 focus:ring-ring" {{ in_array($val, $prefs) ? 'checked' : '' }}>
-                                    <span class="group-hover:text-accent-foreground transition-colors leading-tight">{{ $label }}</span>
+                    <div class="space-y-4 pt-4 border-t border-border">
+                        <div class="mb-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-900">Food Preferences (Optional)</h3>
+                                <p class="text-xs text-gray-500">Quick selection to personalize your experience</p>
+                            </div>
+                        </div>
+                        
+                        @php($prefs = old('dietary_preferences', []))
+                        
+                        <!-- Compact Dietary Preferences -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            @foreach([
+                                'vegetarian' => ['🥬', 'Vegetarian'],
+                                'vegan' => ['🌱', 'Vegan'],
+                                'keto' => ['🥑', 'Keto'],
+                                'gluten_free' => ['🌾', 'Gluten Free'],
+                                'dairy_free' => ['🥛', 'Dairy Free'],
+                                'high_protein' => ['💪', 'High Protein'],
+                                'low_carb' => ['⚡', 'Low Carb'],
+                                'heart_healthy' => ['❤️', 'Heart Healthy']
+                            ] as $val => $config)
+                                <label class="flex items-center gap-2 p-2 border border-gray-200 rounded-md hover:border-green-300 hover:bg-green-50 transition-all cursor-pointer">
+                                    <input type="checkbox" name="dietary_preferences[]" value="{{ $val }}" class="h-3 w-3 rounded border-gray-300 text-green-600 focus:ring-1 focus:ring-green-500" {{ in_array($val, $prefs) ? 'checked' : '' }}>
+                                    <span class="text-sm">{{ $config[0] }}</span>
+                                    <span class="text-xs font-medium text-gray-700 truncate">{{ $config[1] }}</span>
                                 </label>
                             @endforeach
                         </div>
+                        
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
+                            <div class="flex items-center gap-2 text-xs text-green-700">
+                                <span>💡</span>
+                                <span class="font-medium">Get personalized recommendations • Filter recipes • Save time planning</span>
+                            </div>
+                        </div>
+                        
                         @error('dietary_preferences')<p class="text-xs text-destructive mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="inline-flex w-full items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transform hover:scale-[1.01]">
+                    <button type="submit" class="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 transform hover:scale-[1.01]">
                         <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
                         </svg>
                         Create Account
                     </button>

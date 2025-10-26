@@ -35,9 +35,7 @@
             </div>
             <div>
                 <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-muted mb-4">
-                    <svg class="h-6 w-6 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2L4.257 10.257a6 6 0 017.743-7.743L15 5v2z" />
-                    </svg>
+                    <div class="icon-rotate-ccw-key"></div>
                 </div>
                 <h2 class="text-3xl font-bold tracking-tight">Forgot your password?</h2>
                 <p class="mt-2 text-sm text-muted-foreground">No problem! Enter your email address and we'll send you a password reset link.</p>
@@ -99,4 +97,4 @@ unset($__errorArgs, $__bag); ?>
     </div>
 </div>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\StudEats\resources\views/auth/forgot-password.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.guest', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\StudEats\resources\views/auth/forgot-password.blade.php ENDPATH**/ ?>

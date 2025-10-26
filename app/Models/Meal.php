@@ -46,7 +46,20 @@ class Meal extends Model
 
         // Check if file exists before generating URL
         if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->image_path)) {
-            // Force use of correct URL with port 8000
+            // Use current request host to ensure correct URL generation
+            $currentHost = request()->getHost();
+            $currentPort = request()->getPort();
+            $scheme = request()->getScheme();
+            
+            if ($currentHost && ($currentHost === '127.0.0.1' || $currentHost === 'localhost')) {
+                $baseUrl = $scheme . '://' . $currentHost;
+                if ($currentPort && $currentPort != 80 && $currentPort != 443) {
+                    $baseUrl .= ':' . $currentPort;
+                }
+                return $baseUrl . '/storage/' . $this->image_path;
+            }
+            
+            // Fallback to config URL
             $baseUrl = config('app.url');
             if ($baseUrl === 'http://localhost') {
                 $baseUrl = 'http://localhost:8000';
@@ -127,6 +140,75 @@ class Meal extends Model
     public function getServingsAttribute(): int
     {
         return $this->recipe ? $this->recipe->servings : 1;
+    }
+    
+    /**
+     * Get calculated cost based on current ingredient prices.
+     *
+     * @param string $regionCode Region code for pricing
+     * @return float|null Calculated cost or null if no recipe/ingredients
+     */
+    public function getCalculatedCost(string $regionCode = 'NCR'): ?float
+    {
+        if (!$this->recipe) {
+            return null;
+        }
+
+        return $this->recipe->calculateTotalCost($regionCode);
+    }
+
+    /**
+     * Get cost per serving based on current ingredient prices.
+     *
+     * @param string $regionCode Region code for pricing
+     * @return float|null Cost per serving or null if no recipe
+     */
+    public function getCalculatedCostPerServing(string $regionCode = 'NCR'): ?float
+    {
+        if (!$this->recipe) {
+            return null;
+        }
+
+        return $this->recipe->calculateCostPerServing($regionCode);
+    }
+
+    /**
+     * Get the cost to display (calculated or fallback to static cost).
+     *
+     * @param string $regionCode Region code for pricing
+     * @return float Display cost
+     */
+    public function getDisplayCost(string $regionCode = 'NCR'): float
+    {
+        $calculatedCost = $this->getCalculatedCostPerServing($regionCode);
+        
+        // Fall back to static cost if calculation not available or returns 0
+        if ($calculatedCost === null || $calculatedCost <= 0) {
+            return floatval($this->cost ?? 0);
+        }
+        
+        return $calculatedCost;
+    }
+
+    /**
+     * Check if meal has real-time pricing available.
+     *
+     * @param string $regionCode Region code for pricing
+     * @return bool
+     */
+    public function hasRealTimePricing(string $regionCode = 'NCR'): bool
+    {
+        if (!$this->recipe || !$this->recipe->ingredientRelations()->exists()) {
+            return false;
+        }
+        
+        // Check if any ingredient has recent price data for the region
+        return $this->recipe->ingredientRelations()
+            ->whereHas('priceHistory', function($query) use ($regionCode) {
+                $query->where('region_code', $regionCode)
+                    ->where('recorded_at', '>=', now()->subDays(7)); // Price is recent (last 7 days)
+            })
+            ->exists();
     }
     
     /**

@@ -33,7 +33,11 @@
                     </p>
                 </div>
                 <div class="text-blue-600 bg-blue-100 p-2 rounded-lg">
-                    <x-icon name="currency-dollar" class="w-8 h-8" variant="outline" aria-label="Daily budget icon" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-philippine-peso-icon lucide-philippine-peso w-8 h-8">
+                        <path d="M20 11H4"/>
+                        <path d="M20 7H4"/>
+                        <path d="M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7"/>
+                    </svg>
                 </div>
             </div>
         </div>
@@ -42,7 +46,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Weekly Calories</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ number_format($weeklySummary['totalCalories']) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ number_format($weeklySummary['totalCalories']) }} cal</p>
                 </div>
                 <div class="text-purple-600 bg-purple-100 p-2 rounded-lg">
                     <x-icon name="bolt" class="w-8 h-8" variant="outline" aria-label="Weekly calories icon" />
@@ -70,7 +74,7 @@
             <div class="flex items-center">
                 <div class="bg-blue-100 p-2 rounded-lg mr-4">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
                 </div>
                 <div>
@@ -97,7 +101,7 @@
             
             <!-- Daily Calories -->
             <div class="text-center">
-                <div class="text-2xl font-bold text-green-600">{{ number_format($bmiStatus['daily_calories']) }}</div>
+                <div class="text-2xl font-bold text-green-600">{{ number_format($bmiStatus['daily_calories']) }} cal</div>
                 <div class="text-sm text-gray-600">Daily Calories</div>
             </div>
             
@@ -156,7 +160,7 @@
                                 <div class="grid grid-cols-2 gap-4 mb-4">
                                     <div class="bg-green-50 p-3 rounded-lg">
                                         <div class="text-sm text-green-600 font-medium">Calories</div>
-                                        <div class="text-lg font-bold text-green-700">{{ $featuredMeal->nutritionalInfo->calories ?? 'N/A' }}</div>
+                                        <div class="text-lg font-bold text-green-700">{{ $featuredMeal->nutritionalInfo->calories ?? 'N/A' }} cal</div>
                                     </div>
                                     <div class="bg-blue-50 p-3 rounded-lg">
                                         <div class="text-sm text-blue-600 font-medium">Cost</div>
@@ -170,7 +174,7 @@
                                         View Recipe
                                     </a>
                                     <a href="{{ route('meal-plans.create') }}?meal_id={{ $featuredMeal->id }}" 
-                                       class="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100">
+                                       class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
                                         Add to Plan
                                     </a>
                                 </div>
@@ -356,8 +360,18 @@
                                     <x-icon name="calendar-days" class="w-32 h-32 text-gray-300" variant="solid" />
                                 </div>
                                 <div class="relative">
-                                    <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                                        <span class="text-3xl">📅</span>
+                                    <div class="mx-auto w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-6 shadow-inner border border-gray-300">
+                                        <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"></line>
+                                            <circle cx="8" cy="14" r="1" fill="currentColor"></circle>
+                                            <circle cx="12" cy="14" r="1" fill="currentColor"></circle>
+                                            <circle cx="16" cy="14" r="1" fill="currentColor"></circle>
+                                            <circle cx="8" cy="18" r="1" fill="currentColor"></circle>
+                                            <circle cx="12" cy="18" r="1" fill="currentColor"></circle>
+                                        </svg>
                                     </div>
                                     <h3 class="text-xl font-medium text-gray-900 mb-3">No meals planned for today</h3>
                                     <p class="text-gray-500 mb-6 max-w-sm mx-auto leading-relaxed">
@@ -429,7 +443,7 @@
                                         View Recipe
                                     </a>
                                     <a href="{{ route('meal-plans.create') }}?meal_id={{ $meal->id }}" 
-                                       class="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100">
+                                       class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
                                         Add to Plan
                                     </a>
                                 </div>
@@ -447,36 +461,5 @@
             </div>
         </div>
     @endif
-
-    <!-- Quick Actions -->
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="{{ route('meal-plans.create') }}" 
-                   class="flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-3 rounded-md hover:bg-gray-50 hover:border-green-400 hover:text-green-700 transition-all duration-200 group">
-                    <x-icon name="plus" class="w-5 h-5 group-hover:text-green-600" variant="outline" />
-                    Add Meal Plan
-                </a>
-                <a href="{{ route('recipes.index') }}" 
-                   class="flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-3 rounded-md hover:bg-gray-50 hover:border-blue-400 hover:text-blue-700 transition-all duration-200 group">
-                    <x-icon name="book-open" class="w-5 h-5 group-hover:text-blue-600" variant="outline" />
-                    Browse Recipes
-                </a>
-                <a href="{{ route('meal-plans.weekly') }}" 
-                   class="flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-3 rounded-md hover:bg-gray-50 hover:border-purple-400 hover:text-purple-700 transition-all duration-200 group">
-                    <x-icon name="calendar-days" class="w-5 h-5 group-hover:text-purple-600" variant="outline" />
-                    Weekly View
-                </a>
-                <a href="{{ route('profile.edit') }}" 
-                   class="flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-3 rounded-md hover:bg-gray-50 hover:border-orange-400 hover:text-orange-700 transition-all duration-200 group">
-                    <x-icon name="cog-6-tooth" class="w-5 h-5 group-hover:text-orange-600" variant="outline" />
-                    Settings
-                </a>
-            </div>
-        </div>
-    </div>
 </div>
 @endsection

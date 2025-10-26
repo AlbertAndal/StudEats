@@ -48,34 +48,94 @@
                     <p class="text-gray-600 mb-6">{{ $meal->description }}</p>
                     
                     <!-- Quick Info -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-green-600">₱{{ $meal->cost }}</div>
-                            <div class="text-sm text-gray-500">Cost</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <!-- Cost Section - More Prominent -->
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border-2 border-green-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    @php
+                                        $displayCost = $meal->getDisplayCost('NCR');
+                                        $hasRealTimePricing = $meal->hasRealTimePricing('NCR');
+                                        
+                                        // Calculate total from ingredient relations if available
+                                        $totalEstimatedCost = 0;
+                                        if($meal->recipe && $meal->recipe->ingredientRelations->count() > 0) {
+                                            foreach($meal->recipe->ingredientRelations as $ingredient) {
+                                                $quantity = $ingredient->pivot->quantity;
+                                                $price = $ingredient->getPriceForRegion('NCR');
+                                                $estimatedCost = $ingredient->pivot->estimated_cost;
+                                                $cost = $price ? ($quantity * $price) : $estimatedCost;
+                                                $totalEstimatedCost += $cost;
+                                            }
+                                        } elseif($meal->recipe && $meal->recipe->ingredients) {
+                                            // Use ingredients array (already cast from JSON)
+                                            $ingredients = $meal->recipe->ingredients;
+                                            if(is_array($ingredients)) {
+                                                foreach($ingredients as $ingredient) {
+                                                    $amount = floatval($ingredient['amount'] ?? 0);
+                                                    $price = floatval($ingredient['price'] ?? 0);
+                                                    $totalEstimatedCost += $amount * $price;
+                                                }
+                                            }
+                                        } else {
+                                            $totalEstimatedCost = $displayCost;
+                                        }
+                                    @endphp
+                                    <div class="text-3xl font-bold text-green-700">₱{{ number_format($totalEstimatedCost, 2) }}</div>
+                                    <div class="text-sm font-medium text-green-600 mt-1">
+                                        Total Estimated Cost
+                                        @if($hasRealTimePricing)
+                                            <span class="text-blue-600 inline-flex items-center ml-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                                </svg>
+                                                Live Pricing
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-gray-600 mt-1">
+                                        For {{ $meal->recipe->servings ?? 1 }} {{ ($meal->recipe->servings ?? 1) == 1 ? 'serving' : 'servings' }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-blue-600">{{ $meal->nutritionalInfo->calories ?? 'N/A' }}</div>
-                            <div class="text-sm text-gray-500">Calories</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-purple-600">{{ $meal->recipe->total_time ?? 'N/A' }}m</div>
-                            <div class="text-sm text-gray-500">Total Time</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-orange-600">{{ $meal->difficulty }}</div>
-                            <div class="text-sm text-gray-500">Difficulty</div>
+
+                        <!-- Other Quick Stats -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="flex flex-col items-center justify-center bg-blue-50 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-blue-600 mb-1">{{ $meal->nutritionalInfo->calories ?? 'N/A' }}</div>
+                                <div class="text-sm text-gray-600 font-medium">Calories</div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center bg-purple-50 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-purple-600 mb-1">{{ $meal->recipe->total_time ?? 'N/A' }}m</div>
+                                <div class="text-sm text-gray-600 font-medium">Total Time</div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center bg-orange-50 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-orange-600 mb-1">{{ $meal->difficulty }}</div>
+                                <div class="text-sm text-gray-600 font-medium">Difficulty</div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="flex space-x-3">
-                        <a href="{{ route('meal-plans.create') }}?meal_id={{ $meal->id }}" 
-                           class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Add to Meal Plan
-                        </a>
+                        @auth
+                            <a href="{{ route('meal-plans.create') }}?meal_id={{ $meal->id }}" 
+                               class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Add to Meal Plan
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" 
+                               class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                                </svg>
+                                Login to Add to Plan
+                            </a>
+                        @endauth
                         <button onclick="window.print()" 
                                 class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,27 +175,59 @@
         <div class="lg:col-span-1">
             <!-- Ingredients -->
             @if($meal->recipe && $meal->recipe->ingredients)
-            <div class="bg-gray-50 shadow rounded-lg mb-6 border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-300">
-                    <h3 class="text-lg font-semibold text-gray-700">Ingredients</h3>
-                    <p class="text-sm text-gray-500">Serves {{ $meal->recipe->servings ?? 1 }} person(s)</p>
+            <div class="bg-white shadow-sm rounded-2xl mb-8 border border-gray-100 overflow-hidden">
+                <!-- Header Section -->
+                <div class="px-8 py-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-900 tracking-tight">Ingredients</h3>
+                            <p class="text-sm text-gray-500 mt-1 font-medium">Serves {{ $meal->recipe->servings ?? 1 }} {{ ($meal->recipe->servings ?? 1) == 1 ? 'person' : 'people' }}</p>
+                        </div>
+                        <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6h.008v.008H15.75V12zm0 3h.008v.008H15.75V15zm0 3h.008v.008H15.75V18zm-12-3h3.75m0 0h3.75m0 0v3.75M5.25 15V9.75M5.25 15a2.25 2.25 0 01-2.25-2.25V9.75A2.25 2.25 0 015.25 7.5h3.75"/>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <ul class="space-y-3">
-                        @foreach($meal->recipe->ingredients as $ingredient)
-                            <li class="flex items-start">
-                                <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
-                                <div class="text-gray-700">
-                                    <span class="font-medium text-gray-800">{{ $ingredient['name'] ?? $ingredient }}</span>
-                                    @if(is_array($ingredient) && isset($ingredient['amount']))
-                                        <span class="text-gray-600 ml-2">{{ $ingredient['amount'] }} {{ $ingredient['unit'] ?? '' }}</span>
-                                    @endif
+
+                <!-- Ingredients List -->
+                <div class="px-8 py-6">
+                    <div class="space-y-4">
+                        @foreach($meal->recipe->ingredients as $index => $ingredient)
+                            <div class="group flex items-center space-x-4 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200">
+                                <!-- Index Number -->
+                                <div class="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-green-100 transition-colors duration-200">
+                                    <span class="text-sm font-semibold text-gray-600 group-hover:text-green-700">{{ $index + 1 }}</span>
                                 </div>
-                            </li>
+                                
+                                <!-- Ingredient Details -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline space-x-3">
+                                        <h4 class="text-base font-medium text-gray-900 leading-tight">
+                                            {{ $ingredient['name'] ?? $ingredient }}
+                                        </h4>
+                                        @if(is_array($ingredient) && isset($ingredient['amount']))
+                                            <div class="flex items-center space-x-1">
+                                                <span class="text-lg font-semibold text-green-600">{{ $ingredient['amount'] }}</span>
+                                                <span class="text-sm text-gray-500 font-medium uppercase tracking-wide">{{ $ingredient['unit'] ?? '' }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <!-- Check Icon -->
+                                <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                        <svg class="w-3.5 h-3.5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
                         @endforeach
-                    </ul>
+                    </div>
+
                 </div>
             </div>
             @endif
@@ -151,7 +243,7 @@
                     <div class="space-y-3">
                         <div class="flex justify-between">
                             <span class="text-gray-600">Calories</span>
-                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->calories ?? 'N/A' }}</span>
+                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->calories ?? 'N/A' }} cal</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Protein</span>
@@ -173,74 +265,12 @@
                             <span class="text-gray-600">Sugar</span>
                             <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->sugar ?? 'N/A' }}g</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Sodium</span>
-                            <span class="font-medium text-gray-800">{{ $meal->nutritionalInfo->sodium ?? 'N/A' }}mg</span>
-                        </div>
                     </div>
                 </div>
             </div>
             @endif
 
-            <!-- Cooking Time -->
-            @if($meal->recipe)
-            <div class="bg-gray-50 shadow rounded-lg mb-6 border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-300">
-                    <h3 class="text-lg font-semibold text-gray-700">Cooking Time</h3>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Prep Time</span>
-                            <span class="font-medium text-gray-800">{{ $meal->recipe->prep_time ?? 'N/A' }} minutes</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Cook Time</span>
-                            <span class="font-medium text-gray-800">{{ $meal->recipe->cook_time ?? 'N/A' }} minutes</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Total Time</span>
-                            <span class="font-medium text-gray-800">{{ $meal->recipe->total_time ?? 'N/A' }} minutes</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endif
 
-            <!-- Local Alternatives -->
-            @if($meal->recipe && $meal->recipe->local_alternatives)
-            <div class="bg-gray-50 shadow rounded-lg border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-300">
-                    <h3 class="text-lg font-semibold text-gray-700">Local Alternatives</h3>
-                    <p class="text-sm text-gray-500">Budget-friendly substitutes</p>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-4">
-                        @foreach($meal->recipe->local_alternatives as $alternative)
-                            <div class="border-l-4 border-gray-300 pl-4">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-800">
-                                            {{ $alternative['original'] ?? $alternative }}
-                                        </p>
-                                        @if(is_array($alternative) && isset($alternative['alternative']))
-                                            <p class="text-sm text-green-700 mt-1">
-                                                → {{ $alternative['alternative'] }}
-                                            </p>
-                                        @endif
-                                        @if(is_array($alternative) && isset($alternative['notes']))
-                                            <p class="text-xs text-gray-600 mt-1">
-                                                {{ $alternative['notes'] }}
-                                            </p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-            @endif
         </div>
     </div>
 

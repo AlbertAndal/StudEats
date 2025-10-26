@@ -29,7 +29,7 @@ class RegisterRequest extends FormRequest
             'age' => ['nullable', 'integer', 'min:13', 'max:120'],
             'daily_budget' => ['nullable', 'numeric', 'min:100', 'max:1000'],
             'dietary_preferences' => ['nullable', 'array'],
-            'dietary_preferences.*' => ['string', 'in:vegetarian,vegan,pescatarian,gluten_free,dairy_free,low_carb,high_protein'],
+            'dietary_preferences.*' => ['string', 'in:vegetarian,vegan,pescatarian,keto,paleo,mediterranean,gluten_free,dairy_free,nut_free,shellfish_free,soy_free,egg_free,low_carb,high_protein,low_sodium,heart_healthy,diabetic_friendly,weight_loss'],
             'gender' => ['nullable', 'string', 'in:male,female,other'],
             'activity_level' => ['nullable', 'string', 'in:sedentary,lightly_active,moderately_active,very_active'],
             'height' => ['nullable', 'numeric', 'min:100', 'max:300'],

@@ -78,4 +78,33 @@ class NutritionalInfo extends Model
         if ($this->calories == 0) return 0;
         return round(($this->fats * 9 / $this->calories) * 100, 1);
     }
+
+    /**
+     * Calculate calories automatically from macronutrients.
+     * Formula: (Protein × 4) + (Carbs × 4) + (Fats × 9)
+     */
+    public function calculateCaloriesFromMacros(): float
+    {
+        $proteinCalories = $this->protein * 4; // 4 calories per gram of protein
+        $carbCalories = $this->carbs * 4; // 4 calories per gram of carbs
+        $fatCalories = $this->fats * 9; // 9 calories per gram of fat
+        
+        return round($proteinCalories + $carbCalories + $fatCalories, 0);
+    }
+
+    /**
+     * Automatically set calories when nutritional data is saved.
+     */
+    protected static function booted()
+    {
+        static::saving(function ($nutritionalInfo) {
+            // Auto-calculate calories if macronutrients are provided
+            if ($nutritionalInfo->protein > 0 || $nutritionalInfo->carbs > 0 || $nutritionalInfo->fats > 0) {
+                $calculatedCalories = $nutritionalInfo->calculateCaloriesFromMacros();
+                if ($calculatedCalories > 0) {
+                    $nutritionalInfo->calories = $calculatedCalories;
+                }
+            }
+        });
+    }
 }

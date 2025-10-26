@@ -1,0 +1,103 @@
+/* Lucide Icons Admin Styling */
+/* Ensures consistent styling for all Lucide icons in the admin interface */
+
+.lucide {
+    display: inline-block;
+    vertical-align: middle;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+/* Icon sizes */
+.lucide.w-3 { width: 0.75rem; height: 0.75rem; }
+.lucide.w-4 { width: 1rem; height: 1rem; }
+.lucide.w-5 { width: 1.25rem; height: 1.25rem; }
+.lucide.w-6 { width: 1.5rem; height: 1.5rem; }
+.lucide.w-7 { width: 1.75rem; height: 1.75rem; }
+.lucide.w-8 { width: 2rem; height: 2rem; }
+.lucide.w-12 { width: 3rem; height: 3rem; }
+
+/* Color variations */
+.lucide.text-white { stroke: #ffffff; }
+.lucide.text-gray-300 { stroke: #d1d5db; }
+.lucide.text-gray-400 { stroke: #9ca3af; }
+.lucide.text-gray-500 { stroke: #6b7280; }
+.lucide.text-gray-600 { stroke: #4b5563; }
+.lucide.text-gray-700 { stroke: #374151; }
+.lucide.text-gray-900 { stroke: #111827; }
+
+.lucide.text-blue-200 { stroke: #bfdbfe; }
+.lucide.text-blue-600 { stroke: #2563eb; }
+.lucide.text-blue-700 { stroke: #1d4ed8; }
+
+.lucide.text-green-200 { stroke: #bbf7d0; }
+.lucide.text-green-600 { stroke: #16a34a; }
+.lucide.text-green-700 { stroke: #15803d; }
+
+.lucide.text-yellow-200 { stroke: #fef08a; }
+.lucide.text-yellow-600 { stroke: #ca8a04; }
+
+.lucide.text-purple-200 { stroke: #e9d5ff; }
+.lucide.text-purple-600 { stroke: #9333ea; }
+
+.lucide.text-red-400 { stroke: #f87171; }
+.lucide.text-red-600 { stroke: #dc2626; }
+
+.lucide.text-orange-600 { stroke: #ea580c; }
+.lucide.text-emerald-600 { stroke: #059669; }
+
+/* Hover effects */
+.lucide:hover {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Animation support */
+.lucide.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Icon spacing in flex containers */
+.flex .lucide {
+    flex-shrink: 0;
+}
+
+/* Button icon spacing */
+button .lucide,
+a .lucide {
+    margin-right: 0.25rem;
+}
+
+button .lucide:last-child,
+a .lucide:last-child {
+    margin-right: 0;
+    margin-left: 0.25rem;
+}
+
+/* Navigation icon adjustments */
+nav .lucide {
+    vertical-align: text-bottom;
+}
+
+/* Card icon styling */
+.bg-white .lucide {
+    transition: stroke 0.2s ease-in-out;
+}
+
+/* Status indicators */
+.lucide.status-indicator {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .lucide.w-6 { width: 1.25rem; height: 1.25rem; }
+    .lucide.w-7 { width: 1.5rem; height: 1.5rem; }
+    .lucide.w-8 { width: 1.75rem; height: 1.75rem; }
+}

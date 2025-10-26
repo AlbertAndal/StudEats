@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="test-token">
+    <title>Market Pricing API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .loading { opacity: 0.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Market Pricing API Test</h1>
+        <p>This page tests the ingredient pricing API functionality used in the recipe editor.</p>
+
+        <div class="test-section">
+            <h3>🔍 Test Individual Ingredient Price</h3>
+            <input type="text" id="ingredientInput" placeholder="Enter ingredient name (e.g., Carrots)" value="Carrots">
+            <button onclick="testSinglePrice()">Get Price</button>
+            <div id="singleResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Test Multiple Ingredients</h3>
+            <button onclick="testMultipleIngredients()">Test Common Ingredients</button>
+            <div id="multipleResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 API Status & Info</h3>
+            <button onclick="testAPIStatus()">Check API Status</button>
+            <div id="statusResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔬 Debug Information</h3>
+            <button onclick="showDebugInfo()">Show Debug Info</button>
+            <div id="debugResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test individual ingredient price
+        async function testSinglePrice() {
+            const input = document.getElementById('ingredientInput');
+            const result = document.getElementById('singleResult');
+            const ingredientName = input.value.trim();
+            
+            if (!ingredientName) {
+                result.innerHTML = '<div class="error">Please enter an ingredient name</div>';
+                return;
+            }
+
+            result.innerHTML = '<div class="loading">Testing API for: ' + ingredientName + '...</div>';
+
+            try {
+                const response = await fetch('/api/ingredient-price', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ingredient_name: ingredientName,
+                        region: 'NCR'
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (response.ok && data.success) {
+                    result.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Price Found!</h4>
+                            <strong>Ingredient:</strong> ${data.ingredient_name}<br>
+                            <strong>Price:</strong> ₱${data.price} per ${data.common_unit || 'unit'}<br>
+                            <strong>Source:</strong> ${data.source}<br>
+                            <strong>Updated:</strong> ${data.updated_at}<br>
+                            <strong>Is Stale:</strong> ${data.is_stale ? 'Yes' : 'No'}
+                        </div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            <h4>❌ No Price Found</h4>
+                            <p>${data.message || 'Unknown error'}</p>
+                        </div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                result.innerHTML = `
+                    <div class="error">
+                        <h4>🔥 API Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Test multiple common ingredients
+        async function testMultipleIngredients() {
+            const result = document.getElementById('multipleResult');
+            const testIngredients = ['Carrots', 'Pechay', 'Cabbage', 'Bell Pepper', 'Onion'];
+            
+            result.innerHTML = '<div class="loading">Testing multiple ingredients...</div>';
+
+            let html = '<h4>🔍 Testing Common Ingredients:</h4>';
+            let successCount = 0;
+
+            for (const ingredient of testIngredients) {
+                try {
+                    const response = await fetch('/api/ingredient-price', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            ingredient_name: ingredient,
+                            region: 'NCR'
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        html += `<div class="success" style="margin: 5px 0; padding: 10px;">
+                            ✅ <strong>${ingredient}:</strong> ₱${data.price} per ${data.common_unit || 'unit'}
+                        </div>`;
+                        successCount++;
+                    } else {
+                        html += `<div class="error" style="margin: 5px 0; padding: 10px;">
+                            ❌ <strong>${ingredient}:</strong> No price found
+                        </div>`;
+                    }
+                } catch (error) {
+                    html += `<div class="error" style="margin: 5px 0; padding: 10px;">
+                        🔥 <strong>${ingredient}:</strong> Error - ${error.message}
+                    </div>`;
+                }
+            }
+
+            html += `<p><strong>Results:</strong> ${successCount}/${testIngredients.length} ingredients found</p>`;
+            result.innerHTML = html;
+        }
+
+        // Test API status
+        async function testAPIStatus() {
+            const result = document.getElementById('statusResult');
+            result.innerHTML = '<div class="loading">Checking API status...</div>';
+
+            try {
+                // Test if the endpoint exists
+                const response = await fetch('/api/ingredient-price', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ingredient_name: 'Test',
+                        region: 'NCR'
+                    })
+                });
+
+                const statusClass = response.ok ? 'success' : 'error';
+                const statusIcon = response.ok ? '✅' : '❌';
+                
+                result.innerHTML = `
+                    <div class="${statusClass}">
+                        <h4>${statusIcon} API Status</h4>
+                        <strong>HTTP Status:</strong> ${response.status}<br>
+                        <strong>Status Text:</strong> ${response.statusText}<br>
+                        <strong>URL:</strong> /api/ingredient-price<br>
+                        <strong>Method:</strong> POST
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h4>🔥 API Connection Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Show debug information
+        function showDebugInfo() {
+            const result = document.getElementById('debugResult');
+            
+            const debugInfo = {
+                current_url: window.location.href,
+                api_endpoint: '/api/ingredient-price',
+                user_agent: navigator.userAgent,
+                csrf_token: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 'Not found',
+                timestamp: new Date().toISOString()
+            };
+
+            result.innerHTML = `
+                <h4>🔬 Debug Information</h4>
+                <pre>${JSON.stringify(debugInfo, null, 2)}</pre>
+                <p><strong>Note:</strong> This test page doesn't require CSRF token since the API routes were modified to be publicly accessible.</p>
+            `;
+        }
+
+        // Auto-run basic test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Market Pricing API Test Page Loaded');
+            testAPIStatus();
+        });
+    </script>
+</body>
+</html>

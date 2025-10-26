@@ -305,7 +305,7 @@
                                 <x-icon name="fire" class="w-6 h-6 text-green-600" />
                             </div>
                             <div class="text-2xl font-bold text-green-600">
-                                {{ $mealPlans->sum('meal.nutritionalInfo.calories') ?? 0 }}
+                                {{ $mealPlans->sum('meal.nutritionalInfo.calories') ?? 0 }} cal
                             </div>
                             <div class="text-sm text-green-700 font-medium">Total Calories</div>
                         </div>

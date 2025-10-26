@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Analytics Test</title></head>
+<body>
+<button id="testBtn">Click Me</button>
+<div id="output"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('testBtn');
+    btn.addEventListener('click', function() {
+        document.getElementById('output').innerHTML = 'Button clicked! Event listener works.';
+    });
+    console.log('Script loaded successfully');
+});
+</script>
+</body>
+</html>

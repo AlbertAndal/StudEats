@@ -42,7 +42,7 @@ class UpdateProfileRequest extends FormRequest
             'daily_budget' => 'nullable|numeric|min:100|max:2000',
             'timezone' => 'nullable|string|max:255',
             'dietary_preferences' => 'nullable|array',
-            'dietary_preferences.*' => 'string|in:vegetarian,vegan,pescatarian,gluten_free,dairy_free,low_carb,high_protein,keto,paleo,mediterranean',
+            'dietary_preferences.*' => 'string|in:vegetarian,vegan,pescatarian,keto,paleo,mediterranean,gluten_free,dairy_free,nut_free,shellfish_free,soy_free,egg_free,low_carb,high_protein,low_sodium,heart_healthy,diabetic_friendly,weight_loss',
         ];
     }
 

@@ -218,7 +218,8 @@
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900 flex items-center">
                             <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
                             </svg>
                             Your Health Profile
                         </h3>
@@ -239,7 +240,7 @@
                             
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium text-gray-600">Daily Calories</span>
-                                <span class="text-lg font-bold text-green-600">{{ number_format($bmiStatus['daily_calories']) }}</span>
+                                <span class="text-lg font-bold text-green-600">{{ number_format($bmiStatus['daily_calories']) }} cal</span>
                             </div>
                             
                             <div class="pt-3 border-t border-gray-200">
@@ -290,18 +291,26 @@
                 @if($meals->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         @foreach($meals as $meal)
+                            @php
+                                $displayCost = $meal->getDisplayCost('NCR');
+                                $hasRealTimePricing = $meal->hasRealTimePricing('NCR');
+                            @endphp
                             <div class="group border-2 border-gray-200 rounded-lg p-6 cursor-pointer hover:border-green-400 hover:shadow-lg transition-all duration-300 meal-option transform hover:-translate-y-1"
                                  data-meal-id="{{ $meal->id }}"
                                  data-meal-name="{{ $meal->name }}"
                                  data-meal-description="{{ $meal->description }}"
                                  data-meal-calories="{{ $meal->nutritionalInfo->calories ?? 'N/A' }}"
-                                 data-meal-cost="₱{{ $meal->cost }}"
+                                 data-meal-cost="₱{{ number_format($displayCost, 2) }}"
                                  aria-label="Select {{ $meal->name }} for your meal plan">
                                 
                                 <!-- Meal Image/Icon -->
                                 <div class="flex items-center justify-center w-16 h-16 bg-gray-100 group-hover:bg-green-100 rounded-full mx-auto mb-4 transition-colors duration-300">
-                                    @if($meal->image_path)
-                                        <img src="{{ $meal->image_path }}" alt="{{ $meal->name }}" class="w-full h-full object-cover rounded-full">
+                                    @if($meal->image_url)
+                                        <img src="{{ $meal->image_url }}" 
+                                             alt="{{ $meal->name }}" 
+                                             class="w-full h-full object-cover rounded-full"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <span class="text-2xl hidden">🍽️</span>
                                     @else
                                         <span class="text-2xl">🍽️</span>
                                     @endif
@@ -313,7 +322,17 @@
                                         <h3 class="font-semibold text-gray-900 group-hover:text-green-700 transition-colors duration-300 text-left flex-1">
                                             {{ $meal->name }}
                                         </h3>
-                                        <span class="text-lg font-bold text-green-600 ml-2">₱{{ $meal->cost }}</span>
+                                        <div class="flex flex-col items-end ml-2">
+                                            <span class="text-lg font-bold text-green-600">₱{{ number_format($displayCost, 2) }}</span>
+                                            @if($hasRealTimePricing)
+                                                <span class="text-xs text-blue-600 flex items-center mt-0.5">
+                                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                                    </svg>
+                                                    Live
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                     
                                     <p class="text-sm text-gray-600 mb-4 text-left line-clamp-2">

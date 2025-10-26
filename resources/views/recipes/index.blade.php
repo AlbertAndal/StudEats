@@ -229,7 +229,44 @@
                     <div class="p-4">
                         <div class="flex items-start justify-between mb-2">
                             <h3 class="font-semibold text-gray-900 text-lg">{{ $meal->name }}</h3>
-                            <span class="text-sm font-medium text-green-600">₱{{ $meal->cost }}</span>
+                            <div class="flex flex-col items-end">
+                                @php
+                                    // Calculate cost consistently with individual recipe page
+                                    $totalEstimatedCost = 0;
+                                    $hasRealTimePricing = $meal->hasRealTimePricing('NCR');
+                                    
+                                    if($meal->recipe && $meal->recipe->ingredientRelations->count() > 0) {
+                                        foreach($meal->recipe->ingredientRelations as $ingredient) {
+                                            $quantity = $ingredient->pivot->quantity;
+                                            $price = $ingredient->getPriceForRegion('NCR');
+                                            $estimatedCost = $ingredient->pivot->estimated_cost;
+                                            $cost = $price ? ($quantity * $price) : $estimatedCost;
+                                            $totalEstimatedCost += $cost;
+                                        }
+                                    } elseif($meal->recipe && $meal->recipe->ingredients) {
+                                        // Use ingredients array (already cast from JSON)
+                                        $ingredients = $meal->recipe->ingredients;
+                                        if(is_array($ingredients)) {
+                                            foreach($ingredients as $ingredient) {
+                                                $amount = floatval($ingredient['amount'] ?? 0);
+                                                $price = floatval($ingredient['price'] ?? 0);
+                                                $totalEstimatedCost += $amount * $price;
+                                            }
+                                        }
+                                    } else {
+                                        $totalEstimatedCost = $meal->getDisplayCost('NCR');
+                                    }
+                                @endphp
+                                <span class="text-sm font-medium text-green-600">₱{{ number_format($totalEstimatedCost, 2) }}</span>
+                                @if($hasRealTimePricing)
+                                    <span class="text-xs text-blue-600 flex items-center mt-0.5">
+                                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                        </svg>
+                                        Live
+                                    </span>
+                                @endif
+                            </div>
                         </div>
                         
                         <p class="text-sm text-gray-600 mb-3">{{ Str::limit($meal->description, 80) }}</p>
@@ -239,7 +276,12 @@
                                 <span>{{ $meal->nutritionalInfo->calories ?? 'N/A' }} cal</span>
                                 <span class="capitalize">{{ $meal->cuisine_type }}</span>
                             </div>
-                            <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full capitalize">
+                            <span class="text-xs px-2 py-1 rounded-full capitalize font-medium border 
+                                @if($meal->difficulty === 'easy') bg-green-100 text-green-800 border-green-200
+                                @elseif($meal->difficulty === 'medium') bg-yellow-100 text-yellow-800 border-yellow-200
+                                @elseif($meal->difficulty === 'hard') bg-red-100 text-red-800 border-red-200
+                                @else bg-gray-100 text-gray-600 border-gray-200
+                                @endif">
                                 {{ $meal->difficulty }}
                             </span>
                         </div>
@@ -249,10 +291,17 @@
                                class="flex-1 text-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100">
                                 View Recipe
                             </a>
-                            <a href="{{ route('meal-plans.create') }}?meal_id={{ $meal->id }}" 
-                               class="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100">
-                                Add to Plan
-                            </a>
+                            @auth
+                                <a href="{{ route('meal-plans.create') }}?meal_id={{ $meal->id }}" 
+                                   class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
+                                    Add to Plan
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}" 
+                                   class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
+                                    Login to Plan
+                                </a>
+                            @endauth
                         </div>
                     </div>
                 </div>

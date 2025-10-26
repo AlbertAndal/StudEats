@@ -48,7 +48,7 @@ class AdminDashboardController extends Controller
 
         // Optimize top meals query
         $topMeals = Cache::remember('admin_top_meals', 300, function () {
-            return Meal::select(['id', 'name', 'cost', 'cuisine_type'])
+            return Meal::select(['id', 'name', 'cost', 'cuisine_type', 'difficulty', 'image_path'])
                 ->withCount('mealPlans')
                 ->having('meal_plans_count', '>', 0)
                 ->orderBy('meal_plans_count', 'desc')

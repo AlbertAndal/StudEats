@@ -1,5 +1,5 @@
 <!-- Admin Header with Integrated Navigation -->
-<div class="bg-white shadow-sm border-b border-gray-200">
+<div class="bg-white shadow-sm border-b border-gray-200" data-version="2.0-analytics-fixed">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- Left: Brand/Logo -->
@@ -7,6 +7,8 @@
                 <div class="flex-shrink-0">
                     <span class="text-lg font-semibold text-gray-900">StudEats</span>
                     <span class="ml-1 text-xs text-gray-500 font-medium">ADMIN</span>
+                    <!-- Version indicator - remove after testing -->
+                    <span class="ml-2 text-[10px] text-green-600 font-bold bg-green-100 px-2 py-0.5 rounded" title="Analytics Fixed Version">v2.0</span>
                 </div>
             </div>
 
@@ -15,8 +17,11 @@
                 <!-- Dashboard -->
                 <a href="{{ route('admin.dashboard') }}"
                    class="group inline-flex items-center px-3 py-2 border-b-2 font-medium transition-colors duration-200 {{ request()->routeIs('admin.dashboard') ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
+                    <svg class="w-4 h-4 mr-2 lucide lucide-layout-dashboard" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="7" height="9" x="3" y="3" rx="1"/>
+                        <rect width="7" height="5" x="14" y="3" rx="1"/>
+                        <rect width="7" height="9" x="14" y="12" rx="1"/>
+                        <rect width="7" height="5" x="3" y="16" rx="1"/>
                     </svg>
                     Dashboard
                 </a>
@@ -24,8 +29,11 @@
                 <!-- Users -->
                 <a href="{{ route('admin.users.index') }}"
                    class="group inline-flex items-center px-3 py-2 border-b-2 font-medium transition-colors duration-200 {{ request()->routeIs('admin.users.*') ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
+                    <svg class="w-4 h-4 mr-2 lucide lucide-users" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="m22 21-2-2a4 4 0 0 0-4-4h-1"/>
+                        <circle cx="16" cy="7" r="3"/>
                     </svg>
                     <span>Users</span>
                     <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-600 group-hover:bg-blue-200">
@@ -36,45 +44,116 @@
                 <!-- Recipes -->
                 <a href="{{ route('admin.recipes.index') }}"
                    class="group inline-flex items-center px-3 py-2 border-b-2 font-medium transition-colors duration-200 {{ request()->routeIs('admin.recipes.*') ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/>
+                    <svg class="w-4 h-4 mr-2 lucide lucide-chef-hat" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
+                        <line x1="6" x2="18" y1="17" y2="17"/>
                     </svg>
                     <span>Recipes</span>
                     <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200">
                         {{ $navRecipeCount ?? \App\Models\Meal::count() }}
                     </span>
                 </a>
-
-                <!-- Content (Coming Soon) -->
-                <span role="button" aria-disabled="true" title="Coming Soon"
-                      class="inline-flex items-center px-3 py-2 border-b-2 font-medium border-dashed border-gray-300 text-gray-400 cursor-not-allowed select-none">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
-                    </svg>
-                    <span>Content</span>
-                    <span class="ml-1 text-[10px] uppercase tracking-wide text-amber-500 opacity-70">Soon</span>
-                </span>
-
-                <!-- Analytics (Coming Soon) -->
-                <span role="button" aria-disabled="true" title="Coming Soon"
-                      class="inline-flex items-center px-3 py-2 border-b-2 font-medium border-dashed border-gray-300 text-gray-400 cursor-not-allowed select-none">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
-                    </svg>
-                    <span>Analytics</span>
-                    <span class="ml-1 text-[10px] uppercase tracking-wide text-amber-500 opacity-70">Soon</span>
-                </span>
             </div>
             
             <!-- Right: User Profile & Actions -->
             <div class="flex items-center gap-3">
                 <!-- Notifications -->
-                <button class="p-2 text-gray-400 hover:text-gray-500 relative rounded-full hover:bg-gray-100 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0718 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
-                    </svg>
-                    <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400"></span>
-                </button>
+                <div class="relative">
+                    <button id="notificationButton" type="button" class="p-2 text-gray-400 hover:text-gray-500 relative rounded-full hover:bg-gray-100 transition-colors" title="Notifications">
+                        <svg class="w-5 h-5 lucide lucide-bell" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                            <path d="m13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        <span id="notificationBadge" class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
+                    </button>
+                    
+                    <!-- Notifications Dropdown -->
+                    <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-semibold text-gray-900">Notifications</h3>
+                                <button id="markAllReadBtn" type="button" class="text-sm text-blue-600 hover:text-blue-700 font-medium px-3 py-1 rounded-md hover:bg-blue-50 transition-colors">Mark all read</button>
+                            </div>
+                        </div>
+                        <div class="max-h-80 overflow-y-auto">
+                            <div id="notificationList">
+                                <!-- Sample notifications -->
+                                <div class="p-5 border-b border-gray-100 hover:bg-gray-50 cursor-pointer notification-item transition-colors" data-read="false">
+                                    <div class="flex items-start space-x-4">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-blue-600 lucide lucide-user-plus" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                                    <circle cx="9" cy="7" r="4"/>
+                                                    <line x1="19" x2="19" y1="8" y2="14"/>
+                                                    <line x1="22" x2="16" y1="11" y2="11"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-semibold text-gray-900 mb-1">New User Registration</p>
+                                            <p class="text-sm text-gray-600 leading-relaxed">John Albert Andal just registered for an account</p>
+                                            <p class="text-xs text-gray-400 mt-2 font-medium">2 minutes ago</p>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-5 border-b border-gray-100 hover:bg-gray-50 cursor-pointer notification-item transition-colors" data-read="false">
+                                    <div class="flex items-start space-x-4">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-orange-600 lucide lucide-alert-triangle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                                    <path d="M12 9v4"/>
+                                                    <path d="m12 17 .01 0"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-semibold text-gray-900 mb-1">System Alert</p>
+                                            <p class="text-sm text-gray-600 leading-relaxed">Email service experiencing delays - some notifications may be delayed</p>
+                                            <p class="text-xs text-gray-400 mt-2 font-medium">5 minutes ago</p>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-5 border-b border-gray-100 hover:bg-gray-50 cursor-pointer notification-item transition-colors opacity-75" data-read="true">
+                                    <div class="flex items-start space-x-4">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-green-600 lucide lucide-chef-hat" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
+                                                    <line x1="6" x2="18" y1="17" y2="17"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-semibold text-gray-700 mb-1">New Recipe Added</p>
+                                            <p class="text-sm text-gray-500 leading-relaxed">Chicken Adobo recipe has been published and is now available</p>
+                                            <p class="text-xs text-gray-400 mt-2 font-medium">1 hour ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 border-t border-gray-200 bg-gray-50">
+                            <a href="#" class="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center justify-center py-2 px-4 rounded-md hover:bg-blue-50 transition-colors">
+                                <svg class="w-4 h-4 mr-2 lucide lucide-external-link" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M15 3h6v6"/>
+                                    <path d="M10 14 21 3"/>
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                </svg>
+                                View all notifications
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- User Profile & Logout -->
                 <div class="flex items-center gap-3">
@@ -93,8 +172,10 @@
                     <button type="submit"
                             class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                             title="Sign out">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+                        <svg class="w-4 h-4 mr-1 lucide lucide-log-out" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16,17 21,12 16,7"/>
+                            <line x1="21" x2="9" y1="12" y2="12"/>
                         </svg>
                         Logout
                     </button>
@@ -105,5 +186,119 @@
 </div>
 
 <script>
-// Header navigation functionality - System dropdown removed
+// Notification System Functionality
+function toggleNotifications() {
+    const dropdown = document.getElementById('notificationDropdown');
+    const button = document.getElementById('notificationButton');
+    
+    if (dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        button.classList.add('bg-gray-100');
+    } else {
+        dropdown.classList.add('hidden');
+        button.classList.remove('bg-gray-100');
+    }
+}
+
+function closeNotifications() {
+    const dropdown = document.getElementById('notificationDropdown');
+    const button = document.getElementById('notificationButton');
+    dropdown.classList.add('hidden');
+    button.classList.remove('bg-gray-100');
+}
+
+function markAllAsRead() {
+    const notifications = document.querySelectorAll('.notification-item[data-read="false"]');
+    const badge = document.getElementById('notificationBadge');
+    
+    notifications.forEach(notification => {
+        notification.setAttribute('data-read', 'true');
+        notification.classList.add('opacity-75');
+        const dot = notification.querySelector('.bg-blue-500, .bg-orange-500, .bg-green-500');
+        if (dot) {
+            dot.classList.add('hidden');
+        }
+    });
+    
+    // Hide the notification badge
+    badge.classList.add('hidden');
+    
+    // You can add AJAX call here to mark notifications as read in database
+    console.log('All notifications marked as read');
+}
+
+function markNotificationRead(element) {
+    element.setAttribute('data-read', 'true');
+    element.classList.add('opacity-75');
+    const dot = element.querySelector('.bg-blue-500, .bg-orange-500, .bg-green-500');
+    if (dot) {
+        dot.classList.add('hidden');
+    }
+    
+    // Check if all notifications are read
+    const unreadNotifications = document.querySelectorAll('.notification-item[data-read="false"]');
+    if (unreadNotifications.length === 0) {
+        document.getElementById('notificationBadge').classList.add('hidden');
+    }
+}
+
+function updateNotificationCount() {
+    const unreadNotifications = document.querySelectorAll('.notification-item[data-read="false"]');
+    const badge = document.getElementById('notificationBadge');
+    
+    if (unreadNotifications.length === 0) {
+        badge.classList.add('hidden');
+    } else {
+        badge.classList.remove('hidden');
+    }
+}
+
+// Initialize all event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Admin Header: Initializing event listeners');
+    
+    // Notification button click handler
+    const notificationBtn = document.getElementById('notificationButton');
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleNotifications();
+        });
+        console.log('Notifications: Button event listener attached');
+    } else {
+        console.error('Notifications: Button not found');
+    }
+    
+    // Mark all read button click handler
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', markAllAsRead);
+        console.log('Notifications: Mark all read button event listener attached');
+    }
+    
+    // Add click handlers to notification items
+    const notificationItems = document.querySelectorAll('.notification-item');
+    notificationItems.forEach(item => {
+        item.addEventListener('click', function() {
+            if (this.getAttribute('data-read') === 'false') {
+                markNotificationRead(this);
+            }
+        });
+    });
+    
+    // Update notification count
+    updateNotificationCount();
+    
+    // Close notifications when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notificationDropdown');
+        const button = document.getElementById('notificationButton');
+        
+        if (dropdown && button && !dropdown.contains(event.target) && !button.contains(event.target)) {
+            closeNotifications();
+        }
+    });
+    
+    console.log('Admin Header: All event listeners initialized');
+});
 </script>

@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use App\Services\EmailService;
+use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,10 +17,12 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     protected EmailService $emailService;
+    protected OtpService $otpService;
 
-    public function __construct(EmailService $emailService)
+    public function __construct(EmailService $emailService, OtpService $otpService)
     {
         $this->emailService = $emailService;
+        $this->otpService = $otpService;
     }
 
     /**
@@ -50,30 +53,37 @@ class AuthController extends Controller
             'height_unit' => $validated['height_unit'] ?? 'cm',
             'weight' => $validated['weight'] ?? null,
             'weight_unit' => $validated['weight_unit'] ?? 'kg',
+            // Remove automatic email verification - will be verified via OTP
+            'email_verified_at' => null,
         ]);
 
-        // Send OTP for email verification
-        try {
-            $otpService = app(\App\Services\OtpService::class);
-            $otpService->generateAndSendOtp($user->email, $request);
+        Log::info('Registration successful', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+        ]);
 
-            Log::info('Registration successful, OTP sent', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-            ]);
+        try {
+            // Generate and send OTP for email verification
+            $this->otpService->generateAndSendVerificationLink($user->email, $request);
+            
+            // Store pending verification email in session
+            $request->session()->put('pending_verification_email', $user->email);
+            
+            // Send welcome email (optional)
+            $this->emailService->sendAccountConfirmation($user);
+            
         } catch (\Exception $e) {
-            Log::error('Failed to send verification OTP during registration', [
+            Log::warning('Failed to send verification email', [
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'error' => $e->getMessage(),
             ]);
+            
+            // Still proceed with registration, user can request resend
         }
 
-        // Store user ID in session for OTP verification
-        session(['pending_verification_user_id' => $user->id]);
-
         return redirect()
-            ->route('email-verification.show')
+            ->route('email.verify.form', ['email' => $user->email])
             ->with('success', 'Account created! Please check your email for the verification code.');
     }
 
@@ -83,6 +93,14 @@ class AuthController extends Controller
     public function showLogin()
     {
         return view('auth.login_new');
+    }
+
+    /**
+     * Show the admin login form.
+     */
+    public function showAdminLogin()
+    {
+        return view('auth.admin-login');
     }
 
     /**
@@ -109,6 +127,73 @@ class AuthController extends Controller
 
         throw ValidationException::withMessages([
             'email' => ['These credentials do not match our records.'],
+        ]);
+    }
+
+    /**
+     * Handle admin login with role verification.
+     */
+    public function adminLogin(LoginRequest $request): RedirectResponse
+    {
+        $request->ensureIsNotRateLimited();
+
+        $credentials = $request->only('email', 'password');
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+
+            // Verify user is an admin
+            if (!$user->isAdmin()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                Log::warning('Non-admin attempted to access admin login', [
+                    'email' => $credentials['email'],
+                    'ip' => $request->ip(),
+                ]);
+
+                return redirect()
+                    ->route('admin.login')
+                    ->with('error', 'Access denied. Admin privileges required.');
+            }
+
+            // Verify account is active
+            if (!$user->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()
+                    ->route('admin.login')
+                    ->with('error', 'Your admin account has been suspended.');
+            }
+
+            $request->session()->regenerate();
+            RateLimiter::clear($request->throttleKey());
+
+            Log::info('Admin login successful', [
+                'admin_id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+                'ip' => $request->ip(),
+            ]);
+
+            return redirect()
+                ->intended(route('admin.dashboard'))
+                ->with('success', 'Welcome to the admin panel, ' . $user->name . '!');
+        }
+
+        RateLimiter::hit($request->throttleKey());
+
+        Log::warning('Failed admin login attempt', [
+            'email' => $credentials['email'],
+            'ip' => $request->ip(),
+        ]);
+
+        throw ValidationException::withMessages([
+            'email' => ['Invalid admin credentials. Please check your email and password.'],
         ]);
     }
 

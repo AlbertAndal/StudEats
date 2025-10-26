@@ -118,6 +118,9 @@
                             </div>
                             
                             @if($mealPlan)
+                                @php
+                                    $displayCost = $mealPlan->meal->getDisplayCost('NCR');
+                                @endphp
                                 <div class="bg-gray-50 rounded-lg p-3">
                                     <div class="flex items-start justify-between">
                                         <div class="flex-1">
@@ -126,7 +129,7 @@
                                                 <span class="text-xs text-gray-500">
                                                     {{ $mealPlan->meal->nutritionalInfo->calories ?? 'N/A' }} cal
                                                 </span>
-                                                <span class="text-xs text-gray-500">₱{{ $mealPlan->meal->cost }}</span>
+                                                <span class="text-xs text-gray-500">₱{{ number_format($displayCost, 2) }}</span>
                                             </div>
                                         </div>
                                         
@@ -209,7 +212,7 @@
                             <div class="text-sm text-gray-500">Meals Completed</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-purple-600">{{ number_format($totalCalories) }}</div>
+                            <div class="text-2xl font-bold text-purple-600">{{ number_format($totalCalories) }} cal</div>
                             <div class="text-sm text-gray-500">Total Calories</div>
                         </div>
                         <div class="text-center">

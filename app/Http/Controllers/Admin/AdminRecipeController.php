@@ -72,22 +72,27 @@ class AdminRecipeController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'calories' => 'required|integer|min:1',
+            'calories' => 'required|integer|min:0',
             'cost' => 'required|numeric|min:0',
             'cuisine_type' => 'required|string|max:100',
             'difficulty' => 'required|in:easy,medium,hard',
             'is_featured' => 'boolean',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             
-            // Recipe fields
-            'ingredients' => 'required|array|min:1',
-            'ingredients.*' => 'required|string',
+            // Recipe fields - new structured format
+            'ingredient_names' => 'required|array|min:1',
+            'ingredient_names.*' => 'required|string|max:100',
+            'ingredient_quantities' => 'required|array|min:1',
+            'ingredient_quantities.*' => 'required|numeric|min:0',
+            'ingredient_units' => 'required|array|min:1',
+            'ingredient_units.*' => 'required|string|max:50',
+            'ingredient_prices' => 'nullable|array',
+            'ingredient_prices.*' => 'nullable|numeric|min:0',
             'instructions' => 'required|string',
             'prep_time' => 'required|integer|min:1',
             'cook_time' => 'required|integer|min:1',
             'servings' => 'required|integer|min:1',
-            'local_alternatives' => 'nullable|array',
-            'local_alternatives.*' => 'string',
+
             
             // Nutritional info fields
             'protein' => 'required|numeric|min:0',
@@ -98,7 +103,23 @@ class AdminRecipeController extends Controller
             'sodium' => 'nullable|numeric|min:0',
         ]);
 
-        DB::transaction(function () use ($validated, $request) {
+        // Transform structured ingredient data into array format
+        $ingredients = [];
+        $names = $validated['ingredient_names'];
+        $quantities = $validated['ingredient_quantities'];
+        $units = $validated['ingredient_units'];
+        $prices = $validated['ingredient_prices'] ?? [];
+
+        for ($i = 0; $i < count($names); $i++) {
+            $ingredients[] = [
+                'name' => $names[$i],
+                'amount' => $quantities[$i],
+                'unit' => $units[$i],
+                'price' => $prices[$i] ?? null,
+            ];
+        }
+
+        DB::transaction(function () use ($validated, $request, $ingredients) {
             // Handle image upload with enhanced validation
             $imagePath = null;
             if ($request->hasFile('image')) {
@@ -134,18 +155,30 @@ class AdminRecipeController extends Controller
             // Create recipe
             Recipe::create([
                 'meal_id' => $meal->id,
-                'ingredients' => $validated['ingredients'],
+                'ingredients' => $ingredients,
                 'instructions' => $validated['instructions'],
                 'prep_time' => $validated['prep_time'],
                 'cook_time' => $validated['cook_time'],
                 'servings' => $validated['servings'],
-                'local_alternatives' => $validated['local_alternatives'] ?? [],
+
             ]);
 
+            // Auto-calculate calories from macronutrients
+            $proteinCals = $validated['protein'] * 4;
+            $carbCals = $validated['carbs'] * 4;
+            $fatCals = $validated['fats'] * 9;
+            $calculatedCalories = round($proteinCals + $carbCals + $fatCals, 0);
+            
+            // Use calculated calories if available, otherwise use manual input
+            $finalCalories = $calculatedCalories > 0 ? $calculatedCalories : $validated['calories'];
+            
+            // Update meal with calculated calories
+            $meal->update(['calories' => $finalCalories]);
+            
             // Create nutritional info
             NutritionalInfo::create([
                 'meal_id' => $meal->id,
-                'calories' => $validated['calories'],
+                'calories' => $finalCalories,
                 'protein' => $validated['protein'],
                 'carbs' => $validated['carbs'],
                 'fats' => $validated['fats'],
@@ -183,23 +216,33 @@ class AdminRecipeController extends Controller
 
     public function update(Request $request, Meal $recipe)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'calories' => 'required|integer|min:1',
-            'cost' => 'required|numeric|min:0',
-            'cuisine_type' => 'required|string|max:100',
-            'difficulty' => 'required|in:easy,medium,hard',
-            'is_featured' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        try {
+            Log::info('Recipe update started', ['recipe_id' => $recipe->id, 'request_data' => $request->except('image')]);
             
-            // Recipe fields
-            'ingredients' => 'nullable|string',
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'calories' => 'nullable|integer|min:0', // Made nullable - will calculate if missing
+                'cost' => 'nullable|numeric|min:0',      // Made nullable - will calculate if missing
+                'cuisine_type' => 'required|string|max:100',
+                'difficulty' => 'required|in:easy,medium,hard',
+                'is_featured' => 'boolean',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            
+            // Recipe fields - new structured format
+            'ingredient_names' => 'nullable|array',
+            'ingredient_names.*' => 'required|string|max:100',
+            'ingredient_quantities' => 'nullable|array',
+            'ingredient_quantities.*' => 'required|numeric|min:0',
+            'ingredient_units' => 'nullable|array',
+            'ingredient_units.*' => 'required|string|max:50',
+            'ingredient_prices' => 'nullable|array',
+            'ingredient_prices.*' => 'nullable|numeric|min:0',
             'instructions' => 'nullable|string',
             'prep_time' => 'nullable|integer|min:0',
             'cook_time' => 'nullable|integer|min:0',
-            'servings' => 'nullable|integer|min:1',
-            'local_alternatives' => 'nullable|string',
+
+
             
             // Nutritional info fields
             'protein' => 'nullable|numeric|min:0',
@@ -210,18 +253,25 @@ class AdminRecipeController extends Controller
             'sodium' => 'nullable|numeric|min:0',
         ]);
 
-        // Process ingredients and local alternatives from textarea to array
+        // Transform structured ingredient data into array format
         $ingredients = [];
-        if (!empty($validated['ingredients'])) {
-            $ingredients = array_filter(array_map('trim', explode("\n", $validated['ingredients'])));
+        if (!empty($validated['ingredient_names'])) {
+            $names = $validated['ingredient_names'];
+            $quantities = $validated['ingredient_quantities'] ?? [];
+            $units = $validated['ingredient_units'] ?? [];
+            $prices = $validated['ingredient_prices'] ?? [];
+
+            for ($i = 0; $i < count($names); $i++) {
+                $ingredients[] = [
+                    'name' => $names[$i],
+                    'amount' => $quantities[$i] ?? 0,
+                    'unit' => $units[$i] ?? '',
+                    'price' => $prices[$i] ?? null,
+                ];
+            }
         }
 
-        $localAlternatives = [];
-        if (!empty($validated['local_alternatives'])) {
-            $localAlternatives = array_filter(array_map('trim', explode("\n", $validated['local_alternatives'])));
-        }
-
-        DB::transaction(function () use ($validated, $request, $recipe, $ingredients, $localAlternatives) {
+        DB::transaction(function () use ($validated, $request, $recipe, $ingredients) {
             // Handle image upload with enhanced validation
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
@@ -247,6 +297,27 @@ class AdminRecipeController extends Controller
                 }
             }
 
+            // Calculate calories from macronutrients if not provided
+            if (!isset($validated['calories']) || empty($validated['calories'])) {
+                $protein = $validated['protein'] ?? 0;
+                $carbs = $validated['carbs'] ?? 0;
+                $fats = $validated['fats'] ?? 0;
+                $validated['calories'] = round(($protein * 4) + ($carbs * 4) + ($fats * 9), 0);
+                Log::info('Auto-calculated calories', ['calories' => $validated['calories']]);
+            }
+            
+            // Calculate cost from ingredients if not provided
+            if (!isset($validated['cost']) || empty($validated['cost'])) {
+                $totalCost = 0;
+                if (!empty($ingredients)) {
+                    foreach ($ingredients as $ingredient) {
+                        $totalCost += ($ingredient['price'] ?? 0);
+                    }
+                }
+                $validated['cost'] = $totalCost;
+                Log::info('Auto-calculated cost', ['cost' => $validated['cost']]);
+            }
+
             // Update meal
             $recipe->update([
                 'name' => $validated['name'],
@@ -260,16 +331,16 @@ class AdminRecipeController extends Controller
             ]);
 
             // Update or create recipe details if any recipe data is provided
-            if (!empty($validated['ingredients']) || !empty($validated['instructions']) || 
-                isset($validated['prep_time']) || isset($validated['cook_time']) || isset($validated['servings'])) {
+            if (!empty($ingredients) || !empty($validated['instructions']) || 
+                isset($validated['prep_time']) || isset($validated['cook_time'])) {
                 
                 $recipeData = [
-                    'ingredients' => $ingredients,
+                    'ingredients' => !empty($ingredients) ? $ingredients : ($recipe->recipe->ingredients ?? []),
                     'instructions' => $validated['instructions'] ?? '',
                     'prep_time' => $validated['prep_time'] ?? 0,
                     'cook_time' => $validated['cook_time'] ?? 0,
-                    'servings' => $validated['servings'] ?? 1,
-                    'local_alternatives' => $localAlternatives,
+                    'servings' => 1, // Default to 1 for personal meal system
+
                 ];
 
                 if ($recipe->recipe) {
@@ -284,7 +355,6 @@ class AdminRecipeController extends Controller
                 isset($validated['fiber']) || isset($validated['sugar']) || isset($validated['sodium'])) {
                 
                 $nutritionalData = [
-                    'calories' => $validated['calories'],
                     'protein' => $validated['protein'] ?? 0,
                     'carbs' => $validated['carbs'] ?? 0,
                     'fats' => $validated['fats'] ?? 0,
@@ -292,6 +362,21 @@ class AdminRecipeController extends Controller
                     'sugar' => $validated['sugar'] ?? 0,
                     'sodium' => $validated['sodium'] ?? 0,
                 ];
+
+                // Auto-calculate calories if macronutrients are provided
+                $proteinCals = ($nutritionalData['protein'] ?? 0) * 4;
+                $carbCals = ($nutritionalData['carbs'] ?? 0) * 4;
+                $fatCals = ($nutritionalData['fats'] ?? 0) * 9;
+                $calculatedCalories = round($proteinCals + $carbCals + $fatCals, 0);
+                
+                // Use calculated calories if macronutrients provided, otherwise use manual input
+                if ($calculatedCalories > 0) {
+                    $nutritionalData['calories'] = $calculatedCalories;
+                    // Also update the meal's calories field
+                    $recipe->update(['calories' => $calculatedCalories]);
+                } else {
+                    $nutritionalData['calories'] = $validated['calories'] ?? 0;
+                }
 
                 if ($recipe->nutritionalInfo) {
                     $recipe->nutritionalInfo()->update($nutritionalData);
@@ -308,7 +393,40 @@ class AdminRecipeController extends Controller
             );
         });
 
+        Log::info('Recipe update completed successfully', ['recipe_id' => $recipe->id]);
+
+        // Return JSON for AJAX requests
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Recipe updated successfully!',
+                'recipe' => [
+                    'id' => $recipe->id,
+                    'name' => $recipe->name,
+                ]
+            ]);
+        }
+
         return redirect()->route('admin.recipes.index')->with('success', 'Recipe updated successfully!');
+        
+        } catch (\Exception $e) {
+            Log::error('Recipe update failed', [
+                'recipe_id' => $recipe->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to save recipe: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->route('admin.recipes.edit', $recipe)
+                ->withErrors(['error' => 'Failed to save recipe: ' . $e->getMessage()])
+                ->withInput();
+        }
     }
 
     public function destroy(Meal $recipe)

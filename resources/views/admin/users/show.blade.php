@@ -11,8 +11,9 @@
                 <div class="flex items-center gap-4">
                     <a href="{{ route('admin.users.index') }}" 
                        class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                        <svg class="w-6 h-6 lucide lucide-arrow-left" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m12 19-7-7 7-7"/>
+                            <path d="M19 12H5"/>
                         </svg>
                     </a>
                     <div>
@@ -25,8 +26,11 @@
                         @if($user->is_active)
                             <button onclick="showSuspendModal()" 
                                     class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636"/>
+                                <svg class="w-4 h-4 lucide lucide-user-x" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <line x1="17" x2="22" y1="8" y2="13"/>
+                                    <line x1="22" x2="17" y1="8" y2="13"/>
                                 </svg>
                                 Suspend User
                             </button>
@@ -36,8 +40,10 @@
                                 @method('PATCH')
                                 <button type="submit" onclick="return confirm('Are you sure you want to activate this user?')"
                                         class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    <svg class="w-4 h-4 lucide lucide-user-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <polyline points="16,11 18,13 22,9"/>
                                     </svg>
                                     Activate User
                                 </button>
@@ -94,10 +100,10 @@
                                 <span class="text-gray-500">Last Updated</span>
                                 <span class="text-gray-900">{{ $user->updated_at->diffForHumans() }}</span>
                             </div>
-                            @if($user->dietary_preferences)
+                            @if($user->dietary_preferences && count($user->dietary_preferences) > 0)
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-500">Dietary Preferences</span>
-                                    <span class="text-gray-900">{{ $user->dietary_preferences }}</span>
+                                    <span class="text-gray-900">{{ is_array($user->dietary_preferences) ? implode(', ', array_map('ucfirst', $user->dietary_preferences)) : $user->dietary_preferences }}</span>
                                 </div>
                             @endif
                             @if($user->budget_range)
@@ -190,7 +196,7 @@
                                         </div>
                                         <div>
                                             <h5 class="font-medium text-gray-900">{{ $mealPlan->meal->name }}</h5>
-                                            <p class="text-sm text-gray-600">{{ $mealPlan->planned_date->format('M d, Y') }}</p>
+                                            <p class="text-sm text-gray-600">{{ $mealPlan->planned_date ? $mealPlan->planned_date->format('M d, Y') : 'No date set' }}</p>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">

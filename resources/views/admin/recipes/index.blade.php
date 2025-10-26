@@ -13,8 +13,9 @@
             </div>
             <a href="{{ route('admin.recipes.create') }}" 
                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                <svg class="w-5 h-5 mr-2 lucide lucide-plus" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"/>
+                    <path d="M12 5v14"/>
                 </svg>
                 Add New Recipe
             </a>
@@ -25,8 +26,9 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-lg">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
+                        <svg class="w-6 h-6 text-blue-600 lucide lucide-book-open" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                         </svg>
                     </div>
                     <div class="ml-4">
@@ -193,11 +195,6 @@
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">{{ $recipe->name }}</div>
                                             <div class="text-sm text-gray-500">{{ Str::limit($recipe->description, 50) }}</div>
-                                            @if(config('app.debug') && $recipe->image_path)
-                                                <div class="text-xs text-gray-400 mt-1">
-                                                    Debug: {{ $recipe->image_url }}
-                                                </div>
-                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -325,28 +322,48 @@
     </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
-    <div class="bg-white rounded-xl max-w-md w-full p-6">
-        <div class="flex items-center mb-4">
-            <div class="p-3 bg-red-100 rounded-full mr-4">
-                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                </svg>
+<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 p-4 transition-opacity duration-300" style="display: none;">
+    <div class="flex items-center justify-center min-h-full">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all duration-300 scale-95 modal-content">
+        <!-- Modal Header with Icon -->
+        <div class="p-6 pb-4">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Recipe</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Are you sure you want to delete <span class="font-semibold text-gray-900">'<span id="deleteRecipeName"></span>'</span>?
+                    </p>
+                    <p class="text-sm text-red-600 font-medium mt-2">
+                        ⚠️ This action cannot be undone.
+                    </p>
+                </div>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900">Delete Recipe</h3>
         </div>
-        <p class="text-gray-600 mb-6">Are you sure you want to delete "<span id="deleteRecipeName" class="font-medium"></span>"? This action cannot be undone.</p>
-        <div class="flex gap-3">
+        
+        <!-- Modal Actions -->
+        <div class="bg-gray-50 px-6 py-4 rounded-b-2xl flex gap-3">
             <button onclick="closeDeleteModal()" 
-                    class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                    class="flex-1 px-5 py-2.5 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
                 Cancel
             </button>
             <form id="deleteForm" method="POST" class="flex-1">
                 @csrf
                 @method('DELETE')
                 <button type="submit" 
-                        class="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors">
-                    Delete Recipe
+                        class="w-full px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-lg hover:shadow-xl">
+                    <span class="flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                        </svg>
+                        Delete Recipe
+                    </span>
                 </button>
             </form>
         </div>
@@ -384,17 +401,56 @@ function toggleFeatured(recipeId) {
 function deleteRecipe(recipeId, recipeName) {
     document.getElementById('deleteRecipeName').textContent = recipeName;
     document.getElementById('deleteForm').action = `/admin/recipes/${recipeId}`;
-    document.getElementById('deleteModal').classList.remove('hidden');
+    
+    const modal = document.getElementById('deleteModal');
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
+    
+    // Trigger animation
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        const content = modal.querySelector('.modal-content');
+        if (content) {
+            content.style.transform = 'scale(1)';
+        }
+    }, 10);
+    
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
 }
 
 function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
+    const modal = document.getElementById('deleteModal');
+    modal.style.opacity = '0';
+    
+    const content = modal.querySelector('.modal-content');
+    if (content) {
+        content.style.transform = 'scale(0.95)';
+    }
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }, 300);
 }
 
 // Close modal when clicking outside
 document.getElementById('deleteModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeDeleteModal();
+    }
+});
+
+// Close modal with ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('deleteModal');
+        if (!modal.classList.contains('hidden')) {
+            closeDeleteModal();
+        }
     }
 });
 

@@ -189,34 +189,48 @@
 
                 <div class="space-y-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Ingredients</label>
-                        <div id="ingredients-container">
-                            <div class="ingredient-item flex gap-2 mb-2">
-                    <input type="text" 
-                        name="ingredients[]" 
-                        placeholder="e.g., 2 cups rice" maxlength="120"
-                        required aria-required="true"
-                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <button type="button" 
-                                        onclick="removeIngredient(this)"
-                                        class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
+                        <!-- Ingredients Section -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div class="px-6 py-4 border-b border-gray-200">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-1">Recipe Ingredients</h3>
+                                <p class="text-sm text-gray-600">Add ingredients with quantities and estimated costs</p>
+                            </div>
+                            
+                            <div class="p-6 space-y-4">
+                                <!-- Ingredients Grid Container -->
+                                <div class="space-y-3">
+                                    <div id="ingredients-container" class="min-h-[80px]">
+                                        <!-- Ingredients will be added here dynamically -->
+                                        <div class="text-center py-6 text-gray-400">
+                                            <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6h.008v.008H15.75V12zm0 3h.008v.008H15.75V15zm0 3h.008v.008H15.75V18zm-12-3h3.75m0 0h3.75m0 0v3.75M5.25 15V9.75M5.25 15a2.25 2.25 0 01-2.25-2.25V9.75A2.25 2.25 0 015.25 7.5h3.75"/>
+                                            </svg>
+                                            <p class="text-sm font-medium text-gray-500">No ingredients added yet</p>
+                                            <p class="text-xs text-gray-400 mt-1">Click "Add Ingredient" to get started</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Add Ingredient Button -->
+                                <div class="pt-4">
+                                    <button type="button" 
+                                            onclick="addIngredient()"
+                                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                        </svg>
+                                        Add Ingredient
+                                    </button>
+                                </div>
+                            </div>
                             </div>
                         </div>
-                        <button type="button" 
-                                onclick="addIngredient()"
-                                class="mt-2 inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                            </svg>
-                            Add Ingredient
-                        </button>
                         @error('ingredients')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+                        <p class="mt-2 text-xs text-gray-500">
+                            💡 Tip: Estimated cost is optional but helps with budget planning. Live prices from Bantay Presyo will override these when available.
+                        </p>
                     </div>
 
                     <div>
@@ -361,36 +375,88 @@
 </div>
 
 <script>
-function createIngredientRow(value = '') {
+function createIngredientRow(name = '', quantity = '', unit = '', price = '') {
     const wrapper = document.createElement('div');
-    wrapper.className = 'ingredient-item flex gap-2 mb-2';
+    wrapper.className = 'ingredient-item grid grid-cols-12 gap-3';
 
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'ingredients[]';
-    input.required = true;
-    input.maxLength = 120;
-    input.placeholder = 'e.g., 2 cups rice';
-    input.className = 'flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent';
-    if (value) {
-        input.value = value;
-    }
+    // Create wrapper divs for each input to match the edit form structure
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'col-span-5';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.name = 'ingredient_names[]';
+    nameInput.required = true;
+    nameInput.maxLength = 100;
+    nameInput.placeholder = 'e.g., Chicken breast, Rice, Garlic';
+    nameInput.className = 'w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white';
+    nameInput.value = name;
+    nameDiv.appendChild(nameInput);
 
+    // Quantity input
+    const quantityDiv = document.createElement('div');
+    quantityDiv.className = 'col-span-2';
+    const quantityInput = document.createElement('input');
+    quantityInput.type = 'number';
+    quantityInput.name = 'ingredient_quantities[]';
+    quantityInput.required = true;
+    quantityInput.step = '0.01';
+    quantityInput.min = '0';
+    quantityInput.placeholder = '2';
+    quantityInput.className = 'w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white';
+    quantityInput.value = quantity;
+    quantityDiv.appendChild(quantityInput);
+
+    // Unit input
+    const unitDiv = document.createElement('div');
+    unitDiv.className = 'col-span-2';
+    const unitInput = document.createElement('input');
+    unitInput.type = 'text';
+    unitInput.name = 'ingredient_units[]';
+    unitInput.required = true;
+    unitInput.maxLength = 50;
+    unitInput.placeholder = 'kg, cups, tbsp';
+    unitInput.list = 'units-list';
+    unitInput.className = 'w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white';
+    unitInput.value = unit;
+    unitDiv.appendChild(unitInput);
+
+    // Price input
+    const priceDiv = document.createElement('div');
+    priceDiv.className = 'col-span-2';
+    const priceInput = document.createElement('input');
+    priceInput.type = 'number';
+    priceInput.name = 'ingredient_prices[]';
+    priceInput.step = '0.01';
+    priceInput.min = '0';
+    priceInput.placeholder = '0.00';
+    priceInput.className = 'w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white';
+    priceInput.value = price;
+    priceInput.title = 'Optional: Estimated cost for this ingredient';
+    priceDiv.appendChild(priceInput);
+
+    // Remove button
+    const btnWrapper = document.createElement('div');
+    btnWrapper.className = 'col-span-1 flex items-center justify-center';
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors';
+    btn.className = 'w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold';
     btn.setAttribute('aria-label', 'Remove ingredient');
     btn.addEventListener('click', function() { removeIngredient(btn); });
-    btn.innerHTML = '<svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>';
+    btn.innerHTML = '×';
+    btnWrapper.appendChild(btn);
 
-    wrapper.appendChild(input);
-    wrapper.appendChild(btn);
+    wrapper.appendChild(nameDiv);
+    wrapper.appendChild(quantityDiv);
+    wrapper.appendChild(unitDiv);
+    wrapper.appendChild(priceDiv);
+    wrapper.appendChild(btnWrapper);
+    
     return wrapper;
 }
 
-function addIngredient(value = '') {
+function addIngredient(name = '', quantity = '', unit = '', price = '') {
     const container = document.getElementById('ingredients-container');
-    const row = createIngredientRow(value);
+    const row = createIngredientRow(name, quantity, unit, price);
     container.appendChild(row);
     row.querySelector('input').focus();
     toggleRemoveButtons();
@@ -399,7 +465,7 @@ function addIngredient(value = '') {
 function removeIngredient(button) {
     const container = document.getElementById('ingredients-container');
     if (container.children.length > 1) {
-        button.parentElement.remove();
+        button.closest('.ingredient-item').remove();
     }
     toggleRemoveButtons();
 }
@@ -415,12 +481,34 @@ function toggleRemoveButtons() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const oldIngredients = <?php echo json_encode(old('ingredients', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
+    // Add datalist for common units
+    const datalist = document.createElement('datalist');
+    datalist.id = 'units-list';
+    const units = ['kg', 'g', 'lb', 'oz', 'L', 'mL', 'cup', 'cups', 'tbsp', 'tsp', 'pcs', 'pieces', 'can', 'pack', 'bunch', 'cloves', 'head'];
+    units.forEach(unit => {
+        const option = document.createElement('option');
+        option.value = unit;
+        datalist.appendChild(option);
+    });
+    document.body.appendChild(datalist);
+
+    // Handle old input
+    const oldNames = <?php echo json_encode(old('ingredient_names', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
+    const oldQuantities = <?php echo json_encode(old('ingredient_quantities', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
+    const oldUnits = <?php echo json_encode(old('ingredient_units', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
+    const oldPrices = <?php echo json_encode(old('ingredient_prices', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
+    
     const container = document.getElementById('ingredients-container');
     container.innerHTML = '';
-    if (oldIngredients && oldIngredients.length) {
-        oldIngredients.forEach(val => addIngredient(val));
+    
+    if (oldNames && oldNames.length) {
+        for (let i = 0; i < oldNames.length; i++) {
+            addIngredient(oldNames[i] || '', oldQuantities[i] || '', oldUnits[i] || '', oldPrices[i] || '');
+        }
     } else {
+        // Add 3 empty ingredient rows by default
+        addIngredient();
+        addIngredient();
         addIngredient();
     }
 
@@ -432,6 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                submitBtn.innerHTML = '<svg class="animate-spin w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Creating...';
             }
         });
     }

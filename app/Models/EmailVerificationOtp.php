@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,8 +13,10 @@ class EmailVerificationOtp extends Model
     protected $fillable = [
         'email',
         'otp_code',
+        'verification_token',
         'expires_at',
         'is_used',
+        'used_at',
         'ip_address',
         'user_agent',
     ];
@@ -22,6 +25,7 @@ class EmailVerificationOtp extends Model
     {
         return [
             'expires_at' => 'datetime',
+            'used_at' => 'datetime',
             'is_used' => 'boolean',
         ];
     }
@@ -39,40 +43,34 @@ class EmailVerificationOtp extends Model
      */
     public function isValid(): bool
     {
-        return ! $this->is_used && ! $this->isExpired();
+        return !$this->is_used && !$this->isExpired();
     }
 
     /**
-     * Mark the OTP as used.
+     * Scope for finding valid OTPs.
      */
-    public function markAsUsed(): void
-    {
-        $this->update(['is_used' => true]);
-    }
-
-    /**
-     * Scope to get valid OTPs only.
-     */
-    public function scopeValid($query): mixed
+    public function scopeValid($query)
     {
         return $query->where('is_used', false)
-            ->where('expires_at', '>', now());
+                    ->where('expires_at', '>', now());
     }
 
     /**
-     * Scope to get expired OTPs.
+     * Scope for finding OTPs by email.
      */
-    public function scopeExpired($query): mixed
-    {
-        return $query->where('expires_at', '<=', now());
-    }
-
-    /**
-     * Scope to get OTPs for a specific email.
-     */
-    public function scopeForEmail($query, string $email): mixed
+    public function scopeForEmail($query, string $email)
     {
         return $query->where('email', $email);
+    }
+
+    /**
+     * Find an OTP by email and verification token.
+     */
+    public static function findByVerificationToken(string $email, string $token): ?self
+    {
+        return static::where('email', $email)
+                    ->where('verification_token', $token)
+                    ->first();
     }
 
     /**
@@ -80,6 +78,26 @@ class EmailVerificationOtp extends Model
      */
     public static function cleanupExpired(): int
     {
-        return static::expired()->delete();
+        return static::where('expires_at', '<', now())->delete();
+    }
+
+    /**
+     * Get remaining time before expiry in seconds.
+     */
+    public function remainingSeconds(): int
+    {
+        if ($this->isExpired()) {
+            return 0;
+        }
+        
+        return $this->expires_at->diffInSeconds(now());
+    }
+
+    /**
+     * Get remaining time before expiry in minutes (rounded up).
+     */
+    public function remainingMinutes(): int
+    {
+        return (int) ceil($this->remainingSeconds() / 60);
     }
 }

@@ -8,211 +8,252 @@ use App\Notifications\EmailVerificationOtpNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 
 class OtpService
 {
-    /**
-     * OTP expiration time in seconds (5 minutes).
-     */
     const OTP_EXPIRATION_SECONDS = 300;
-
-    /**
-     * Maximum OTP attempts per email per hour.
-     */
     const MAX_ATTEMPTS_PER_HOUR = 5;
+    const RATE_LIMIT_PREFIX = 'email_verification';
 
-    /**
-     * Rate limit key prefix.
-     */
-    const RATE_LIMIT_PREFIX = 'otp_verification';
-
-    /**
-     * Generate a new OTP for email verification.
-     */
     public function generateOtp(string $email, ?Request $request = null): EmailVerificationOtp
     {
-        // Clean up expired OTPs first
         $this->cleanupExpiredOtps();
-
-        // Invalidate any existing valid OTPs for this email
         $this->invalidateExistingOtps($email);
 
-        // Generate 6-digit OTP
         $otpCode = $this->generateSecureOtpCode();
+        $verificationToken = $this->generateVerificationToken();
 
-        // Create OTP record
         $otp = EmailVerificationOtp::create([
             'email' => $email,
             'otp_code' => $otpCode,
+            'verification_token' => $verificationToken,
             'expires_at' => Carbon::now()->addSeconds(self::OTP_EXPIRATION_SECONDS),
             'ip_address' => $request?->ip(),
             'user_agent' => $request?->userAgent(),
         ]);
 
-        Log::info('OTP generated', [
+        Log::info('Verification code generated', [
             'email' => $email,
-            'ip' => $request?->ip(),
             'expires_at' => $otp->expires_at,
         ]);
 
         return $otp;
     }
 
-    /**
-     * Verify an OTP code for a given email.
-     */
-    public function verifyOtp(string $email, string $otpCode): bool
+    public function verifyToken(string $email, string $token): array
     {
-        $otp = EmailVerificationOtp::forEmail($email)
-            ->where('otp_code', $otpCode)
-            ->valid()
-            ->latest()
-            ->first();
+        $tokenVariations = [
+            $token,
+            urldecode($token),
+            trim($token),
+            str_replace(' ', '+', $token),
+        ];
 
-        if (! $otp) {
-            Log::warning('OTP verification failed - invalid or expired', [
-                'email' => $email,
-                'provided_code' => $otpCode,
+        $otp = null;
+        foreach ($tokenVariations as $variation) {
+            $otp = EmailVerificationOtp::findByVerificationToken($email, $variation);
+            if ($otp) break;
+        }
+
+        if (!$otp) {
+            return ['success' => false, 'message' => 'Invalid verification link.'];
+        }
+
+        if ($otp->is_used) {
+            $user = User::where('email', $email)->first();
+            if ($user && !is_null($user->email_verified_at)) {
+                return [
+                    'success' => true,
+                    'message' => 'Your email is already verified.',
+                    'already_verified' => true,
+                ];
+            }
+            return ['success' => false, 'message' => 'This verification link has already been used.'];
+        }
+
+        if ($otp->isExpired()) {
+            return ['success' => false, 'message' => 'Your verification link has expired.'];
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($otp, $email) {
+            $otp->update(['is_used' => true, 'used_at' => now()]);
+            
+            $user = User::where('email', $email)->first();
+            if ($user && is_null($user->email_verified_at)) {
+                $user->update(['email_verified_at' => now()]);
+            }
+        });
+
+        return ['success' => true, 'message' => 'Email verified successfully.'];
+    }
+
+    public function sendVerificationEmail(string $email, string $otpCode, string $verificationToken): void
+    {
+        try {
+            // Send email immediately using Mail facade (synchronous)
+            $verificationUrl = route('email.verify.token', [
+                'token' => $verificationToken,
+                'email' => $email
             ]);
 
-            return false;
+            Mail::send([], [], function ($message) use ($email, $otpCode, $verificationUrl) {
+                $message->to($email)
+                    ->subject('StudEats - Your Verification Code: ' . $otpCode)
+                    ->html($this->generateEmailHtml($otpCode, $verificationUrl, $email));
+            });
+
+            Log::info('Verification email sent immediately', [
+                'email' => $email,
+                'otp_code' => $otpCode,
+                'method' => 'synchronous',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send verification email', [
+                'email' => $email,
+                'error' => $e->getMessage(),
+            ]);
+            
+            // Log the OTP code as fallback for development
+            Log::info('OTP Code (email failed)', [
+                'email' => $email,
+                'otp_code' => $otpCode,
+                'verification_token' => substr($verificationToken, 0, 10) . '...'
+            ]);
+            
+            throw $e;
         }
-
-        // Mark OTP as used
-        $otp->markAsUsed();
-
-        Log::info('OTP verified successfully', [
-            'email' => $email,
-            'otp_id' => $otp->id,
-        ]);
-
-        return true;
     }
 
     /**
-     * Send OTP via email notification.
+     * Generate HTML email content for OTP verification.
      */
-    public function sendOtpEmail(string $email, string $otpCode): void
+    private function generateEmailHtml(string $otpCode, string $verificationUrl, string $email): string
     {
-        // Try to find existing user or create a temporary notification recipient
-        $user = User::where('email', $email)->first();
-
-        if ($user) {
-            $user->notify(new EmailVerificationOtpNotification($otpCode));
-        } else {
-            // For non-existing users during registration
-            \Illuminate\Support\Facades\Notification::route('mail', $email)
-                ->notify(new EmailVerificationOtpNotification($otpCode));
-        }
-
-        Log::info('OTP email sent', ['email' => $email]);
+        return "
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset='utf-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1'>
+            <title>StudEats Email Verification</title>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+                .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+                .otp-code { background: #059669; color: white; font-size: 32px; font-weight: bold; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0; letter-spacing: 5px; }
+                .button { display: inline-block; background: #059669; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+                .footer { text-align: center; margin-top: 30px; font-size: 14px; color: #666; }
+                .warning { background: #fef3c7; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+            </style>
+        </head>
+        <body>
+            <div class='header'>
+                <h1>🍽️ StudEats</h1>
+                <h2>Email Verification</h2>
+            </div>
+            <div class='content'>
+                <p>Hello!</p>
+                <p>Thank you for registering with <strong>StudEats</strong>. To complete your registration and start planning your meals, please verify your email address.</p>
+                
+                <h3>Your Verification Code:</h3>
+                <div class='otp-code'>{$otpCode}</div>
+                
+                <p>Enter this 6-digit code on the verification page, or click the button below to verify automatically:</p>
+                
+                <p style='text-align: center;'>
+                    <a href='{$verificationUrl}' class='button'>Verify Email Address</a>
+                </p>
+                
+                <div class='warning'>
+                    <strong>⚠️ Important:</strong>
+                    <ul>
+                        <li>This code expires in <strong>5 minutes</strong></li>
+                        <li>Do not share this code with anyone</li>
+                        <li>If you didn't create this account, please ignore this email</li>
+                    </ul>
+                </div>
+                
+                <p>Having trouble? Contact our support team or check your spam folder.</p>
+                
+                <p>Happy meal planning!<br>
+                <strong>The StudEats Team</strong></p>
+            </div>
+            <div class='footer'>
+                <p>This email was sent to {$email}</p>
+                <p>© 2025 StudEats. All rights reserved.</p>
+            </div>
+        </body>
+        </html>
+        ";
     }
 
-    /**
-     * Check if email is rate limited for OTP requests.
-     */
     public function isRateLimited(string $email): bool
     {
         $key = $this->getRateLimitKey($email);
-
         return RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS_PER_HOUR);
     }
 
-    /**
-     * Increment rate limit attempts for email.
-     */
     public function incrementRateLimit(string $email): void
     {
         $key = $this->getRateLimitKey($email);
-        RateLimiter::hit($key, 3600); // 1 hour
+        RateLimiter::hit($key, 3600);
     }
 
-    /**
-     * Get remaining rate limit attempts.
-     */
     public function getRemainingAttempts(string $email): int
     {
         $key = $this->getRateLimitKey($email);
-
         return RateLimiter::remaining($key, self::MAX_ATTEMPTS_PER_HOUR);
     }
 
-    /**
-     * Get seconds until rate limit resets.
-     */
     public function getRateLimitResetTime(string $email): int
     {
         $key = $this->getRateLimitKey($email);
-
         return RateLimiter::availableIn($key);
     }
 
-    /**
-     * Clean up expired OTPs from database.
-     */
     public function cleanupExpiredOtps(): int
     {
         $deletedCount = EmailVerificationOtp::cleanupExpired();
-
         if ($deletedCount > 0) {
-            Log::info('Cleaned up expired OTPs', ['count' => $deletedCount]);
+            Log::info('Cleaned up expired verification codes', ['count' => $deletedCount]);
         }
-
         return $deletedCount;
     }
 
-    /**
-     * Invalidate existing valid OTPs for an email.
-     */
     private function invalidateExistingOtps(string $email): void
     {
-        EmailVerificationOtp::forEmail($email)
-            ->valid()
-            ->update(['is_used' => true]);
+        EmailVerificationOtp::forEmail($email)->valid()->update(['is_used' => true]);
     }
 
-    /**
-     * Generate a secure 6-digit OTP code.
-     */
     private function generateSecureOtpCode(): string
     {
-        // Use cryptographically secure random number generation
-        $min = 100000; // 6-digit minimum
-        $max = 999999; // 6-digit maximum
-
-        return (string) random_int($min, $max);
+        return (string) random_int(100000, 999999);
     }
 
-    /**
-     * Get rate limit key for email.
-     */
+    private function generateVerificationToken(): string
+    {
+        return bin2hex(random_bytes(32));
+    }
+
     private function getRateLimitKey(string $email): string
     {
         return self::RATE_LIMIT_PREFIX.':'.hash('sha256', $email);
     }
 
-    /**
-     * Generate and send OTP in one operation.
-     */
-    public function generateAndSendOtp(string $email, ?Request $request = null): EmailVerificationOtp
+    public function generateAndSendVerificationLink(string $email, ?Request $request = null): EmailVerificationOtp
     {
-        // Check rate limiting
         if ($this->isRateLimited($email)) {
             throw new \Exception(
-                'Too many OTP requests. Please wait '.
+                'Too many verification requests. Please wait '.
                 $this->getRateLimitResetTime($email).
                 ' seconds before requesting again.'
             );
         }
 
-        // Generate OTP
         $otp = $this->generateOtp($email, $request);
-
-        // Send email
-        $this->sendOtpEmail($email, $otp->otp_code);
-
-        // Increment rate limit
+        $this->sendVerificationEmail($email, $otp->otp_code, $otp->verification_token);
         $this->incrementRateLimit($email);
 
         return $otp;
