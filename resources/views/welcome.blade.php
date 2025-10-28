@@ -82,7 +82,7 @@
                                 Sign In
                             </a>
                             <a href="{{ route('register') }}" class="bg-green-600 hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 text-white px-4 py-2 rounded-md text-sm font-medium">
-                                Register
+                                Sign Up
                             </a>
                         @endauth
                     </div>
@@ -101,11 +101,11 @@
                                 <span class="block text-green-600">for Filipino Students</span>
                             </h1>
                             <p class="mt-8 sm:mt-10 md:mt-12 text-base text-gray-600 sm:text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed sm:leading-relaxed md:leading-relaxed px-4">
-                                Plan healthy, affordable meals that fit your student budget and busy schedule. From tapsilog to adobo, eat well without the guilt.
+                                Helping students eat smarter and spend wiser with healthy, budget-friendly meal plans made for college students
                             </p>
                             <div class="mt-10 sm:mt-12 md:mt-14 lg:mt-16 flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
                                 <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 transition-colors shadow-lg hover:shadow-xl">
-                                    Register Now
+                                    Sign Up Now
                                 </a>
                                 <a href="{{ route('recipes.index') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 transition-colors">
                                     Browse Sample Meals
@@ -124,95 +124,212 @@
                 <div class="text-center mb-12 sm:mb-16 lg:mb-20">
                     <p class="text-sm font-semibold text-green-600 tracking-wider uppercase mb-3">Features</p>
                     <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-4">
-                        Everything you need to succeed
+                        Smart meal planning made simple
                     </h2>
                     <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed px-4">
-                        Simple tools designed for Filipino students who want to eat well without the hassle.
+                        Comprehensive tools that help Filipino students plan nutritious meals, track spending, and manage their food budget efficiently.
                     </p>
                 </div>
 
-                <!-- Features Grid -->
-                <div class="max-w-5xl mx-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 lg:gap-12">
-                        <!-- Feature 1 -->
-                        <div class="group p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-colors duration-200">
-                            <div class="flex items-start space-x-4 sm:space-x-5">
-                                <div class="flex-shrink-0">
-                                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 group-hover:scale-105 transition-all duration-200">
-                                        <svg class="w-6 h-6 sm:w-7 sm:h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
+                <!-- Features Content -->
+                <div class="max-w-6xl mx-auto">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <!-- Image Slideshow -->
+                        <div class="relative lg:order-1 order-2">
+                            <div class="slideshow-container rounded-2xl overflow-hidden shadow-2xl bg-gray-100 aspect-square">
+                                <!-- Slide 1 -->
+                                <div class="slide fade active">
+                                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Budget-friendly Filipino meal" 
+                                         class="w-full h-full object-cover">
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                                        <p class="text-white text-sm font-medium">Budget-Friendly Planning</p>
                                     </div>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-3 leading-tight">Budget-Friendly Planning</h3>
-                                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                        Track your daily food budget with precision. Stay under ₱350 per day with smart meal suggestions.
-                                    </p>
+                                <!-- Slide 2 -->
+                                <div class="slide fade">
+                                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Filipino adobo dish" 
+                                         class="w-full h-full object-cover">
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                                        <p class="text-white text-sm font-medium">Filipino Recipes</p>
+                                    </div>
+                                </div>
+                                <!-- Slide 3 -->
+                                <div class="slide fade">
+                                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Quick and simple meal preparation" 
+                                         class="w-full h-full object-cover">
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                                        <p class="text-white text-sm font-medium">Quick & Simple</p>
+                                    </div>
+                                </div>
+                                <!-- Slide 4 -->
+                                <div class="slide fade">
+                                    <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Weekly meal planning calendar" 
+                                         class="w-full h-full object-cover">
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                                        <p class="text-white text-sm font-medium">Weekly Meal Calendar</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Navigation dots -->
+                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                    <span class="dot active" onclick="currentSlide(1)"></span>
+                                    <span class="dot" onclick="currentSlide(2)"></span>
+                                    <span class="dot" onclick="currentSlide(3)"></span>
+                                    <span class="dot" onclick="currentSlide(4)"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Feature 2 -->
-                        <div class="group p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-colors duration-200">
-                            <div class="flex items-start space-x-4 sm:space-x-5">
-                                <div class="flex-shrink-0">
-                                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 group-hover:scale-105 transition-all duration-200">
-                                        <svg class="w-6 h-6 sm:w-7 sm:h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-3 leading-tight">Filipino Recipes</h3>
-                                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                        Authentic Filipino dishes simplified for students. From adobo to sinigang, cook what you love.
-                                    </p>
-                                </div>
+                        <!-- Features Text -->
+                        <div class="lg:order-2 order-1 space-y-8">
+                            <!-- Feature 1 -->
+                            <div class="group">
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 leading-tight">Budget-Friendly Planning</h3>
+                                <p class="text-base sm:text-lg text-gray-600 leading-relaxed">
+                                    Track your daily food budget with precision. Stay under preferred budget with diverse meal suggestions.
+                                </p>
                             </div>
-                        </div>
 
-                        <!-- Feature 3 -->
-                        <div class="group p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-colors duration-200">
-                            <div class="flex items-start space-x-4 sm:space-x-5">
-                                <div class="flex-shrink-0">
-                                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 group-hover:scale-105 transition-all duration-200">
-                                        <svg class="w-6 h-6 sm:w-7 sm:h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-3 leading-tight">Quick & Simple</h3>
-                                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                        Most meals ready in 15-30 minutes. Perfect for busy schedules between classes and study sessions.
-                                    </p>
-                                </div>
+                            <!-- Feature 2 -->
+                            <div class="group">
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 leading-tight">Filipino Recipes</h3>
+                                <p class="text-base sm:text-lg text-gray-600 leading-relaxed">
+                                    Authentic Filipino dishes simplified for students. From adobo to sinigang, cook what you love.
+                                </p>
                             </div>
-                        </div>
 
-                        <!-- Feature 4 -->
-                        <div class="group p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-colors duration-200">
-                            <div class="flex items-start space-x-4 sm:space-x-5">
-                                <div class="flex-shrink-0">
-                                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 group-hover:scale-105 transition-all duration-200">
-                                        <svg class="w-6 h-6 sm:w-7 sm:h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-3 leading-tight">Weekly Meal Calendar</h3>
-                                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                        Plan your entire week in advance. Never worry about what to eat or repeat meals by accident.
-                                    </p>
-                                </div>
+                            <!-- Feature 3 -->
+                            <div class="group">
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 leading-tight">Quick & Simple</h3>
+                                <p class="text-base sm:text-lg text-gray-600 leading-relaxed">
+                                    Most meals ready in 15-30 minutes. Perfect for busy schedules between classes and study sessions.
+                                </p>
+                            </div>
+
+                            <!-- Feature 4 -->
+                            <div class="group">
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 leading-tight">Weekly Meal Calendar</h3>
+                                <p class="text-base sm:text-lg text-gray-600 leading-relaxed">
+                                    Plan your entire week in advance. Never worry about what to eat or repeat meals by accident.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Slideshow CSS and JavaScript -->
+        <style>
+        .slideshow-container {
+            position: relative;
+            height: 500px;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide.fade {
+            animation-name: fade;
+            animation-duration: 1.5s;
+        }
+
+        @keyframes fade {
+            from {opacity: 0.4} 
+            to {opacity: 1}
+        }
+
+        .dot {
+            cursor: pointer;
+            height: 10px;
+            width: 10px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dot.active, .dot:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        @media (max-width: 1023px) {
+            .slideshow-container {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .slideshow-container {
+                height: 300px;
+            }
+        }
+        </style>
+
+        <script>
+        let slideIndex = 1;
+        let slideTimer;
+
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("slide");
+            let dots = document.getElementsByClassName("dot");
+            
+            if (n > slides.length) {slideIndex = 1}
+            if (n < 1) {slideIndex = slides.length}
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove("active");
+            }
+            
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].classList.remove("active");
+            }
+            
+            if (slides[slideIndex-1]) {
+                slides[slideIndex-1].classList.add("active");
+            }
+            if (dots[slideIndex-1]) {
+                dots[slideIndex-1].classList.add("active");
+            }
+        }
+
+        function currentSlide(n) {
+            clearTimeout(slideTimer);
+            showSlides(slideIndex = n);
+            autoSlide();
+        }
+
+        function nextSlide() {
+            showSlides(slideIndex += 1);
+        }
+
+        function autoSlide() {
+            slideTimer = setTimeout(function() {
+                nextSlide();
+                autoSlide();
+            }, 4000);
+        }
+
+        // Initialize slideshow when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            showSlides(slideIndex);
+            autoSlide();
+        });
+        </script>
 
         <!-- Testimonials Carousel Section -->
         <section class="bg-gray-50">
@@ -351,7 +468,7 @@
                         <div id="basic-collapse-one-with-arrow" class="accordion-content w-full px-0 overflow-hidden transition-all duration-500" aria-labelledby="basic-heading-one-with-arrow" style="max-height: 0;">
                             <div class="pt-4">
                                 <p class="text-base text-gray-900 leading-6">
-                                    Absolutely not! StudEats is designed for complete beginners. Our step-by-step instructions include photos, cooking tips, and time estimates. Start with simple 15-minute meals and gradually build your skills as you become more confident in the kitchen.
+                                    No cooking experience needed! StudEats features simple recipes perfect for students living in dorms or shared apartments. Our recipes use basic cooking methods like boiling, frying, and sautéing with detailed instructions. Many meals can be prepared with just a rice cooker, electric stove, or basic kitchen setup.
                                 </p>
                             </div>
                         </div>
@@ -367,7 +484,7 @@
                         <div id="basic-collapse-two-with-arrow" class="accordion-content w-full px-0 overflow-hidden transition-all duration-500" aria-labelledby="basic-heading-two-with-arrow" style="max-height: 0;">
                             <div class="pt-4">
                                 <p class="text-base text-gray-900 leading-6">
-                                    Students typically save ₱8,000-12,000 monthly compared to food delivery and dining out. Our meal plans average ₱200-350 per day versus ₱500+ for fast food. That's potentially ₱150,000+ in savings per year!
+                                    Home cooking can save you ₱3,000-6,000 monthly compared to regular food delivery and canteen meals. While a typical fastfood meal costs ₱150-300, our planned meals average ₱80-200 per serving. Actual savings depend on your current eating habits and local ingredient prices.
                                 </p>
                             </div>
                         </div>
@@ -383,7 +500,7 @@
                         <div id="basic-collapse-three-with-arrow" class="accordion-content w-full px-0 overflow-hidden transition-all duration-500" aria-labelledby="basic-heading-three-with-arrow" style="max-height: 0;">
                             <div class="pt-4">
                                 <p class="text-base text-gray-900 leading-6">
-                                    Yes! Our recipes are based on traditional Filipino dishes but simplified for student cooking. From classic adobo to regional specialties, all recipes use authentic ingredients and techniques available at local markets.
+                                    Yes! Our recipes feature authentic Filipino comfort food adapted for student budgets and cooking skills. We focus on popular dishes like adobo, sinigang, tinola, and fried rice using traditional ingredients you'll find in any Filipino household or local market.
                                 </p>
                             </div>
                         </div>
@@ -399,7 +516,7 @@
                         <div id="basic-collapse-four-with-arrow" class="accordion-content w-full px-0 overflow-hidden transition-all duration-500" aria-labelledby="basic-heading-four-with-arrow" style="max-height: 0;">
                             <div class="pt-4">
                                 <p class="text-base text-gray-900 leading-6">
-                                    All ingredients are available at local markets, SM, Puregold, or neighborhood stores. We avoid hard-to-find items and provide substitution suggestions for regional availability and dietary restrictions.
+                                    All ingredients are commonly available at wet markets, grocery stores like SM, Puregold, Robinson's, or local sari-sari stores. We prioritize affordable, Filipino staples and provide alternative ingredients when certain items might be expensive or unavailable in your area.
                                 </p>
                             </div>
                         </div>
@@ -415,7 +532,7 @@
                         <div id="basic-collapse-five-with-arrow" class="accordion-content w-full px-0 overflow-hidden transition-all duration-500" aria-labelledby="basic-heading-five-with-arrow" style="max-height: 0;">
                             <div class="pt-4">
                                 <p class="text-base text-gray-900 leading-6">
-                                    Most recipes take 15-30 minutes total. We include prep time, cooking time, and difficulty level for each recipe. Perfect for busy students between classes or during study breaks!
+                                    Preparation times vary from 10-45 minutes depending on the recipe complexity. Quick meals like scrambled eggs or instant noodle upgrades take 10-15 minutes, while dishes like adobo or sinigang may need 30-45 minutes. Each recipe clearly shows prep and cooking times to help you plan around your schedule.
                                 </p>
                             </div>
                         </div>
@@ -431,7 +548,7 @@
                         <div id="basic-collapse-six-with-arrow" class="accordion-content w-full px-0 overflow-hidden transition-all duration-500" aria-labelledby="basic-heading-six-with-arrow" style="max-height: 0;">
                             <div class="pt-4">
                                 <p class="text-base text-gray-900 leading-6">
-                                    Yes! StudEats is completely free for all students. All features including meal planning, recipes, budget tracking, and nutrition information are available at no cost. No hidden fees, no subscriptions - just free meal planning designed to help students eat better.
+                                    Yes, StudEats is free to use for basic meal planning and recipes. You can create meal plans, browse recipes, and track your food budget without any subscription fees. We believe healthy eating should be accessible to all Filipino students regardless of their financial situation.
                                 </p>
                             </div>
                         </div>
