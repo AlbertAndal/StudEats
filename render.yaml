@@ -1,13 +1,17 @@
 services:
   - type: web
     name: studeats
-    env: docker # Use Docker if you prefer, or 'node' for native build
+    env: docker # Use Docker for better compatibility
+    dockerfile: Dockerfile.render
     buildCommand: "./render-build.sh"
     startCommand: "./render-start.sh"
     plan: free # Change to 'starter' or higher for production
     region: oregon # Choose closest region
-    branch: main # Or your preferred branch
+    branch: main # Deploy from main branch
     envVars:
+      # Core Laravel Configuration
+      - key: APP_NAME
+        value: StudEats
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -16,18 +20,34 @@ services:
         value: errorlog
       - key: LOG_LEVEL
         value: error
+      
+      # Database Configuration (PostgreSQL for Render)
+      - key: DB_CONNECTION
+        value: pgsql
+      
+      # Cache & Session Configuration
       - key: CACHE_STORE
         value: file
       - key: SESSION_DRIVER
         value: file
       - key: QUEUE_CONNECTION
-        value: sync
+        value: database
       - key: SESSION_LIFETIME
         value: 120
+      - key: SESSION_ENCRYPT
+        value: false
+      
+      # File System Configuration
       - key: FILESYSTEM_DISK
         value: local
       - key: BROADCAST_CONNECTION
         value: log
+      
+      # Laravel Optimization
+      - key: APP_MAINTENANCE_DRIVER
+        value: file
+      - key: BCRYPT_ROUNDS
+        value: 12
     # Database and other sensitive env vars should be set in Render dashboard
     # for security (not in this file)
 

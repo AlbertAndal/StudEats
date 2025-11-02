@@ -113,7 +113,7 @@ StudEats is a modern, intelligent meal planning platform designed to help users 
 1. **Clone the repository**
    ```bash
    git clone https://github.com/AlbertAndal/StudEats-12.git
-   cd StudEats-12
+   cd StudEats
    ```
 
 2. **Install PHP dependencies**
@@ -283,6 +283,7 @@ We welcome contributions to StudEats! Please follow these guidelines:
 - **Bug Reports**: [GitHub Issues](https://github.com/AlbertAndal/StudEats-12/issues)
 - **Feature Requests**: [GitHub Discussions](https://github.com/AlbertAndal/StudEats-12/discussions)
 - **Documentation**: Check the `/docs` directory for detailed guides
+- **Deployment Issues**: See [RENDER-500-ERROR-SOLUTION.md](RENDER-500-ERROR-SOLUTION.md) and [RENDER-DEPLOYMENT-TROUBLESHOOTING.md](RENDER-DEPLOYMENT-TROUBLESHOOTING.md)
 
 ---
 

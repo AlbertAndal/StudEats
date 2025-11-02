@@ -28,10 +28,26 @@ if [ -f "package.json" ]; then
     if npm ci --include=dev; then
         echo "✅ NPM install successful"
         
-        # Build frontend assets
+        # Build frontend assets with verbose output
         echo "Building frontend assets..."
         if npm run build; then
             echo "✅ Frontend build successful"
+            
+            # Verify build output
+            if [ -d "public/build" ]; then
+                echo "✅ Build directory created"
+                echo "Build contents:"
+                ls -la public/build/
+                
+                if [ -f "public/build/manifest.json" ]; then
+                    echo "✅ Manifest file exists"
+                else
+                    echo "⚠️ Warning: manifest.json not found"
+                fi
+            else
+                echo "❌ Build directory not created!"
+                exit 1
+            fi
             
             # Clean up node_modules to save space
             echo "Cleaning up build dependencies..."
@@ -39,11 +55,11 @@ if [ -f "package.json" ]; then
             npm cache clean --force || echo "⚠️ NPM cache clean failed"
         else
             echo "❌ Frontend build failed"
-            echo "Continuing without frontend assets..."
+            exit 1
         fi
     else
         echo "❌ NPM install failed"
-        echo "Continuing without frontend assets..."
+        exit 1
     fi
 else
     echo "⚠️ No package.json found, skipping frontend build"

@@ -19,4 +19,18 @@ export default defineConfig({
             '@': path.resolve(__dirname, './resources'),
         },
     },
+    build: {
+        manifest: true,
+        outDir: 'public/build',
+        rollupOptions: {
+            output: {
+                manualChunks: undefined,
+            },
+        },
+    },
+    server: {
+        hmr: {
+            host: 'localhost',
+        },
+    },
 });

@@ -20,6 +20,29 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Fallback CSS for production if Vite assets fail to load -->
+    @if(app()->environment('production'))
+    <script>
+        // Check if Vite CSS loaded, if not load Tailwind from CDN
+        window.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('link[href*="app"]');
+            let cssLoaded = false;
+            links.forEach(link => {
+                if (link.sheet && link.sheet.cssRules.length > 0) {
+                    cssLoaded = true;
+                }
+            });
+            
+            if (!cssLoaded) {
+                console.warn('Vite CSS failed to load, using Tailwind CDN fallback');
+                const fallback = document.createElement('script');
+                fallback.src = 'https://cdn.tailwindcss.com';
+                document.head.appendChild(fallback);
+            }
+        });
+    </script>
+    @endif
 </head>
 <body class="font-sans antialiased bg-background text-foreground">
     <div class="min-h-screen flex flex-col">
