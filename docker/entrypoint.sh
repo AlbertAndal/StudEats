@@ -5,13 +5,27 @@ set -e
 
 echo "Starting StudEats application setup..."
 
+# Parse DATABASE_URL if available (Railway format)
+if [ -n "$DATABASE_URL" ]; then
+    echo "Parsing DATABASE_URL for Railway deployment..."
+    # Extract components from DATABASE_URL
+    # Format: mysql://username:password@host:port/database
+    export DB_CONNECTION=mysql
+    export DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
+    export DB_PORT=$(echo $DATABASE_URL | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
+    export DB_DATABASE=$(echo $DATABASE_URL | sed -n 's/.*\/\(.*\)/\1/p')
+    export DB_USERNAME=$(echo $DATABASE_URL | sed -n 's/.*:\/\/\([^:]*\):.*/\1/p')
+    export DB_PASSWORD=$(echo $DATABASE_URL | sed -n 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/p')
+    echo "Database configuration parsed from DATABASE_URL"
+fi
+
 # Wait for database to be ready with timeout
 echo "Waiting for database connection..."
-TIMEOUT=60
+TIMEOUT=30
 COUNTER=0
 while ! php artisan migrate:status &> /dev/null; do
     if [ $COUNTER -ge $TIMEOUT ]; then
-        echo "Database connection timeout after ${TIMEOUT} seconds"
+        echo "Database connection timeout after ${TIMEOUT} seconds, continuing anyway..."
         break
     fi
     echo "Database not ready, waiting... ($COUNTER/$TIMEOUT)"
