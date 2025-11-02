@@ -12,7 +12,8 @@ cmds = [
 cmds = [
     'mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache',
     'chmod -R 777 storage bootstrap/cache',
-    'chmod +x start-railway.sh'
+    'chmod +x start-railway.sh',
+    'chmod +x post-deploy.sh'
 ]
 
 [start]
