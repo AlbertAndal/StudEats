@@ -1,9 +1,6 @@
 # Use official PHP 8.2 with Apache
 FROM php:8.2-apache
 
-# Set working directory
-WORKDIR /var/www/html
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
@@ -56,8 +53,8 @@ RUN npm ci --include=dev \
 # Copy Apache configuration
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
-# Expose port 80
-EXPOSE 80
+# Expose port 8000
+EXPOSE 8000
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
