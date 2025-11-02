@@ -10,14 +10,14 @@ cmds = [
 
 [phases.build]
 cmds = [
-    'echo "APP_NAME=StudEats" > .env',
-    'echo "APP_ENV=production" >> .env',
-    'echo "APP_DEBUG=false" >> .env',
-    'echo "APP_KEY=" >> .env',
+    'echo "Creating .env file..."',
+    'cat > .env << EOF\nAPP_NAME=StudEats\nAPP_ENV=production\nAPP_DEBUG=false\nAPP_KEY=\nLOG_CHANNEL=errorlog\nEOF',
+    'cat .env',
     'mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache',
     'chmod -R 777 storage bootstrap/cache',
     'chmod +x start-railway.sh',
-    'chmod +x post-deploy.sh'
+    'chmod +x post-deploy.sh',
+    'ls -la'
 ]
 
 [start]
