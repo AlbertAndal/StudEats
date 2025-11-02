@@ -10,6 +10,7 @@ cmds = [
 
 [phases.build]
 cmds = [
+    'cp .env.example .env || echo "APP_KEY=" > .env',
     'mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache',
     'chmod -R 777 storage bootstrap/cache',
     'chmod +x start-railway.sh',
