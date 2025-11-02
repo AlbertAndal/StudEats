@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://studeats-11.onrender.com" target="_blank">🌐 Live Demo</a> • 
+  <a href="https://studeats-12.onrender.com" target="_blank">🌐 Live Demo</a> • 
   <a href="#-features">Features</a> • 
   <a href="#-getting-started">Getting Started</a> • 
   <a href="#-documentation">Documentation</a>
@@ -184,7 +184,7 @@ Deploy to Render, Railway, or any cloud platform:
 - **Render**: Use the included `render-build.sh` and `render-start.sh`
 - **Railway**: Configured with `railway.json` and deployment scripts  
 - **Docker**: Production-ready Dockerfile included
-- **Troubleshooting**: See `RENDER-DEPLOYMENT-TROUBLESHOOTING.md` for 500 error fixes
+- **Troubleshooting**: See `RENDER-500-ERROR-SOLUTION.md` for immediate 500 error fix
 
 ---
 
@@ -196,7 +196,8 @@ Comprehensive documentation is available in the `/docs` directory:
 - **[Admin Guide](docs/admin-dashboard-guide.md)** - Administrative features
 - **[API Documentation](docs/analytics-implementation-summary.md)** - API integration guides
 - **[Deployment Guide](docs/RENDER-ENV-FIX.md)** - Cloud deployment instructions
-- **[Troubleshooting](RENDER-DEPLOYMENT-TROUBLESHOOTING.md)** - Fix 500 server errors
+- **[500 Error Fix](RENDER-500-ERROR-SOLUTION.md)** - Immediate solution: APP_KEY issue
+- **[Troubleshooting Guide](RENDER-DEPLOYMENT-TROUBLESHOOTING.md)** - Complete deployment guide
 
 ### Key Documentation Files:
 - 📧 [Email System](docs/email-confirmation-system.md)
