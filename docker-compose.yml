@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: studeats-app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./storage:/var/www/html/storage
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=studeats
+      - DB_USERNAME=studeats_user
+      - DB_PASSWORD=studeats_password
+      - QUEUE_CONNECTION=database
+    depends_on:
+      - db
+      - redis
+    networks:
+      - studeats-network
+
+  db:
+    image: mysql:8.0
+    container_name: studeats-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=studeats
+      - MYSQL_USER=studeats_user
+      - MYSQL_PASSWORD=studeats_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - studeats-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: studeats-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - studeats-network
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: studeats-queue
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=studeats
+      - DB_USERNAME=studeats_user
+      - DB_PASSWORD=studeats_password
+      - QUEUE_CONNECTION=database
+    depends_on:
+      - db
+      - redis
+    networks:
+      - studeats-network
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: studeats-scheduler
+    restart: unless-stopped
+    command: php artisan schedule:work
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=studeats
+      - DB_USERNAME=studeats_user
+      - DB_PASSWORD=studeats_password
+    depends_on:
+      - db
+    networks:
+      - studeats-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  studeats-network:
+    driver: bridge

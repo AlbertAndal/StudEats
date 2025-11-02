@@ -1,0 +1,46 @@
+# Docker files
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+.dockerignore
+
+# Ignore node_modules in Docker context
+node_modules/
+npm-debug.log*
+
+# Ignore development files
+.env.local
+.env.development
+.env.testing
+
+# Ignore version control
+.git/
+.gitignore
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore Laravel specific
+/vendor/
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/*
+
+# Ignore build artifacts
+/public/hot
+/public/storage
+/public/build
+
+# Ignore test files
+/tests/
+phpunit.xml
+.phpunit.result.cache
