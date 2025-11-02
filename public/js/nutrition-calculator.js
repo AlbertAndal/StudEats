@@ -139,20 +139,6 @@ class NutritionCalculator {
         if (applyBtn) {
             applyBtn.addEventListener('click', () => this.applyNutritionToForm());
         }
-        
-        // Add event listeners for price calculation
-        document.addEventListener('input', (e) => {
-            if (e.target.matches('[name="ingredient_price[]"]') || 
-                e.target.matches('[name="ingredient_quantity[]"]') ||
-                e.target.matches('[name="servings"]')) {
-                this.calculateTotalPrice();
-            }
-        });
-        
-        // Calculate initial price on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            this.calculateTotalPrice();
-        });
     }
     
     /**
@@ -235,24 +221,19 @@ class NutritionCalculator {
         const rows = document.querySelectorAll('.ingredient-row');
         
         rows.forEach(row => {
-            const nameInput = row.querySelector('[name="ingredient_name[]"]');
-            const quantityInput = row.querySelector('[name="ingredient_quantity[]"]');
-            const unitInput = row.querySelector('[name="ingredient_unit[]"]');
-            const priceInput = row.querySelector('[name="ingredient_price[]"]');
+            const nameInput = row.querySelector('[name="ingredient_names[]"]');
+            const quantityInput = row.querySelector('[name="ingredient_quantities[]"]');
+            const unitInput = row.querySelector('[name="ingredient_units[]"]');
             
             const name = nameInput?.value.trim();
             const quantity = quantityInput?.value.trim();
             const unit = unitInput?.value.trim();
-            const price = priceInput?.value.trim();
-            const id = row.id || row.dataset.id || `ingredient-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
             
-            if (name && quantity) {
+            if (name && quantity && unit) {
                 ingredients.push({
-                    id: id,
                     name: name,
                     quantity: parseFloat(quantity),
-                    unit: unit || '',
-                    price: parseFloat(price) || 0
+                    unit: unit
                 });
             }
         });
@@ -279,73 +260,41 @@ class NutritionCalculator {
     }
     
     /**
-     * Apply calculated nutrition values to the form inputs
+     * Apply calculated nutrition to form fields
      */
     applyNutritionToForm() {
-        const nutritionSummary = document.getElementById('nutrition-summary');
-        if (!nutritionSummary || nutritionSummary.classList.contains('hidden')) {
-            this.showError('Please calculate nutrition first.');
-            return;
-        }
+        const calories = document.getElementById('calc-calories').textContent;
+        const protein = document.getElementById('calc-protein').textContent.replace('g', '');
+        const carbs = document.getElementById('calc-carbs').textContent.replace('g', '');
+        const fats = document.getElementById('calc-fats').textContent.replace('g', '');
         
-        // Get calculated values
-        const calories = document.getElementById('calc-calories')?.textContent || '0';
-        const protein = document.getElementById('calc-protein')?.textContent.replace('g', '') || '0';
-        const carbs = document.getElementById('calc-carbs')?.textContent.replace('g', '') || '0';
-        const fats = document.getElementById('calc-fats')?.textContent.replace('g', '') || '0';
-        
-        // Apply to form inputs
+        // Find the nutrition input fields
         const caloriesInput = document.querySelector('[name="calories"]');
         const proteinInput = document.querySelector('[name="protein"]');
         const carbsInput = document.querySelector('[name="carbs"]');
         const fatsInput = document.querySelector('[name="fats"]');
         
-        if (caloriesInput) caloriesInput.value = parseFloat(calories);
-        if (proteinInput) proteinInput.value = parseFloat(protein);
-        if (carbsInput) carbsInput.value = parseFloat(carbs);
-        if (fatsInput) fatsInput.value = parseFloat(fats);
+        // Apply values with animation
+        if (caloriesInput) {
+            this.animateValue(caloriesInput, calories);
+        }
+        if (proteinInput) {
+            this.animateValue(proteinInput, protein);
+        }
+        if (carbsInput) {
+            this.animateValue(carbsInput, carbs);
+        }
+        if (fatsInput) {
+            this.animateValue(fatsInput, fats);
+        }
         
-        // Calculate total price
-        this.calculateTotalPrice();
+        // Scroll to nutrition section
+        const nutritionSection = document.querySelector('details[open]');
+        if (nutritionSection) {
+            nutritionSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
         
         this.showNotification('✅ Nutrition values applied to form!', 'success');
-    }
-    
-    /**
-     * Calculate total price for all ingredients
-     */
-    calculateTotalPrice() {
-        const ingredients = this.getIngredientsFromForm();
-        let totalPrice = 0;
-        
-        ingredients.forEach(ingredient => {
-            const quantity = parseFloat(ingredient.quantity) || 0;
-            const price = parseFloat(ingredient.price) || 0;
-            const ingredientTotal = quantity * price;
-            totalPrice += ingredientTotal;
-            
-            // Update individual ingredient price display if element exists
-            const priceDisplayEl = document.getElementById(`ingredient-total-${ingredient.id}`);
-            if (priceDisplayEl) {
-                priceDisplayEl.textContent = `₱${ingredientTotal.toFixed(2)}`;
-            }
-        });
-        
-        // Update total price display
-        const totalPriceEl = document.getElementById('total-recipe-price');
-        if (totalPriceEl) {
-            totalPriceEl.textContent = `₱${totalPrice.toFixed(2)}`;
-        }
-        
-        // Calculate price per serving
-        const servings = parseInt(document.querySelector('[name="servings"]')?.value) || 1;
-        const pricePerServing = totalPrice / servings;
-        
-        // Update price per serving display
-        const pricePerServingEl = document.getElementById('price-per-serving');
-        if (pricePerServingEl) {
-            pricePerServingEl.textContent = `₱${pricePerServing.toFixed(2)}`;
-        }
     }
     
     /**
