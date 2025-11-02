@@ -43,9 +43,10 @@ RUN chown -R www-data:www-data /var/www/html \
 # Install PHP dependencies
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# Install Node.js dependencies and build assets
-RUN npm ci --only=production \
+# Install Node.js dependencies (including dev dependencies for Vite)
+RUN npm ci \
     && npm run build \
+    && npm prune --production \
     && rm -rf node_modules
 
 # Copy Apache configuration
