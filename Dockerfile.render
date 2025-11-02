@@ -1,0 +1,63 @@
+# Render-optimized Dockerfile for StudEats Laravel App
+FROM php:8.2-cli
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    nodejs \
+    npm \
+    && docker-php-ext-install pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy composer files first for better caching
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Copy package files
+COPY package*.json ./
+
+# Install Node dependencies and build assets
+RUN npm ci --include=dev \
+    && npm run build \
+    && rm -rf node_modules \
+    && npm cache clean --force
+
+# Copy application code
+COPY . .
+
+# Create Laravel directories and set permissions
+RUN mkdir -p storage/framework/cache/data \
+    && mkdir -p storage/framework/sessions \
+    && mkdir -p storage/framework/views \
+    && mkdir -p storage/logs \
+    && mkdir -p bootstrap/cache \
+    && chmod -R 755 storage bootstrap/cache
+
+# Run composer scripts now that all files are present
+RUN composer dump-autoload --optimize
+
+# Expose port (Render uses PORT environment variable)
+EXPOSE 8000
+
+# Copy startup script
+COPY render-start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
+# Use the startup script
+CMD ["/usr/local/bin/start.sh"]

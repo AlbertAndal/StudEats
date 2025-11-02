@@ -5,18 +5,23 @@ set -e
 
 echo "Starting StudEats application setup..."
 
-# Parse DATABASE_URL if available (Railway format)
+# Parse DATABASE_URL if available (Render PostgreSQL format)
 if [ -n "$DATABASE_URL" ]; then
-    echo "Parsing DATABASE_URL for Railway deployment..."
+    echo "Parsing DATABASE_URL for Render deployment..."
     # Extract components from DATABASE_URL
-    # Format: mysql://username:password@host:port/database
-    export DB_CONNECTION=mysql
+    # Format: postgresql://username:password@host:port/database
+    if [[ "$DATABASE_URL" == postgres* ]]; then
+        export DB_CONNECTION=pgsql
+    else
+        export DB_CONNECTION=mysql
+    fi
     export DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
     export DB_PORT=$(echo $DATABASE_URL | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
     export DB_DATABASE=$(echo $DATABASE_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
     export DB_USERNAME=$(echo $DATABASE_URL | sed -n 's/.*:\/\/\([^:]*\):.*/\1/p')
     export DB_PASSWORD=$(echo $DATABASE_URL | sed -n 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/p')
     echo "Database configuration parsed from DATABASE_URL"
+    echo "DB_CONNECTION=$DB_CONNECTION"
     echo "DB_HOST=$DB_HOST"
     echo "DB_PORT=$DB_PORT"
     echo "DB_DATABASE=$DB_DATABASE"
@@ -97,7 +102,14 @@ fi
 
 echo "StudEats application setup completed!"
 
-# Start the Laravel server on Railway's assigned port
+# Start the Laravel server on the assigned port
 PORT=${PORT:-8000}
 echo "Starting Laravel server on 0.0.0.0:$PORT"
-exec php artisan serve --host=0.0.0.0 --port=$PORT
+echo "Environment: ${APP_ENV:-production}"
+echo "Debug mode: ${APP_DEBUG:-false}"
+
+# Show some debug info
+php --version
+php artisan --version 2>&1 || echo "Laravel not ready"
+
+exec php artisan serve --host=0.0.0.0 --port=$PORT --no-interaction

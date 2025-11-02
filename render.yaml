@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: studeats
+    env: docker # Use Docker if you prefer, or 'node' for native build
+    buildCommand: "./render-build.sh"
+    startCommand: "./render-start.sh"
+    plan: free # Change to 'starter' or higher for production
+    region: oregon # Choose closest region
+    branch: main # Or your preferred branch
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: errorlog
+      - key: LOG_LEVEL
+        value: error
+      - key: CACHE_STORE
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: SESSION_LIFETIME
+        value: 120
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: BROADCAST_CONNECTION
+        value: log
+    # Database and other sensitive env vars should be set in Render dashboard
+    # for security (not in this file)
+
+databases:
+  - name: studeats-db
+    databaseName: studeats
+    user: studeats_user
+    plan: free # Change for production
