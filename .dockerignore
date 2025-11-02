@@ -12,7 +12,6 @@ yarn-error.log*
 .env.local
 .env.development
 .env.testing
-.env.example
 
 # Ignore version control
 .git/
