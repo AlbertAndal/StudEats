@@ -53,7 +53,7 @@ RUN npm ci --include=dev \
 # Copy Apache configuration
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
-# Expose port 8000
+# Expose port 8000 (Railway will use $PORT environment variable)
 EXPOSE 8000
 
 # Copy entrypoint script
@@ -62,4 +62,3 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Use entrypoint script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["apache2-foreground"]

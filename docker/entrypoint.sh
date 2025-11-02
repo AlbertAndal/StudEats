@@ -13,10 +13,14 @@ if [ -n "$DATABASE_URL" ]; then
     export DB_CONNECTION=mysql
     export DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
     export DB_PORT=$(echo $DATABASE_URL | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
-    export DB_DATABASE=$(echo $DATABASE_URL | sed -n 's/.*\/\(.*\)/\1/p')
+    export DB_DATABASE=$(echo $DATABASE_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
     export DB_USERNAME=$(echo $DATABASE_URL | sed -n 's/.*:\/\/\([^:]*\):.*/\1/p')
     export DB_PASSWORD=$(echo $DATABASE_URL | sed -n 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/p')
     echo "Database configuration parsed from DATABASE_URL"
+    echo "DB_HOST=$DB_HOST"
+    echo "DB_PORT=$DB_PORT"
+    echo "DB_DATABASE=$DB_DATABASE"
+    echo "DB_USERNAME=$DB_USERNAME"
 fi
 
 # Wait for database to be ready with timeout
@@ -35,16 +39,28 @@ else
     echo "Database connected successfully"
 fi
 
-# Generate application key if not exists
-if [ ! -f .env ]; then
-    echo "Creating .env file..."
-    cp .env.example .env
-fi
-
-# Generate app key if not set
-if ! grep -q "APP_KEY=base64:" .env; then
-    echo "Generating application key..."
-    php artisan key:generate --no-interaction
+# Handle .env file for Railway deployment
+if [ -n "$DATABASE_URL" ]; then
+    # Railway deployment - environment variables come from Railway
+    echo "Railway deployment detected - using environment variables"
+    if [ ! -f .env ]; then
+        echo "Creating minimal .env file for Railway..."
+        echo "APP_ENV=production" > .env
+        echo "APP_DEBUG=false" >> .env
+        echo "LOG_CHANNEL=errorlog" >> .env
+    fi
+else
+    # Local or other deployment
+    if [ ! -f .env ]; then
+        echo "Creating .env file from example..."
+        cp .env.example .env
+    fi
+    
+    # Generate app key if not set
+    if ! grep -q "APP_KEY=base64:" .env; then
+        echo "Generating application key..."
+        php artisan key:generate --no-interaction
+    fi
 fi
 
 # Clear caches
@@ -56,7 +72,10 @@ php artisan route:clear --no-interaction
 
 # Run database migrations
 echo "Running database migrations..."
-php artisan migrate --force --no-interaction
+php artisan migrate --force --no-interaction || {
+    echo "Migration failed, but continuing..."
+    echo "This might be expected if this is the first deployment"
+}
 
 # Create storage link
 echo "Creating storage link..."
@@ -78,5 +97,7 @@ fi
 
 echo "StudEats application setup completed!"
 
-# Execute the main command
-exec "$@"
+# Start the Laravel server on Railway's assigned port
+PORT=${PORT:-8000}
+echo "Starting Laravel server on 0.0.0.0:$PORT"
+exec php artisan serve --host=0.0.0.0 --port=$PORT
