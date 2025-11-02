@@ -112,7 +112,7 @@ StudEats is a modern, intelligent meal planning platform designed to help users 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/AlbertAndal/StudEats-12.git
+   git clone https://github.com/AlbertAndal/StudEats-13.git
    cd StudEats
    ```
 
@@ -280,8 +280,8 @@ We welcome contributions to StudEats! Please follow these guidelines:
 
 ## 🐛 Support & Issues
 
-- **Bug Reports**: [GitHub Issues](https://github.com/AlbertAndal/StudEats-12/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/AlbertAndal/StudEats-12/discussions)
+- **Bug Reports**: [GitHub Issues](https://github.com/AlbertAndal/StudEats-13/issues)
+- **Feature Requests**: [GitHub Discussions](https://github.com/AlbertAndal/StudEats-13/discussions)
 - **Documentation**: Check the `/docs` directory for detailed guides
 - **Deployment Issues**: See [RENDER-500-ERROR-SOLUTION.md](RENDER-500-ERROR-SOLUTION.md) and [RENDER-DEPLOYMENT-TROUBLESHOOTING.md](RENDER-DEPLOYMENT-TROUBLESHOOTING.md)
 
@@ -308,5 +308,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <p align="center">
   <a href="https://studeats-12.onrender.com">🌐 Visit StudEats</a> • 
-  <a href="https://github.com/AlbertAndal/StudEats-12">⭐ Star on GitHub</a>
-</p
+  <a href="https://github.com/AlbertAndal/StudEats-13">⭐ Star on GitHub</a>
+</p>
