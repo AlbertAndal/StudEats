@@ -1,31 +1,35 @@
 # Docker files
-Dockerfile
 docker-compose.yml
 docker-compose.override.yml
-.dockerignore
 
 # Ignore node_modules in Docker context
 node_modules/
 npm-debug.log*
+yarn-error.log*
+.npm/
 
 # Ignore development files
 .env.local
 .env.development
 .env.testing
+.env.example
 
 # Ignore version control
 .git/
 .gitignore
+.gitattributes
 
 # Ignore IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
+.editorconfig
 
 # Ignore OS files
 .DS_Store
 Thumbs.db
+*.log
 
 # Ignore Laravel specific
 /vendor/
@@ -38,9 +42,16 @@ Thumbs.db
 # Ignore build artifacts
 /public/hot
 /public/storage
-/public/build
 
 # Ignore test files
 /tests/
 phpunit.xml
 .phpunit.result.cache
+
+# Ignore documentation
+/docs/
+README.md
+
+# Railway specific
+railway.json
+nixpacks.toml

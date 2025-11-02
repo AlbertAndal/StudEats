@@ -16,7 +16,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     nodejs \
     npm \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    supervisor \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -44,10 +47,11 @@ RUN chown -R www-data:www-data /var/www/html \
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
 # Install Node.js dependencies (including dev dependencies for Vite)
-RUN npm ci \
+RUN npm ci --include=dev \
     && npm run build \
     && npm prune --production \
-    && rm -rf node_modules
+    && npm cache clean --force \
+    && rm -rf node_modules ~/.npm
 
 # Copy Apache configuration
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
