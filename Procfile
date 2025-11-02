@@ -1,1 +1,1 @@
-web: bash -c "php artisan config:clear && (php artisan migrate --force --isolated || echo Migration failed) && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"
+web: bash start-railway.sh
