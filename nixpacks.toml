@@ -1,28 +1,19 @@
 [phases.setup]
 nixPkgs = ['nodejs', 'php82', 'php82Packages.composer']
-nixLibs = ['libpng', 'libjpeg', 'freetype', 'libzip', 'oniguruma']
 
 [phases.install]
 cmds = [
-    'composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist',
-    'npm ci --include=dev --prefer-offline',
-    'npm run build',
-    'npm prune --production'
+    'composer install --no-dev --optimize-autoloader --no-interaction',
+    'npm ci --include=dev',
+    'npm run build'
 ]
 
 [phases.build]
 cmds = [
-    'mkdir -p storage/framework/{cache,sessions,views}',
-    'mkdir -p storage/logs bootstrap/cache',
-    'chmod -R 775 storage bootstrap/cache',
-    'chmod +x start-railway.sh',
-    'ls -la storage',
-    'ls -la bootstrap/cache'
+    'mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache',
+    'chmod -R 777 storage bootstrap/cache',
+    'chmod +x start-railway.sh'
 ]
 
 [start]
 cmd = 'bash start-railway.sh'
-
-[variables]
-NIXPACKS_PHP_VERSION = '8.2'
-NIXPACKS_PHP_EXTENSION = 'pdo_mysql,mbstring,gd,zip,exif,pcntl,bcmath'
