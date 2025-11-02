@@ -16,12 +16,21 @@ use Illuminate\Support\Facades\Route;
 
 // Welcome page
 Route::get('/', function () {
-    // Get sample meals for the landing page (featured first, then by cost)
-    $sampleMeals = \App\Models\Meal::whereNotNull('image_path')
-        ->orderBy('is_featured', 'desc')
-        ->orderBy('cost', 'asc')
-        ->limit(6)
-        ->get();
+    try {
+        // Check if database is accessible
+        \DB::connection()->getPdo();
+        
+        // Get sample meals for the landing page (featured first, then by cost)
+        $sampleMeals = \App\Models\Meal::whereNotNull('image_path')
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('cost', 'asc')
+            ->limit(6)
+            ->get();
+    } catch (\Exception $e) {
+        // If database query fails, return empty collection
+        \Log::warning('Welcome page error: ' . $e->getMessage());
+        $sampleMeals = collect([]);
+    }
     
     return view('welcome', compact('sampleMeals'));
 })->name('welcome');
