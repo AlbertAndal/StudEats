@@ -21,17 +21,19 @@ fi
 
 # Wait for database to be ready with timeout
 echo "Waiting for database connection..."
-TIMEOUT=30
+TIMEOUT=15
 COUNTER=0
-while ! php artisan migrate:status &> /dev/null; do
-    if [ $COUNTER -ge $TIMEOUT ]; then
-        echo "Database connection timeout after ${TIMEOUT} seconds, continuing anyway..."
-        break
-    fi
+until php artisan migrate:status &> /dev/null || [ $COUNTER -ge $TIMEOUT ]; do
     echo "Database not ready, waiting... ($COUNTER/$TIMEOUT)"
-    sleep 2
-    COUNTER=$((COUNTER + 2))
+    sleep 1
+    COUNTER=$((COUNTER + 1))
 done
+
+if [ $COUNTER -ge $TIMEOUT ]; then
+    echo "Database connection timeout after ${TIMEOUT} seconds, continuing anyway..."
+else
+    echo "Database connected successfully"
+fi
 
 # Generate application key if not exists
 if [ ! -f .env ]; then
