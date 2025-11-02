@@ -182,8 +182,9 @@ docker run -p 8000:8000 studeats
 Deploy to Render, Railway, or any cloud platform:
 
 - **Render**: Use the included `render-build.sh` and `render-start.sh`
-- **Railway**: Configured with `railway.json` and deployment scripts
+- **Railway**: Configured with `railway.json` and deployment scripts  
 - **Docker**: Production-ready Dockerfile included
+- **Troubleshooting**: See `RENDER-DEPLOYMENT-TROUBLESHOOTING.md` for 500 error fixes
 
 ---
 
@@ -195,6 +196,7 @@ Comprehensive documentation is available in the `/docs` directory:
 - **[Admin Guide](docs/admin-dashboard-guide.md)** - Administrative features
 - **[API Documentation](docs/analytics-implementation-summary.md)** - API integration guides
 - **[Deployment Guide](docs/RENDER-ENV-FIX.md)** - Cloud deployment instructions
+- **[Troubleshooting](RENDER-DEPLOYMENT-TROUBLESHOOTING.md)** - Fix 500 server errors
 
 ### Key Documentation Files:
 - 📧 [Email System](docs/email-confirmation-system.md)
