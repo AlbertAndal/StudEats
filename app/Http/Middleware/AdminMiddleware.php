@@ -17,16 +17,16 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please log in to continue.');
+            return redirect()->route('admin.login')->with('error', 'Please log in with admin credentials.');
         }
 
         if (!Auth::user()->isAdmin()) {
-            abort(403, 'Access denied. Admin privileges required.');
+            return redirect()->route('admin.login')->with('error', 'Access denied. Admin privileges required.');
         }
 
         if (!Auth::user()->is_active) {
             Auth::logout();
-            return redirect()->route('login')->with('error', 'Your account has been suspended.');
+            return redirect()->route('admin.login')->with('error', 'Your admin account has been suspended.');
         }
 
         return $next($request);
