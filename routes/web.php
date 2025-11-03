@@ -77,7 +77,7 @@ Route::middleware('guest')->group(function () {
 // Email verification routes (accessible to both guests and authenticated users)
 Route::get('/email/verify', [EmailVerificationController::class, 'showVerification'])->name('email.verify.form');
 Route::post('/email/verify', [EmailVerificationController::class, 'verifyOtp'])->name('email.verify.otp');
-Route::post('/email/resend', [EmailVerificationController::class, 'resendOtp'])->name('email.verify.resend');
+Route::match(['GET', 'POST'], '/email/resend', [EmailVerificationController::class, 'resendOtp'])->name('email.verify.resend');
 Route::get('/email/verify/{token}', [EmailVerificationController::class, 'verifyEmail'])->name('email.verify.token');
 
 // Public recipes routes (accessible to all users)

@@ -146,15 +146,25 @@ class EmailVerificationController extends Controller
     }
 
     /**
-     * Resend OTP verification code.
+     * Resend OTP to user's email.
      */
     public function resendOtp(Request $request): RedirectResponse
     {
+        // Handle both GET and POST requests
+        $email = $request->input('email') ?? 
+                 $request->query('email') ?? 
+                 $request->session()->get('pending_verification_email');
+
+        // If no email provided, redirect to verification form
+        if (!$email) {
+            return redirect()->route('email.verify.form')
+                ->withErrors(['email' => 'Email address is required for resending verification code.']);
+        }
+
+        $request->merge(['email' => $email]);
         $request->validate([
             'email' => ['required', 'email', 'exists:users,email'],
         ]);
-
-        $email = $request->input('email');
 
         try {
             // Generate and send new OTP
