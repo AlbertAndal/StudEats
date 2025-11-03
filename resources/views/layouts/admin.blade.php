@@ -24,7 +24,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    <!-- CSRF Manager for session handling -->
+    <!-- CSRF Manager for session handling and 419 error prevention -->
     <script src="{{ asset('js/csrf-manager.js') }}"></script>
     
     <!-- Fallback CSS for production if Vite assets fail to load -->
