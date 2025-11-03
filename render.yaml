@@ -54,19 +54,19 @@ services:
       - key: BCRYPT_ROUNDS
         value: 12
       
-      # Mail Configuration
+      # Mail Configuration (Alternative SSL port for better connectivity)
       - key: MAIL_MAILER
         value: smtp
       - key: MAIL_HOST
         value: smtp.gmail.com
       - key: MAIL_PORT
-        value: 587
+        value: 465
       - key: MAIL_USERNAME
         value: johnalbertandal5@gmail.com
       - key: MAIL_PASSWORD
         value: nharujmmwoawzwgp
       - key: MAIL_ENCRYPTION
-        value: tls
+        value: ssl
       - key: MAIL_FROM_ADDRESS
         value: johnalbertandal5@gmail.com
       - key: MAIL_FROM_NAME
@@ -121,19 +121,19 @@ services:
       - key: QUEUE_CONNECTION
         value: database
       
-      # Mail Configuration (Same as web service)
+      # Mail Configuration (Same as web service - SSL port for better connectivity)
       - key: MAIL_MAILER
         value: smtp
       - key: MAIL_HOST
         value: smtp.gmail.com
       - key: MAIL_PORT
-        value: 587
+        value: 465
       - key: MAIL_USERNAME
         value: johnalbertandal5@gmail.com
       - key: MAIL_PASSWORD
         value: nharujmmwoawzwgp
       - key: MAIL_ENCRYPTION
-        value: tls
+        value: ssl
       - key: MAIL_FROM_ADDRESS
         value: johnalbertandal5@gmail.com
       - key: MAIL_FROM_NAME
