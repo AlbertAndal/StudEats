@@ -74,7 +74,20 @@ fi
 
 # Test database connection
 echo "Testing database connection..."
-if php artisan migrate:status --no-interaction 2>&1; then
+CONNECTION_TEST=$(php artisan migrate:status --no-interaction 2>&1)
+if echo "$CONNECTION_TEST" | grep -q "could not translate host name\|could not find driver\|Connection refused"; then
+    echo "❌ CRITICAL: Database connection failed"
+    echo "Error details: $CONNECTION_TEST"
+    echo ""
+    echo "🔧 TROUBLESHOOTING STEPS:"
+    echo "1. Go to Render Dashboard: https://dashboard.render.com"
+    echo "2. Verify PostgreSQL database 'studeats-db' is created and active"
+    echo "3. Check that DATABASE_URL is automatically set from database connection"
+    echo "4. If database doesn't exist, create one with name 'studeats-db'"
+    echo "5. Redeploy the web service after database is ready"
+    echo ""
+    echo "⚠️ Starting server anyway (will fail on database operations)"
+elif php artisan migrate:status --no-interaction 2>&1; then
     echo "✅ Database connection successful"
     
     # Run database migrations
@@ -85,9 +98,7 @@ if php artisan migrate:status --no-interaction 2>&1; then
         echo "⚠️ Migrations failed - continuing anyway"
     fi
 else
-    echo "❌ Database connection failed"
-    echo "This will likely cause the application to fail"
-    echo "Please check your DATABASE_URL in Render dashboard"
+    echo "⚠️ Database connection status unclear - continuing"
 fi
 
 # Create storage symlink

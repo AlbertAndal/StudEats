@@ -24,12 +24,16 @@ services:
       # Database Configuration (PostgreSQL for Render)
       - key: DB_CONNECTION
         value: pgsql
+      - key: DATABASE_URL
+        fromDatabase:
+          name: studeats-db
+          property: connectionString
       
       # Cache & Session Configuration
       - key: CACHE_STORE
-        value: file
+        value: database
       - key: SESSION_DRIVER
-        value: file
+        value: database
       - key: QUEUE_CONNECTION
         value: database
       - key: SESSION_LIFETIME
