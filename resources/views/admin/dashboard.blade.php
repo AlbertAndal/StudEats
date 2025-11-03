@@ -57,7 +57,11 @@
                         <h3 class="text-sm font-medium text-green-100">Active Users</h3>
                         <p class="text-3xl font-bold">{{ number_format($stats['active_users']) }}</p>
                         <p class="text-xs text-green-100 mt-1">
-                            {{ number_format(($stats['active_users'] / $stats['total_users']) * 100, 1) }}% of total
+                            @if($stats['total_users'] > 0)
+                                {{ number_format(($stats['active_users'] / $stats['total_users']) * 100, 1) }}% of total
+                            @else
+                                0% of total
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -136,7 +140,7 @@
                                                     <div>
                                                         <p class="text-sm text-gray-900 font-medium">{{ $activity->description }}</p>
                                                         <div class="mt-1 flex items-center gap-4 text-xs text-gray-500">
-                                                            <span>{{ $activity->adminUser->name }}</span>
+                                                            <span>{{ $activity->adminUser ? $activity->adminUser->name : 'Unknown Admin' }}</span>
                                                             <span>•</span>
                                                             <span>{{ $activity->created_at->diffForHumans() }}</span>
                                                         </div>
