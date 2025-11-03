@@ -1,8 +1,6 @@
-@extends('layouts.guest')
+<?php $__env->startSection('title', 'Admin Login - StudEats'); ?>
 
-@section('title', 'Admin Login - StudEats')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="min-h-screen grid md:grid-cols-2">
     <!-- Cover / Image Side -->
     <div class="hidden md:flex flex-col relative overflow-hidden bg-gradient-to-br from-green-600 to-emerald-500 text-white p-10">
@@ -51,16 +49,16 @@
             </div>
 
             <!-- Alert Message -->
-            @if (session('error'))
+            <?php if(session('error')): ?>
                 <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-3">
                     <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                     </svg>
-                    <span>{{ session('error') }}</span>
+                    <span><?php echo e(session('error')); ?></span>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            @if (session('status'))
+            <?php if(session('status')): ?>
                 <div class="mb-6 rounded-md border border-green-200 bg-green-50 p-4">
                     <div class="flex">
                         <div class="flex-shrink-0">
@@ -69,23 +67,37 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm text-green-800">{{ session('status') }}</p>
+                            <p class="text-sm text-green-800"><?php echo e(session('status')); ?></p>
                         </div>
                     </div>
                 </div>
-            @endif
+            <?php endif; ?>
 
             <!-- Login Form -->
-            <form action="{{ route('admin.login.submit') }}" method="POST" class="space-y-5" data-persist id="admin-login-form">
-                @csrf
+            <form action="<?php echo e(route('admin.login.submit')); ?>" method="POST" class="space-y-5">
+                <?php echo csrf_field(); ?>
                 
                 <div class="space-y-4">
                     <!-- Email Field -->
                     <div class="space-y-1">
                         <label for="email" class="text-sm font-medium">Admin Email Address</label>
-                        <input id="email" name="email" type="email" autocomplete="email" required value="{{ old('email') }}" placeholder="admin@studeats.com"
-                               class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 @error('email') border-destructive @enderror">
-                        @error('email')<p class="text-xs text-destructive mt-1">{{ $message }}</p>@enderror
+                        <input id="email" name="email" type="email" autocomplete="email" required value="<?php echo e(old('email')); ?>" placeholder="admin@studeats.com"
+                               class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-destructive <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                        <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-xs text-destructive mt-1"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <!-- Password Field -->
@@ -93,7 +105,14 @@
                         <label for="password" class="text-sm font-medium">Admin Password</label>
                         <div class="relative">
                             <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••"
-                                   class="w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 @error('password') border-destructive @enderror">
+                                   class="w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-destructive <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
                             <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground transition-colors" onclick="togglePasswordVisibility('password')">
                                 <svg id="password-eye-open" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -104,7 +123,14 @@
                                 </svg>
                             </button>
                         </div>
-                        @error('password')<p class="text-xs text-destructive mt-1">{{ $message }}</p>@enderror
+                        <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-xs text-destructive mt-1"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
@@ -127,7 +153,7 @@
                 <!-- Back to Login Link -->
                 <div class="text-center text-sm text-muted-foreground">
                     Not an admin?
-                    <a href="{{ route('login') }}" class="font-medium text-primary hover:underline">Back to user login</a>
+                    <a href="<?php echo e(route('login')); ?>" class="font-medium text-primary hover:underline">Back to user login</a>
                 </div>
             </form>
         </div>
@@ -150,34 +176,7 @@ function togglePasswordVisibility(fieldId) {
         eyeClosed.classList.add('hidden');
     }
 }
-
-// Initialize CSRF manager and restore form data if needed
-document.addEventListener('DOMContentLoaded', function() {
-    // Restore form data if available
-    if (window.csrfManager) {
-        csrfManager.restoreFormData('admin-login-form');
-    }
-    
-    // Add form submission handling
-    const form = document.getElementById('admin-login-form');
-    const submitBtn = form.querySelector('button[type="submit"]');
-    
-    form.addEventListener('submit', function() {
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Authenticating...
-            `;
-        }
-    });
-});
 </script>
+<?php $__env->stopSection(); ?>
 
-<!-- Include CSRF Manager -->
-<script src="{{ asset('js/csrf-manager.js') }}"></script>
-
-@endsection
+<?php echo $__env->make('layouts.guest', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\StudEats\resources\views/auth/admin-login.blade.php ENDPATH**/ ?>

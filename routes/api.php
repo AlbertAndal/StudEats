@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\NutritionController;
+use App\Http\Controllers\Api\SessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,11 @@ use Illuminate\Support\Facades\Route;
 ned to the "api" middleware group. Make something great!
 |
 */
+
+// Session & CSRF management API
+Route::get('/csrf-token', [SessionController::class, 'getCsrfToken'])->name('api.csrf-token');
+Route::get('/session-check', [SessionController::class, 'checkSession'])->name('api.session-check');
+Route::post('/session-refresh', [SessionController::class, 'refreshSession'])->name('api.session-refresh');
 
 // Nutrition calculation API
 Route::post('/nutrition/calculate', [NutritionController::class, 'calculate'])->name('api.nutrition.calculate');
