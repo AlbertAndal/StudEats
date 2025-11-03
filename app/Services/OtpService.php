@@ -100,18 +100,18 @@ class OtpService
 
             $emailHtml = $this->generateEmailHtml($otpCode, $verificationUrl, $email);
 
-            // Use queue to send email asynchronously
-            Mail::queue([], [], function ($message) use ($email, $otpCode, $emailHtml) {
+            // Send email immediately (queue worker will handle if needed)
+            Mail::send([], [], function ($message) use ($email, $otpCode, $emailHtml) {
                 $message->to($email)
                     ->subject('StudEats - Your Verification Code: ' . $otpCode)
                     ->html($emailHtml);
             });
 
-            Log::info('Verification email queued successfully', [
+            Log::info('Verification email sent successfully', [
                 'email' => $email,
                 'otp_code' => $otpCode,
-                'method' => 'queued',
-                'queue' => config('queue.default'),
+                'method' => 'immediate',
+                'driver' => config('mail.default'),
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to queue verification email', [
