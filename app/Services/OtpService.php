@@ -92,34 +92,39 @@ class OtpService
     public function sendVerificationEmail(string $email, string $otpCode, string $verificationToken): void
     {
         try {
-            // Send email immediately using Mail facade (synchronous)
+            // Queue the email for background processing
             $verificationUrl = route('email.verify.token', [
                 'token' => $verificationToken,
                 'email' => $email
             ]);
 
-            Mail::send([], [], function ($message) use ($email, $otpCode, $verificationUrl) {
+            $emailHtml = $this->generateEmailHtml($otpCode, $verificationUrl, $email);
+
+            // Use queue to send email asynchronously
+            Mail::queue([], [], function ($message) use ($email, $otpCode, $emailHtml) {
                 $message->to($email)
                     ->subject('StudEats - Your Verification Code: ' . $otpCode)
-                    ->html($this->generateEmailHtml($otpCode, $verificationUrl, $email));
+                    ->html($emailHtml);
             });
 
-            Log::info('Verification email sent immediately', [
+            Log::info('Verification email queued successfully', [
                 'email' => $email,
                 'otp_code' => $otpCode,
-                'method' => 'synchronous',
+                'method' => 'queued',
+                'queue' => config('queue.default'),
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to send verification email', [
+            Log::error('Failed to queue verification email', [
                 'email' => $email,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
             
             // Log the OTP code as fallback for development
-            Log::info('OTP Code (email failed)', [
+            Log::info('OTP Code (email failed) - Use this to verify manually', [
                 'email' => $email,
                 'otp_code' => $otpCode,
-                'verification_token' => substr($verificationToken, 0, 10) . '...'
+                'verification_url' => route('email.verify.token', ['token' => $verificationToken, 'email' => $email]),
             ]);
             
             throw $e;
