@@ -53,6 +53,16 @@
                         {{ $navRecipeCount ?? \App\Models\Meal::count() }}
                     </span>
                 </a>
+
+                <!-- Security Monitor -->
+                <a href="{{ route('admin.security-monitor.index') }}"
+                   class="group inline-flex items-center px-3 py-2 border-b-2 font-medium transition-colors duration-200 {{ request()->routeIs('admin.security-monitor.*') ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                    <svg class="w-4 h-4 mr-2 lucide lucide-shield-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    <span>Security</span>
+                </a>
             </div>
             
             <!-- Right: User Profile & Actions -->

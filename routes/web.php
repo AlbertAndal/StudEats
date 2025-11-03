@@ -151,6 +151,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/market-prices/stats', [AdminMarketPriceController::class, 'stats'])->name('market-prices.stats');
     Route::get('/market-prices/ingredients', [AdminMarketPriceController::class, 'ingredients'])->name('market-prices.ingredients');
     Route::get('/market-prices/{ingredient}/history', [AdminMarketPriceController::class, 'history'])->name('market-prices.history');
+
+    // Security Monitor
+    Route::get('/security-monitor', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'index'])->name('security-monitor.index');
+    Route::get('/security-monitor/stats', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'getStats'])->name('security-monitor.stats');
+    Route::get('/security-monitor/csrf-errors', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'getCsrfErrors'])->name('security-monitor.csrf-errors');
+    Route::get('/security-monitor/session-stats', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'getSessionStats'])->name('security-monitor.session-stats');
+    Route::post('/security-monitor/clear-sessions', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'clearOldSessions'])->name('security-monitor.clear-sessions');
+    Route::get('/security-monitor/export', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'exportReport'])->name('security-monitor.export');
+    Route::post('/security-monitor/test', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'testSecurity'])->name('security-monitor.test');
 });
 
 // API Routes for Dynamic Pricing System
