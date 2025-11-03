@@ -55,16 +55,18 @@ fi
 # Clear caches
 echo "Clearing application caches..."
 php artisan config:clear --no-interaction
-php artisan cache:clear --no-interaction
-php artisan view:clear --no-interaction
-php artisan route:clear --no-interaction
 
-# Run database migrations
+# Run database migrations BEFORE cache operations
 echo "Running database migrations..."
 php artisan migrate --force --no-interaction || {
     echo "Migration failed, but continuing..."
     echo "This might be expected if this is the first deployment"
 }
+
+# Now clear other caches after migrations
+php artisan cache:clear --no-interaction || echo "Cache clear failed, continuing..."
+php artisan view:clear --no-interaction
+php artisan route:clear --no-interaction
 
 # Create storage link
 echo "Creating storage link..."
