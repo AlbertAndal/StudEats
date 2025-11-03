@@ -7,25 +7,9 @@ echo "Starting StudEats application setup..."
 
 # Parse DATABASE_URL if available (Render PostgreSQL format)
 if [ -n "$DATABASE_URL" ]; then
-    echo "Parsing DATABASE_URL for Render deployment..."
-    # Extract components from DATABASE_URL
-    # Format: postgresql://username:password@host:port/database
-    if [[ "$DATABASE_URL" == postgres* ]]; then
-        export DB_CONNECTION=pgsql
-    else
-        export DB_CONNECTION=mysql
-    fi
-    export DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
-    export DB_PORT=$(echo $DATABASE_URL | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
-    export DB_DATABASE=$(echo $DATABASE_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
-    export DB_USERNAME=$(echo $DATABASE_URL | sed -n 's/.*:\/\/\([^:]*\):.*/\1/p')
-    export DB_PASSWORD=$(echo $DATABASE_URL | sed -n 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/p')
-    echo "Database configuration parsed from DATABASE_URL"
-    echo "DB_CONNECTION=$DB_CONNECTION"
-    echo "DB_HOST=$DB_HOST"
-    echo "DB_PORT=$DB_PORT"
-    echo "DB_DATABASE=$DB_DATABASE"
-    echo "DB_USERNAME=$DB_USERNAME"
+    echo "DATABASE_URL is set, Laravel will use it directly"
+    # Don't override - let Laravel's database config use the DATABASE_URL directly
+    # This is more reliable than parsing it manually
 fi
 
 # Wait for database to be ready with timeout
