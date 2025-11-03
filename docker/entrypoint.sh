@@ -63,6 +63,10 @@ php artisan migrate --force --no-interaction || {
     echo "This might be expected if this is the first deployment"
 }
 
+# Seed admin users for production
+echo "Seeding admin users..."
+php artisan db:seed --class=AdminUserSeeder --force --no-interaction || echo "Admin seeding skipped or failed, continuing..."
+
 # Now clear other caches after migrations
 php artisan cache:clear --no-interaction || echo "Cache clear failed, continuing..."
 php artisan view:clear --no-interaction
