@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Login - StudEats'); ?>
 
 <?php $__env->startSection('content'); ?>

@@ -57,7 +57,11 @@
                         <h3 class="text-sm font-medium text-green-100">Active Users</h3>
                         <p class="text-3xl font-bold">{{ number_format($stats['active_users']) }}</p>
                         <p class="text-xs text-green-100 mt-1">
-                            {{ number_format(($stats['active_users'] / $stats['total_users']) * 100, 1) }}% of total
+                            @if($stats['total_users'] > 0)
+                                {{ number_format(($stats['active_users'] / $stats['total_users']) * 100, 1) }}% of total
+                            @else
+                                0% of total
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -77,7 +81,7 @@
                     <div class="ml-4">
                         <h3 class="text-sm font-medium text-yellow-100">Total Recipes</h3>
                         <p class="text-3xl font-bold">{{ number_format($stats['total_meals']) }}</p>
-                        <p class="text-xs text-yellow-100 mt-1">{{ $stats['featured_meals'] }} featured</p>
+                        <p class="text-xs text-yellow-100 mt-1">{{ $stats['featured_meals'] ?? 0 }} featured</p>
                     </div>
                 </div>
             </div>
@@ -134,11 +138,11 @@
                                                 </div>
                                                 <div class="min-w-0 flex-1">
                                                     <div>
-                                                        <p class="text-sm text-gray-900 font-medium">{{ $activity->description }}</p>
+                                                        <p class="text-sm text-gray-900 font-medium">{{ $activity->description ?? 'Activity' }}</p>
                                                         <div class="mt-1 flex items-center gap-4 text-xs text-gray-500">
-                                                            <span>{{ $activity->adminUser->name }}</span>
+                                                            <span>{{ $activity->adminUser->name ?? 'Unknown Admin' }}</span>
                                                             <span>•</span>
-                                                            <span>{{ $activity->created_at->diffForHumans() }}</span>
+                                                            <span>{{ $activity->created_at ? $activity->created_at->diffForHumans() : 'Recently' }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -266,32 +270,49 @@
                             @foreach($topMeals as $meal)
                                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                                     <div class="flex items-center">
-                                        @if($meal->image_url)
-                                            <img src="{{ $meal->image_url }}" 
-                                                 alt="{{ $meal->name }}" 
+                                        @php
+                                            $imageUrl = null;
+                                            if (isset($meal->image_path) && $meal->image_path) {
+                                                try {
+                                                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($meal->image_path)) {
+                                                        $imageUrl = asset('storage/' . $meal->image_path);
+                                                    }
+                                                } catch (\Exception $e) {
+                                                    // Silent fail - use placeholder
+                                                }
+                                            }
+                                        @endphp
+                                        
+                                        @if($imageUrl)
+                                            <img src="{{ $imageUrl }}" 
+                                                 alt="{{ $meal->name ?? 'Meal' }}" 
                                                  class="w-12 h-12 rounded-lg object-cover mr-4">
                                         @else
                                             <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-pink-500 rounded-lg flex items-center justify-center text-white font-bold mr-4">
-                                                {{ strtoupper(substr($meal->name, 0, 2)) }}
+                                                {{ isset($meal->name) ? strtoupper(substr($meal->name, 0, 2)) : 'M' }}
                                             </div>
                                         @endif
                                         <div>
-                                            <h4 class="font-medium text-gray-900">{{ $meal->name }}</h4>
-                                            <p class="text-sm text-gray-500">{{ $meal->cuisine_type }} • {{ ucfirst($meal->difficulty) }}</p>
+                                            <h4 class="font-medium text-gray-900">{{ $meal->name ?? 'Unnamed Meal' }}</h4>
+                                            <p class="text-sm text-gray-500">
+                                                {{ $meal->cuisine_type ?? 'Unknown' }} • {{ isset($meal->difficulty) ? ucfirst($meal->difficulty) : 'N/A' }}
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-4">
                                         <div class="text-center">
-                                            <div class="text-lg font-bold text-gray-900">{{ $meal->meal_plans_count }}</div>
+                                            <div class="text-lg font-bold text-gray-900">{{ $meal->meal_plans_count ?? 0 }}</div>
                                             <div class="text-xs text-gray-500">Plans</div>
                                         </div>
-                                        <a href="{{ route('admin.recipes.show', $meal) }}" 
-                                           class="text-blue-600 hover:text-blue-700">
-                                            <svg class="w-5 h-5 lucide lucide-eye" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                                                <circle cx="12" cy="12" r="3"/>
-                                            </svg>
-                                        </a>
+                                        @if(isset($meal->id))
+                                            <a href="{{ route('admin.recipes.show', $meal->id) }}" 
+                                               class="text-blue-600 hover:text-blue-700">
+                                                <svg class="w-5 h-5 lucide lucide-eye" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                                    <circle cx="12" cy="12" r="3"/>
+                                                </svg>
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach

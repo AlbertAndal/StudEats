@@ -14,62 +14,87 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
+        // Initialize all variables with safe defaults
+        $stats = [
+            'total_users' => 0,
+            'active_users' => 0,
+            'suspended_users' => 0,
+            'total_meals' => 0,
+            'featured_meals' => 0,
+            'recent_registrations' => 0,
+        ];
+        $recentActivities = collect();
+        $userGrowth = collect();
+        $topMeals = collect();
+
+        // Fetch statistics with comprehensive error handling
         try {
-            // Cache expensive queries for 5 minutes to prevent timeouts
-            $stats = Cache::remember('admin_dashboard_stats', 300, function () {
-                return [
-                    'total_users' => User::count(),
-                    'active_users' => User::where('is_active', true)->count(),
-                    'suspended_users' => User::where('is_active', false)->count(),
-                    'total_meals' => Meal::count(),
-                    'featured_meals' => Meal::where('is_featured', true)->count(),
-                    'recent_registrations' => User::where('created_at', '>=', now()->subDays(7))->count(),
-                ];
-            });
+            $stats = $this->getStatistics();
         } catch (\Exception $e) {
-            \Log::error('Admin dashboard cache error: ' . $e->getMessage());
-            // Fallback to direct queries if cache fails
-            $stats = [
-                'total_users' => User::count(),
-                'active_users' => User::where('is_active', true)->count(),
-                'suspended_users' => User::where('is_active', false)->count(),
-                'total_meals' => Meal::count(),
-                'featured_meals' => Meal::where('is_featured', true)->count(),
-                'recent_registrations' => User::where('created_at', '>=', now()->subDays(7))->count(),
-            ];
+            \Log::error('Admin dashboard stats error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
         }
 
+        // Fetch recent activities with error handling
         try {
-            // Get recent activities without complex joins
-            $recentActivities = Cache::remember('admin_recent_activities', 300, function () {
-                return AdminLog::with('adminUser:id,name,email')
-                    ->latest()
-                    ->limit(10)
-                    ->get();
-            });
+            $recentActivities = $this->getRecentActivities();
         } catch (\Exception $e) {
-            \Log::error('Admin activities cache error: ' . $e->getMessage());
-            $recentActivities = AdminLog::with('adminUser:id,name,email')
+            \Log::error('Admin recent activities error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+
+        // Fetch user growth with error handling
+        try {
+            $userGrowth = $this->getUserGrowth();
+        } catch (\Exception $e) {
+            \Log::error('Admin user growth error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+
+        // Fetch top meals with error handling
+        try {
+            $topMeals = $this->getTopMeals();
+        } catch (\Exception $e) {
+            \Log::error('Admin top meals error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+
+        return view('admin.dashboard', compact('stats', 'recentActivities', 'userGrowth', 'topMeals'));
+    }
+
+    private function getStatistics(): array
+    {
+        return [
+            'total_users' => User::count() ?? 0,
+            'active_users' => User::where('is_active', true)->count() ?? 0,
+            'suspended_users' => User::where('is_active', false)->count() ?? 0,
+            'total_meals' => Meal::count() ?? 0,
+            'featured_meals' => Meal::where('is_featured', true)->count() ?? 0,
+            'recent_registrations' => User::where('created_at', '>=', now()->subDays(7))->count() ?? 0,
+        ];
+    }
+
+    private function getRecentActivities()
+    {
+        try {
+            return AdminLog::with('adminUser:id,name,email')
                 ->latest()
                 ->limit(10)
                 ->get();
-        }
-
-        try {
-            // Simplified user growth query with date filtering
-            $userGrowth = Cache::remember('admin_user_growth', 300, function () {
-                return User::select(
-                    DB::raw('DATE(created_at) as date'),
-                    DB::raw('COUNT(*) as count')
-                )
-                ->where('created_at', '>=', now()->subDays(30))
-                ->groupBy(DB::raw('DATE(created_at)'))
-                ->orderBy('date')
-                ->get();
-            });
         } catch (\Exception $e) {
-            \Log::error('Admin user growth cache error: ' . $e->getMessage());
-            $userGrowth = User::select(
+            \Log::error('Failed to fetch admin activities', ['error' => $e->getMessage()]);
+            return collect();
+        }
+    }
+
+    private function getUserGrowth()
+    {
+        try {
+            return User::select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('COUNT(*) as count')
             )
@@ -77,29 +102,35 @@ class AdminDashboardController extends Controller
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
             ->get();
-        }
-
-        try {
-            // Optimize top meals query
-            $topMeals = Cache::remember('admin_top_meals', 300, function () {
-                return Meal::select(['id', 'name', 'cost', 'cuisine_type', 'difficulty', 'image_path'])
-                    ->withCount('mealPlans')
-                    ->having('meal_plans_count', '>', 0)
-                    ->orderBy('meal_plans_count', 'desc')
-                    ->limit(5)
-                    ->get();
-            });
         } catch (\Exception $e) {
-            \Log::error('Admin top meals cache error: ' . $e->getMessage());
-            $topMeals = Meal::select(['id', 'name', 'cost', 'cuisine_type', 'difficulty', 'image_path'])
-                ->withCount('mealPlans')
+            \Log::error('Failed to fetch user growth', ['error' => $e->getMessage()]);
+            return collect();
+        }
+    }
+
+    private function getTopMeals()
+    {
+        try {
+            return DB::table('meals')
+                ->select(
+                    'meals.id',
+                    'meals.name',
+                    'meals.cost',
+                    'meals.cuisine_type',
+                    'meals.difficulty',
+                    'meals.image_path',
+                    DB::raw('COUNT(meal_plans.id) as meal_plans_count')
+                )
+                ->leftJoin('meal_plans', 'meals.id', '=', 'meal_plans.meal_id')
+                ->groupBy('meals.id', 'meals.name', 'meals.cost', 'meals.cuisine_type', 'meals.difficulty', 'meals.image_path')
                 ->having('meal_plans_count', '>', 0)
-                ->orderBy('meal_plans_count', 'desc')
+                ->orderByDesc('meal_plans_count')
                 ->limit(5)
                 ->get();
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch top meals', ['error' => $e->getMessage()]);
+            return collect();
         }
-
-        return view('admin.dashboard', compact('stats', 'recentActivities', 'userGrowth', 'topMeals'));
     }    public function systemHealth()
     {
         $health = [
