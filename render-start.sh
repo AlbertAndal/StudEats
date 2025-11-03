@@ -131,6 +131,25 @@ chmod -R 755 storage
 echo "=== Starting Laravel Application ==="
 echo "Application will be available on: http://0.0.0.0:${PORT:-8000}"
 
+# Start background queue worker for email processing
+echo "Starting background queue worker..."
+nohup php artisan queue:work --daemon --timeout=60 --memory=128 --tries=3 --delay=3 > /tmp/queue.log 2>&1 &
+QUEUE_PID=$!
+echo "Queue worker started with PID: $QUEUE_PID"
+
+# Create a simple queue status check
+nohup bash -c '
+while true; do
+    if ! kill -0 $1 2>/dev/null; then
+        echo "Queue worker died, restarting..."
+        php artisan queue:work --daemon --timeout=60 --memory=128 --tries=3 --delay=3 > /tmp/queue.log 2>&1 &
+        QUEUE_PID=$!
+        echo "Queue worker restarted with PID: $QUEUE_PID"
+    fi
+    sleep 30
+done
+' -- $QUEUE_PID &
+
 # Enable error exit now that we're starting the server
 set -e
 
