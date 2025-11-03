@@ -36,8 +36,15 @@
                         <circle cx="16" cy="7" r="3"/>
                     </svg>
                     <span>Users</span>
+                    @php
+                        try {
+                            $userCount = $navUserCount ?? \App\Models\User::count();
+                        } catch (\Exception $e) {
+                            $userCount = '...';
+                        }
+                    @endphp
                     <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-600 group-hover:bg-blue-200">
-                        {{ $navUserCount ?? \App\Models\User::count() }}
+                        {{ $userCount }}
                     </span>
                 </a>
 
@@ -49,8 +56,15 @@
                         <line x1="6" x2="18" y1="17" y2="17"/>
                     </svg>
                     <span>Recipes</span>
+                    @php
+                        try {
+                            $recipeCount = $navRecipeCount ?? \App\Models\Meal::count();
+                        } catch (\Exception $e) {
+                            $recipeCount = '...';
+                        }
+                    @endphp
                     <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200">
-                        {{ $navRecipeCount ?? \App\Models\Meal::count() }}
+                        {{ $recipeCount }}
                     </span>
                 </a>
 

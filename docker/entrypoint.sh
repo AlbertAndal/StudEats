@@ -68,6 +68,11 @@ echo "Creating session table..."
 php artisan session:table --no-interaction 2>/dev/null || echo "Session table already exists or creation skipped"
 php artisan migrate --force --no-interaction || echo "Session migration skipped"
 
+# Create cache table if it doesn't exist
+echo "Creating cache table..."
+php artisan cache:table --no-interaction 2>/dev/null || echo "Cache table already exists or creation skipped"
+php artisan migrate --force --no-interaction || echo "Cache migration skipped"
+
 # Seed admin users for production
 echo "Seeding admin users..."
 php artisan db:seed --class=AdminUserSeeder --force --no-interaction || echo "Admin seeding skipped or failed, continuing..."
