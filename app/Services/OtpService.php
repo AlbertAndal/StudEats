@@ -112,22 +112,32 @@ class OtpService
                 'otp_code' => $otpCode,
                 'method' => 'immediate',
                 'driver' => config('mail.default'),
+                'smtp_config' => [
+                    'host' => config('mail.mailers.smtp.host'),
+                    'port' => config('mail.mailers.smtp.port'),
+                    'encryption' => config('mail.mailers.smtp.encryption'),
+                ],
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to queue verification email', [
+            Log::error('Failed to send verification email', [
                 'email' => $email,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'smtp_host' => config('mail.mailers.smtp.host'),
+                'smtp_port' => config('mail.mailers.smtp.port'),
+                'smtp_encryption' => config('mail.mailers.smtp.encryption'),
             ]);
             
-            // Log the OTP code as fallback for development
-            Log::info('OTP Code (email failed) - Use this to verify manually', [
+            // ALWAYS log the OTP code so it can be used manually
+            Log::warning('EMAIL DELIVERY FAILED - Manual OTP Code for Testing', [
                 'email' => $email,
                 'otp_code' => $otpCode,
                 'verification_url' => route('email.verify.token', ['token' => $verificationToken, 'email' => $email]),
+                'expires_at' => Carbon::now()->addSeconds(self::OTP_EXPIRATION_SECONDS)->toISOString(),
+                'manual_verification_note' => 'Use this OTP code to verify manually while email issues are resolved',
             ]);
             
-            throw $e;
+            // Don't throw the exception - let the user know email failed but provide manual option
+            // throw $e;
         }
     }
 

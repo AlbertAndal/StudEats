@@ -54,7 +54,7 @@ services:
       - key: BCRYPT_ROUNDS
         value: 12
       
-      # Mail Configuration (Alternative SSL port for better connectivity)
+      # Mail Configuration - Try multiple approaches for reliability
       - key: MAIL_MAILER
         value: smtp
       - key: MAIL_HOST
@@ -67,6 +67,8 @@ services:
         value: nharujmmwoawzwgp
       - key: MAIL_ENCRYPTION
         value: ssl
+      - key: MAIL_TIMEOUT
+        value: 30
       - key: MAIL_FROM_ADDRESS
         value: johnalbertandal5@gmail.com
       - key: MAIL_FROM_NAME
@@ -134,6 +136,8 @@ services:
         value: nharujmmwoawzwgp
       - key: MAIL_ENCRYPTION
         value: ssl
+      - key: MAIL_TIMEOUT
+        value: 30
       - key: MAIL_FROM_ADDRESS
         value: johnalbertandal5@gmail.com
       - key: MAIL_FROM_NAME
