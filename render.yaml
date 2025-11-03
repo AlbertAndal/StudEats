@@ -64,7 +64,7 @@ services:
       - key: MAIL_USERNAME
         value: johnalbertandal5@gmail.com
       - key: MAIL_PASSWORD
-        value: "fovl fkzb btdz ezvk"
+        value: fovlfkzbbtdzezvk
       - key: MAIL_ENCRYPTION
         value: tls
       - key: MAIL_FROM_ADDRESS
@@ -83,7 +83,7 @@ services:
     region: oregon
     branch: main
     buildCommand: "./render-build.sh"
-    startCommand: "php artisan queue:work --tries=3 --timeout=90 --sleep=3"
+    startCommand: "./render-queue-worker.sh"
     envVars:
       # Core Laravel Configuration
       - key: APP_NAME
@@ -121,7 +121,7 @@ services:
       - key: MAIL_USERNAME
         value: johnalbertandal5@gmail.com
       - key: MAIL_PASSWORD
-        value: "fovl fkzb btdz ezvk"
+        value: fovlfkzbbtdzezvk
       - key: MAIL_ENCRYPTION
         value: tls
       - key: MAIL_FROM_ADDRESS

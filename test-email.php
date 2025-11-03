@@ -18,13 +18,13 @@ echo "Mail From: " . config('mail.from.address') . "\n\n";
 echo "Attempting to send test email...\n";
 
 try {
-    Mail::raw('This is a test email from StudEats!', function ($message) {
-        $message->to('johnalbertandal5@gmail.com')
+    Mail::raw('🍽️ This is a test email from StudEats! If you receive this, your Gmail SMTP configuration is working correctly.', function ($message) {
+        $message->to('ryuigarena@gmail.com')
             ->subject('StudEats Test Email - ' . date('Y-m-d H:i:s'));
     });
     
     echo "✓ Email sent successfully!\n";
-    echo "Check your inbox at johnalbertandal5@gmail.com\n";
+    echo "Check your inbox at ryuigarena@gmail.com (and spam folder)\n";
 } catch (\Exception $e) {
     echo "✗ Email failed: " . $e->getMessage() . "\n";
     echo "\nFull error:\n";
