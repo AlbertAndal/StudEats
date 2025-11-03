@@ -90,8 +90,8 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-// Protected routes (removed 'verified' middleware)
-Route::middleware(['auth'])->group(function () {
+// Protected routes (requires authentication and email verification)
+Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

@@ -114,6 +114,24 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+            
+            // Check if email is verified
+            if (!$user->hasVerifiedEmail()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                
+                Log::warning('Unverified user attempted to login', [
+                    'email' => $credentials['email'],
+                    'user_id' => $user->id,
+                ]);
+                
+                return redirect()
+                    ->route('email.verify.form', ['email' => $user->email])
+                    ->with('error', 'Please verify your email address before logging in.');
+            }
+            
             $request->session()->regenerate();
 
             RateLimiter::clear($request->throttleKey());
