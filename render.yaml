@@ -64,7 +64,7 @@ services:
       - key: MAIL_USERNAME
         value: johnalbertandal5@gmail.com
       - key: MAIL_PASSWORD
-        value: fovlfkzbbtdzezvk
+        value: nharujmmwoawzwgp
       - key: MAIL_ENCRYPTION
         value: tls
       - key: MAIL_FROM_ADDRESS
@@ -131,7 +131,7 @@ services:
       - key: MAIL_USERNAME
         value: johnalbertandal5@gmail.com
       - key: MAIL_PASSWORD
-        value: fovlfkzbbtdzezvk
+        value: nharujmmwoawzwgp
       - key: MAIL_ENCRYPTION
         value: tls
       - key: MAIL_FROM_ADDRESS
