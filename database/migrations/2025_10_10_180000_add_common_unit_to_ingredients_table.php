@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ingredients', function (Blueprint $table) {
-            $table->string('common_unit', 20)->default('kg')->after('unit');
+            $table->string('common_unit', 20)->default('kg');
         });
     }
 
