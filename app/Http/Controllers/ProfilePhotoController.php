@@ -37,12 +37,23 @@ class ProfilePhotoController extends Controller
             $file = $request->file('photo');
             $filename = 'profile_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             
+            // Ensure directories exist
+            $tempDir = storage_path('app/public/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+            
+            $profilePhotosDir = storage_path('app/public/profile_photos');
+            if (!file_exists($profilePhotosDir)) {
+                mkdir($profilePhotosDir, 0755, true);
+            }
+            
             // Store original file temporarily
             $tempPath = $file->storeAs('temp', $filename, 'public');
             $fullTempPath = storage_path('app/public/' . $tempPath);
             
             // Try to get image dimensions using basic functions
-            $imageInfo = getimagesize($fullTempPath);
+            $imageInfo = @getimagesize($fullTempPath);
             $width = $imageInfo ? $imageInfo[0] : 800;
             $height = $imageInfo ? $imageInfo[1] : 600;
             
@@ -58,6 +69,11 @@ class ProfilePhotoController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Profile photo upload failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to upload photo: ' . $e->getMessage()
