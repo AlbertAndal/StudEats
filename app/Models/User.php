@@ -320,8 +320,14 @@ class User extends Authenticatable implements MustVerifyEmail
             return $this->profile_photo;
         }
 
-        // For local storage
-        return asset('storage/' . $this->profile_photo);
+        // Use Storage facade for reliable URL generation
+        // This works with both local storage and cloud storage
+        try {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->profile_photo);
+        } catch (\Exception $e) {
+            // Fallback to asset helper if Storage fails
+            return asset('storage/' . $this->profile_photo);
+        }
     }
 
     /**
