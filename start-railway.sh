@@ -4,22 +4,23 @@ echo "=== StudEats Railway Startup ==="
 echo "Port: ${PORT:-8000}"
 echo "Environment: ${APP_ENV:-production}"
 
-# Check if .env exists
-if [ -f .env ]; then
-    echo "✓ .env file found"
-else
-    echo "✗ .env file NOT found - creating minimal one"
-    echo "APP_KEY=" > .env
+# Minimal .env setup for Railway
+if [ ! -f .env ]; then
+    echo "Creating minimal .env for Railway..."
+    cat > .env << EOF
+APP_ENV=production
+APP_DEBUG=false
+APP_KEY=base64:cVdpd4/yHnZtTDWQB+yi351zUDmvNHf/j5pPEgTM4a4=
+LOG_CHANNEL=errorlog
+LOG_LEVEL=error
+SESSION_DRIVER=file
+CACHE_STORE=file
+EOF
 fi
 
-# Clear any cached config to use Railway environment variables
-echo "Clearing config cache..."
-php artisan config:clear 2>&1 | head -5 || echo "Config clear skipped"
+# Quick config clear without timeout
+php artisan config:clear --no-interaction 2>/dev/null || true
 
-# Show Laravel version
-echo "Laravel version:"
-php artisan --version 2>&1 || echo "Could not get version"
-
-# Start the server
+# Start server immediately - Railway handles database via DATABASE_URL
 echo "Starting server on 0.0.0.0:${PORT:-8000}..."
-php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+exec php artisan serve --host=0.0.0.0 --port=${PORT:-8000} --no-interaction
