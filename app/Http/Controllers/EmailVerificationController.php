@@ -99,7 +99,7 @@ class EmailVerificationController extends Controller
             }
 
             // Use transaction for atomicity
-            \Illuminate\Support\Facades\DB::transaction(function () use ($otp, $email) {
+            $user = \Illuminate\Support\Facades\DB::transaction(function () use ($otp, $email) {
                 // Mark OTP as used
                 $otp->update([
                     'is_used' => true,
@@ -111,6 +111,8 @@ class EmailVerificationController extends Controller
                 if ($user && is_null($user->email_verified_at)) {
                     $user->update(['email_verified_at' => now()]);
                 }
+                
+                return $user;
             });
 
             // Clear rate limiting on successful verification
@@ -118,20 +120,23 @@ class EmailVerificationController extends Controller
 
             // Clear pending verification from session
             $request->session()->forget('pending_verification_email');
+            $request->session()->forget('dev_otp_code');
+            $request->session()->forget('dev_otp_expires');
 
             Log::info('Email verified successfully via OTP', [
                 'email' => $email,
                 'otp_id' => $otp->id,
             ]);
 
-            // Redirect to dashboard if user is logged in, otherwise to login
-            if (Auth::check()) {
-                return redirect()->route('dashboard')
-                    ->with('success', 'Your email has been verified successfully!');
-            } else {
-                return redirect()->route('login')
-                    ->with('success', 'Your email has been verified! Please log in to continue.');
+            // Auto-login the user if not already logged in
+            if (!Auth::check() && $user) {
+                Auth::login($user);
+                $request->session()->regenerate();
             }
+
+            // Always redirect to dashboard after successful verification
+            return redirect()->route('dashboard')
+                ->with('success', 'Your email has been verified successfully! Welcome to StudEats!');
 
         } catch (\Exception $e) {
             Log::error('Error verifying OTP', [
