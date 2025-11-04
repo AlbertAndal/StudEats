@@ -91,19 +91,19 @@
         <div class="md:flex md:items-center md:justify-between">
             <div class="flex items-center space-x-4">
                 <div class="flex-shrink-0">
-                    <div class="relative group">
+                    <div class="relative group cursor-pointer" data-profile-photo-container>
                         @if($user->hasProfilePhoto())
                             <img class="h-20 w-20 rounded-full object-cover ring-4 ring-white shadow-lg transition-all duration-200 group-hover:shadow-xl" 
                                  src="{{ $user->getAvatarUrl() }}" 
                                  alt="{{ $user->name }}" 
                                  data-profile-image>
                         @else
-                            <div class="h-20 w-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center ring-4 ring-white shadow-lg">
+                            <div class="h-20 w-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center ring-4 ring-white shadow-lg" data-profile-image>
                                 <span class="text-2xl font-bold text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                             </div>
                         @endif
 
-                        <div class="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-black bg-opacity-50 transition-opacity duration-200 cursor-pointer flex items-center justify-center">
+                        <div class="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-black bg-opacity-50 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
                             <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -758,9 +758,15 @@
         });
 
         // Enhanced photo upload functionality with preview and validation
+        const profilePhotoContainer = document.querySelector('[data-profile-photo-container]');
         const profileImage = document.querySelector('[data-profile-image]');
-        if (profileImage) {
-            profileImage.addEventListener('click', function() {
+        
+        if (profilePhotoContainer && profileImage) {
+            // Add click handler to the entire container (including overlay)
+            profilePhotoContainer.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
                 fileInput.accept = 'image/jpeg,image/jpg,image/png,image/gif';
@@ -782,25 +788,83 @@
                         }
                         
                         // Show loading state
-                        const originalSrc = profileImage.src;
+                        const isImg = profileImage.tagName === 'IMG';
+                        const originalContent = isImg ? profileImage.src : profileImage.innerHTML;
                         profileImage.style.opacity = '0.6';
                         profileImage.style.transition = 'opacity 0.3s ease';
                         
-                        // Preview the image
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            profileImage.src = e.target.result;
-                            profileImage.style.opacity = '1';
-                            showNotification('Photo updated! Remember to save your changes.', 'success');
-                        };
+                        // Upload the file via AJAX
+                        const formData = new FormData();
+                        formData.append('photo', file);
+                        formData.append('_token', '{{ csrf_token() }}');
                         
-                        reader.onerror = function() {
-                            profileImage.src = originalSrc;
+                        fetch('{{ route("profile.photo.upload") }}', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // If cropping is needed, handle it here
+                                if (data.data && data.data.temp_path) {
+                                    // For now, auto-crop with no adjustments
+                                    return fetch('{{ route("profile.photo.crop") }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        },
+                                        body: JSON.stringify({
+                                            temp_path: data.data.temp_path,
+                                            x: 0,
+                                            y: 0,
+                                            width: data.data.width,
+                                            height: data.data.height
+                                        })
+                                    }).then(r => r.json());
+                                }
+                                return data;
+                            } else {
+                                throw new Error(data.message || 'Upload failed');
+                            }
+                        })
+                        .then(data => {
+                            if (data.success && data.data) {
+                                // Update the image
+                                if (isImg) {
+                                    profileImage.src = data.data.photo_url || data.data.avatar_url;
+                                } else {
+                                    // Replace the placeholder with an image
+                                    const newImg = document.createElement('img');
+                                    newImg.className = 'h-20 w-20 rounded-full object-cover ring-4 ring-white shadow-lg transition-all duration-200 group-hover:shadow-xl';
+                                    newImg.src = data.data.photo_url || data.data.avatar_url;
+                                    newImg.alt = '{{ $user->name }}';
+                                    newImg.setAttribute('data-profile-image', '');
+                                    profileImage.replaceWith(newImg);
+                                }
+                                profileImage.style.opacity = '1';
+                                showNotification('Profile photo updated successfully!', 'success');
+                                
+                                // Reload the page after 1 second to show the new photo
+                                setTimeout(() => location.reload(), 1000);
+                            } else {
+                                throw new Error(data.message || 'Failed to save photo');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Upload error:', error);
+                            if (isImg) {
+                                profileImage.src = originalContent;
+                            } else {
+                                profileImage.innerHTML = originalContent;
+                            }
                             profileImage.style.opacity = '1';
-                            showNotification('Error reading file. Please try again.', 'error');
-                        };
-                        
-                        reader.readAsDataURL(file);
+                            showNotification('Error uploading photo: ' + error.message, 'error');
+                        });
                     }
                 });
                 
@@ -810,13 +874,17 @@
             });
             
             // Add hover effect
-            profileImage.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.05)';
-                this.style.transition = 'transform 0.2s ease';
+            profilePhotoContainer.addEventListener('mouseenter', function() {
+                if (profileImage.tagName === 'IMG') {
+                    profileImage.style.transform = 'scale(1.05)';
+                    profileImage.style.transition = 'transform 0.2s ease';
+                }
             });
             
-            profileImage.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1)';
+            profilePhotoContainer.addEventListener('mouseleave', function() {
+                if (profileImage.tagName === 'IMG') {
+                    profileImage.style.transform = 'scale(1)';
+                }
             });
         }
 
