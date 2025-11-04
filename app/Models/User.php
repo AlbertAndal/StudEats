@@ -66,7 +66,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'dietary_preferences' => 'array',
             'daily_budget' => 'decimal:2',
             'is_active' => 'boolean',
             'suspended_at' => 'datetime',
@@ -510,66 +509,45 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get formatted dietary preferences with configuration.
+     * Now returns the text description instead of structured data.
      */
-    public function getFormattedDietaryPreferences(): array
+    public function getFormattedDietaryPreferences(): string
     {
-        if (!$this->dietary_preferences || empty($this->dietary_preferences)) {
-            return [];
-        }
-
-        $config = self::getDietaryPreferenceConfig();
-        $formatted = [];
-
-        foreach ($this->dietary_preferences as $preference) {
-            $formatted[] = $config[$preference] ?? [
-                'label' => ucfirst(str_replace('_', ' ', $preference)),
-                'icon' => '🍽️',
-                'description' => 'Diet preference',
-                'category' => 'Other',
-                'color' => 'bg-gray-100 text-gray-800 border-gray-200'
-            ];
-        }
-
-        return $formatted;
+        return is_string($this->dietary_preferences) ? $this->dietary_preferences : '';
     }
 
     /**
      * Get dietary preferences grouped by category.
+     * Returns empty array since preferences are now free text.
      */
     public function getGroupedDietaryPreferences(): array
     {
-        $formatted = $this->getFormattedDietaryPreferences();
-        $grouped = [];
-
-        foreach ($formatted as $preference) {
-            $category = $preference['category'];
-            if (!isset($grouped[$category])) {
-                $grouped[$category] = [];
-            }
-            $grouped[$category][] = $preference;
-        }
-
-        return $grouped;
+        return [];
     }
 
     /**
      * Check if user has specific dietary preference.
+     * Now does a case-insensitive text search.
      */
     public function hasDietaryPreference(string $preference): bool
     {
-        return in_array($preference, $this->dietary_preferences ?? []);
+        if (!is_string($this->dietary_preferences)) {
+            return false;
+        }
+        return stripos($this->dietary_preferences, $preference) !== false;
     }
 
     /**
      * Add dietary preference if not already present.
+     * Appends to the text description.
      */
     public function addDietaryPreference(string $preference): bool
     {
-        $preferences = $this->dietary_preferences ?? [];
+        $current = is_string($this->dietary_preferences) ? $this->dietary_preferences : '';
         
-        if (!in_array($preference, $preferences)) {
-            $preferences[] = $preference;
-            $this->update(['dietary_preferences' => $preferences]);
+        if (stripos($current, $preference) === false) {
+            $updated = trim($current . ($current ? ', ' : '') . $preference);
+            $this->update(['dietary_preferences' => $updated]);
             return true;
         }
         
@@ -578,18 +556,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Remove dietary preference if present.
+     * Not applicable for text-based preferences.
      */
     public function removeDietaryPreference(string $preference): bool
     {
-        $preferences = $this->dietary_preferences ?? [];
-        $key = array_search($preference, $preferences);
-        
-        if ($key !== false) {
-            unset($preferences[$key]);
-            $this->update(['dietary_preferences' => array_values($preferences)]);
-            return true;
-        }
-        
         return false;
     }
 
@@ -598,13 +568,11 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getDietaryPreferenceSummary(): array
     {
-        $preferences = $this->dietary_preferences ?? [];
-        $count = count($preferences);
-        $config = self::getDietaryPreferenceConfig();
+        $text = is_string($this->dietary_preferences) ? trim($this->dietary_preferences) : '';
         
         $summary = [
-            'count' => $count,
-            'has_preferences' => $count > 0,
+            'count' => !empty($text) ? 1 : 0,
+            'has_preferences' => !empty($text),
             'display_preferences' => [],
             'categories' => []
         ];

@@ -7,8 +7,26 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Security Monitor</h1>
-            <p class="mt-2 text-gray-600">Monitor CSRF errors, session health, and security events</p>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                        <svg class="w-8 h-8 mr-3 text-blue-600 lucide lucide-shield" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                        </svg>
+                        Security Monitor
+                    </h1>
+                    <p class="mt-2 text-gray-600">Monitor CSRF errors, session health, and security events</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm font-medium text-green-700">Real-time Monitoring</span>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        Last updated: <span id="last-updated">--</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Dashboard Cards -->
@@ -18,8 +36,10 @@
                 <div class="p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            <svg class="h-6 w-6 text-red-400 lucide lucide-alert-triangle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                <path d="M12 9v4"/>
+                                <path d="m12 17 .01 0"/>
                             </svg>
                         </div>
                         <div class="ml-5 w-0 flex-1">
@@ -37,8 +57,11 @@
                 <div class="p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+                            <svg class="h-6 w-6 text-green-400 lucide lucide-users" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="m22 21-2-2a4 4 0 0 0-4-4h-1"/>
+                                <circle cx="16" cy="7" r="3"/>
                             </svg>
                         </div>
                         <div class="ml-5 w-0 flex-1">
@@ -56,8 +79,10 @@
                 <div class="p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM5 7h5l5-5v5H5z"></path>
+                            <svg class="h-6 w-6 text-yellow-400 lucide lucide-shield-alert" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                                <path d="M12 8v4"/>
+                                <path d="M12 16h.01"/>
                             </svg>
                         </div>
                         <div class="ml-5 w-0 flex-1">
@@ -75,9 +100,10 @@
                 <div class="p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
+                            <svg class="h-6 w-6 text-blue-400 lucide lucide-shield-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                                <path d="m9 12 2 2 4-4"/>
+            </svg>
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
@@ -137,8 +163,11 @@
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Recent CSRF Errors</h3>
                     <div class="mt-3 sm:mt-0 sm:ml-4">
                         <button type="button" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onclick="refreshCsrfErrors()">
-                            <svg class="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            <svg class="-ml-0.5 mr-2 h-4 w-4 lucide lucide-refresh-cw" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                                <path d="M21 3v5h-5"/>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                                <path d="M3 21v-5h5"/>
                             </svg>
                             Refresh
                         </button>
@@ -171,29 +200,39 @@
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Security Actions</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onclick="clearOldSessions()">
-                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        <svg class="-ml-1 mr-2 h-4 w-4 lucide lucide-trash-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"/>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                            <line x1="10" x2="10" y1="11" y2="17"/>
+                            <line x1="14" x2="14" y1="11" y2="17"/>
                         </svg>
                         Clear Old Sessions
                     </button>
                     
                     <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onclick="exportSecurityReport()">
-                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        <svg class="-ml-1 mr-2 h-4 w-4 lucide lucide-download" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" x2="12" y1="15" y2="3"/>
                         </svg>
                         Export Report
                     </button>
                     
                     <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onclick="refreshAllData()">
-                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        <svg class="-ml-1 mr-2 h-4 w-4 lucide lucide-refresh-cw" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                            <path d="M21 3v5h-5"/>
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                            <path d="M3 21v-5h5"/>
                         </svg>
                         Refresh All
                     </button>
                     
                     <button type="button" class="inline-flex items-center px-4 py-2 border border-yellow-300 text-sm font-medium rounded-md text-yellow-700 bg-yellow-50 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" onclick="testSecurity()">
-                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <svg class="-ml-1 mr-2 h-4 w-4 lucide lucide-shield-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                            <path d="m9 12 2 2 4-4"/>
                         </svg>
                         Test Security
                     </button>
@@ -211,17 +250,43 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up automatic refresh every 30 seconds
     setInterval(refreshAllData, 30000);
+    
+    // Update timestamp every second
+    setInterval(updateLastUpdatedTime, 1000);
 });
 
 function refreshAllData() {
     loadDashboardStats();
     loadCsrfErrors();
     loadSessionStats();
+    updateLastUpdatedTime();
+}
+
+function updateLastUpdatedTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        hour12: true, 
+        hour: 'numeric', 
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    document.getElementById('last-updated').textContent = timeString;
 }
 
 function loadDashboardStats() {
+    // Show loading state
+    document.getElementById('csrf-errors-today').innerHTML = '<div class="animate-pulse w-8 h-4 bg-gray-300 rounded"></div>';
+    document.getElementById('active-sessions').innerHTML = '<div class="animate-pulse w-8 h-4 bg-gray-300 rounded"></div>';
+    document.getElementById('security-alerts').innerHTML = '<div class="animate-pulse w-8 h-4 bg-gray-300 rounded"></div>';
+    document.getElementById('session-health').innerHTML = '<div class="animate-pulse w-12 h-4 bg-gray-300 rounded"></div>';
+    
     fetch('/admin/security-monitor/stats')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             document.getElementById('csrf-errors-today').textContent = data.csrf_errors_today || '0';
             document.getElementById('active-sessions').textContent = data.active_sessions || '0';
@@ -230,14 +295,25 @@ function loadDashboardStats() {
         })
         .catch(error => {
             console.error('Error loading dashboard stats:', error);
+            document.getElementById('csrf-errors-today').textContent = 'Error';
+            document.getElementById('active-sessions').textContent = 'Error';
+            document.getElementById('security-alerts').textContent = 'Error';
+            document.getElementById('session-health').textContent = 'Error';
         });
 }
 
 function loadCsrfErrors() {
+    const tbody = document.getElementById('csrf-errors-table');
+    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center"><div class="inline-flex items-center"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Loading CSRF errors...</div></td></tr>';
+    
     fetch('/admin/security-monitor/csrf-errors')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
-            const tbody = document.getElementById('csrf-errors-table');
             tbody.innerHTML = '';
             
             if (data.errors && data.errors.length > 0) {
@@ -246,29 +322,40 @@ function loadCsrfErrors() {
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${error.timestamp}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${error.ip || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${error.url || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${error.user_agent ? error.user_agent.substring(0, 50) + '...' : 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-xs truncate" title="${error.url || 'N/A'}">${error.url || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate" title="${error.user_agent || 'N/A'}">${error.user_agent ? error.user_agent.substring(0, 50) + '...' : 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                Error
+                                CSRF Error
                             </span>
                         </td>
                     `;
                     tbody.appendChild(row);
                 });
             } else {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No recent CSRF errors found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500"><div class="flex items-center justify-center"><svg class="w-5 h-5 mr-2 text-green-500 lucide lucide-shield-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>No recent CSRF errors found - system is secure!</div></td></tr>';
             }
         })
         .catch(error => {
             console.error('Error loading CSRF errors:', error);
-            document.getElementById('csrf-errors-table').innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error loading data</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500"><div class="flex items-center justify-center"><svg class="w-5 h-5 mr-2 lucide lucide-alert-triangle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="m12 17 .01 0"/></svg>Error loading CSRF error data</div></td></tr>';
         });
 }
 
 function loadSessionStats() {
+    // Show loading states
+    document.getElementById('total-sessions-24h').innerHTML = '<div class="animate-pulse w-8 h-4 bg-gray-300 rounded"></div>';
+    document.getElementById('expired-sessions').innerHTML = '<div class="animate-pulse w-8 h-4 bg-gray-300 rounded"></div>';
+    document.getElementById('avg-session-duration').innerHTML = '<div class="animate-pulse w-16 h-4 bg-gray-300 rounded"></div>';
+    document.getElementById('peak-sessions').innerHTML = '<div class="animate-pulse w-8 h-4 bg-gray-300 rounded"></div>';
+    
     fetch('/admin/security-monitor/session-stats')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             document.getElementById('total-sessions-24h').textContent = data.total_sessions_24h || '0';
             document.getElementById('expired-sessions').textContent = data.expired_sessions || '0';
@@ -277,6 +364,10 @@ function loadSessionStats() {
         })
         .catch(error => {
             console.error('Error loading session stats:', error);
+            document.getElementById('total-sessions-24h').textContent = 'Error';
+            document.getElementById('expired-sessions').textContent = 'Error';
+            document.getElementById('avg-session-duration').textContent = 'Error';
+            document.getElementById('peak-sessions').textContent = 'Error';
         });
 }
 

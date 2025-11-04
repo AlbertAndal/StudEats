@@ -135,50 +135,20 @@
                                             </div>
                                         </div>
                                         
-                                        @if(Auth::user()->dietary_preferences && count(Auth::user()->dietary_preferences) > 0)
+                                        @if(Auth::user()->dietary_preferences && trim(Auth::user()->dietary_preferences) !== '')
                                         <!-- Dietary Preferences Quick View -->
                                         <div class="px-4 py-3 border-b border-gray-100">
                                             <div class="flex items-center justify-between mb-2">
                                                 <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Dietary Preferences</h3>
-                                                <span class="text-xs text-gray-500">{{ count(Auth::user()->dietary_preferences) }} active</span>
+                                                <span class="text-xs text-gray-500">Configured</span>
                                             </div>
-                                            @php
-                                                $quickPreferenceConfig = [
-                                                    'vegetarian' => ['🥬', 'Vegetarian'],
-                                                    'vegan' => ['🌱', 'Vegan'],
-                                                    'pescatarian' => ['🐟', 'Pescatarian'],
-                                                    'keto' => ['🥑', 'Keto'],
-                                                    'paleo' => ['🥩', 'Paleo'],
-                                                    'mediterranean' => ['🫒', 'Mediterranean'],
-                                                    'gluten_free' => ['🌾', 'Gluten Free'],
-                                                    'dairy_free' => ['🥛', 'Dairy Free'],
-                                                    'nut_free' => ['🥜', 'Nut Free'],
-                                                    'shellfish_free' => ['🦐', 'Shellfish Free'],
-                                                    'soy_free' => ['🫘', 'Soy Free'],
-                                                    'egg_free' => ['🥚', 'Egg Free'],
-                                                    'low_carb' => ['⚡', 'Low Carb'],
-                                                    'high_protein' => ['💪', 'High Protein'],
-                                                    'low_sodium' => ['🧂', 'Low Sodium'],
-                                                    'heart_healthy' => ['❤️', 'Heart Healthy'],
-                                                    'diabetic_friendly' => ['🩺', 'Diabetic Friendly'],
-                                                    'weight_loss' => ['📉', 'Weight Loss']
-                                                ];
-                                            @endphp
-                                            <div class="flex flex-wrap gap-1">
-                                                @foreach(array_slice(Auth::user()->dietary_preferences, 0, 4) as $preference)
-                                                    @php
-                                                        $config = $quickPreferenceConfig[$preference] ?? ['🍽️', ucfirst(str_replace('_', ' ', $preference))];
-                                                    @endphp
-                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        <span class="mr-1">{{ $config[0] }}</span>
-                                                        {{ $config[1] }}
-                                                    </span>
-                                                @endforeach
-                                                @if(count(Auth::user()->dietary_preferences) > 4)
-                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                                        +{{ count(Auth::user()->dietary_preferences) - 4 }} more
-                                                    </span>
-                                                @endif
+                                            <div class="bg-green-50 rounded-lg p-2 border border-green-200">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-sm flex-shrink-0">🍽️</span>
+                                                    <p class="text-xs text-green-700 leading-relaxed">
+                                                        {{ Str::limit(Auth::user()->dietary_preferences, 80) }}
+                                                    </p>
+                                                </div>
                                             </div>
                                             <div class="mt-2">
                                                 <a href="{{ route('profile.edit') }}" 

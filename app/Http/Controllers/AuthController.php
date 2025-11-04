@@ -46,7 +46,7 @@ class AuthController extends Controller
             'password' => $validated['password'], // Will be hashed automatically due to cast
             'age' => $validated['age'] ?? null,
             'daily_budget' => $validated['daily_budget'] ?? null,
-            'dietary_preferences' => $validated['dietary_preferences'] ?? [],
+            'dietary_preferences' => $validated['dietary_preferences'] ?? '',
             'gender' => $validated['gender'] ?? null,
             'activity_level' => $validated['activity_level'] ?? null,
             'height' => $validated['height'] ?? null,

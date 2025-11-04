@@ -39,76 +39,50 @@
 @endpush
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
     <!-- Email Verification Status Alert -->
     @if(!$user->email_verified_at)
-    <div class="mb-8 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-6 shadow-sm">
-        <div class="flex items-start">
+    <div class="mb-6 bg-orange-50 border-l-4 border-orange-400 rounded-r-lg p-4 shadow-sm">
+        <div class="flex items-start gap-3">
             <div class="flex-shrink-0">
-                <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <svg class="h-5 w-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
             </div>
-            <div class="ml-3 flex-1">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-red-800">⚠️ Account Verification Required</h3>
-                        <p class="text-sm text-red-700 mt-1">
-                            Please verify your email address <strong>{{ $user->email }}</strong> before making profile changes.
-                            This ensures the security of your account and enables all features.
-                        </p>
-                    </div>
-                    <div class="flex items-center space-x-2 ml-4">
-                        <a href="{{ route('email.verify.form') }}" 
-                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-md hover:shadow-lg">
-                            <svg class="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Verify Email
-                        </a>
-                    </div>
-                </div>
-                <div class="mt-3 text-xs text-red-600 bg-red-100 rounded-md p-2">
-                    <strong>Note:</strong> Some profile updates may be limited until email verification is complete.
+            <div class="flex-1 min-w-0">
+                <h3 class="text-sm font-semibold text-orange-800">Email Verification Required</h3>
+                <p class="text-sm text-orange-700 mt-1">
+                    Please verify <span class="font-medium">{{ $user->email }}</span> to unlock all features.
+                </p>
+                <div class="mt-3">
+                    <a href="{{ route('email.verify.form') }}" 
+                       class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">
+                        <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Verify Now
+                    </a>
                 </div>
             </div>
         </div>
     </div>
     @else
-    <div class="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 shadow-sm">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-            </div>
-            <div class="ml-3">
-                <p class="text-sm font-medium text-green-800">
-                    ✓ Your account is verified and secure! You can make changes to your profile.
-                </p>
-            </div>
+    <div class="mb-6 bg-green-50 border-l-4 border-green-400 rounded-r-lg p-3 shadow-sm">
+        <div class="flex items-center gap-2">
+            <svg class="h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-sm font-medium text-green-800">
+                Account verified • All features enabled
+            </p>
         </div>
     </div>
     @endif
 
     <!-- Header -->
     <div class="mb-8">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Edit Profile</h1>
-                <p class="mt-2 text-gray-600">Update your personal information and preferences to get better meal recommendations</p>
-            </div>
-            <div class="hidden sm:block">
-                <div class="bg-green-50 rounded-lg p-4">
-                    <div class="flex items-center">
-                        <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <p class="ml-2 text-sm text-green-800">Complete your profile for personalized recommendations</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Profile</h1>
+        <p class="text-base text-gray-600 max-w-2xl">Update your personal information and preferences to get better meal recommendations tailored to your dietary needs and budget.</p>
     </div>
 
     <!-- Loading Overlay -->
@@ -129,12 +103,14 @@
         <!-- Left Column: Personal Information -->
         <div class="space-y-6">
             <!-- Personal Information -->
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                <div class="px-4 py-3 bg-gradient-to-r from-green-50 to-blue-50 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                        <svg class="h-4 w-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                        </svg>
+            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
+                <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
+                    <h2 class="text-base font-semibold text-gray-900 flex items-center">
+                        <div class="p-2 bg-green-100 rounded-lg mr-3">
+                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
                         Personal Information
                     </h2>
                 </div>
@@ -146,7 +122,7 @@
                             Full Name <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="name" name="name" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('name') border-red-300 @enderror"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('name') border-red-300 @enderror"
                                value="{{ old('name', $user->name) }}"
                                placeholder="Enter your full name">
                     @error('name')
@@ -171,7 +147,7 @@
                         </label>
                         <div class="relative">
                             <input type="email" id="email" name="email" required
-                                   class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('email') border-red-300 @enderror @if(!$user->email_verified_at) border-orange-300 bg-orange-50 @endif"
+                                   class="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('email') border-red-300 @enderror @if(!$user->email_verified_at) border-orange-300 bg-orange-50 @endif"
                                    value="{{ old('email', $user->email) }}"
                                    placeholder="Enter your email address">
                             @if(!$user->email_verified_at)
@@ -200,7 +176,7 @@
                         <div>
                             <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age</label>
                             <input type="number" id="age" name="age" min="13" max="120"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('age') border-red-300 @enderror"
+                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('age') border-red-300 @enderror"
                                    value="{{ old('age', $user->age) }}"
                                    placeholder="Age">
                             @error('age')
@@ -210,7 +186,7 @@
                         <div>
                             <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                             <select id="gender" name="gender"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('gender') border-red-300 @enderror">
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('gender') border-red-300 @enderror">
                                 <option value="">Select</option>
                                 <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>Male</option>
                                 <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>Female</option>
@@ -227,7 +203,7 @@
                     <div>
                         <label for="timezone" class="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
                         <select id="timezone" name="timezone"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('timezone') border-red-300 @enderror">
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('timezone') border-red-300 @enderror">
                             <option value="">Select timezone</option>
                             <option value="Asia/Manila" {{ old('timezone', $user->timezone) == 'Asia/Manila' ? 'selected' : '' }}>Asia/Manila (PHT)</option>
                             <option value="Asia/Singapore" {{ old('timezone', $user->timezone) == 'Asia/Singapore' ? 'selected' : '' }}>Asia/Singapore</option>
@@ -243,12 +219,14 @@
             </div>
 
             <!-- Physical Information -->
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                        <svg class="h-4 w-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
+                <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
+                    <h2 class="text-base font-semibold text-gray-900 flex items-center">
+                        <div class="p-2 bg-green-100 rounded-lg mr-3">
+                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
                         Physical Information
                     </h2>
                 </div>
@@ -260,11 +238,11 @@
                             <label for="height" class="block text-sm font-medium text-gray-700 mb-1">Height</label>
                             <div class="flex space-x-1">
                                 <input type="number" id="height" name="height" min="100" max="250" step="0.1"
-                                       class="flex-1 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('height') border-red-300 @enderror"
+                                       class="flex-1 px-3 py-2.5 border border-gray-300 rounded-l-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('height') border-red-300 @enderror"
                                        value="{{ old('height', $user->height) }}"
                                        placeholder="170">
                                 <select name="height_unit" 
-                                        class="px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                        class="px-3 py-2.5 border border-gray-300 rounded-r-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50">
                                     <option value="cm" {{ old('height_unit', $user->height_unit ?? 'cm') == 'cm' ? 'selected' : '' }}>cm</option>
                                     <option value="ft" {{ old('height_unit', $user->height_unit) == 'ft' ? 'selected' : '' }}>ft</option>
                                 </select>
@@ -277,11 +255,11 @@
                             <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">Weight</label>
                             <div class="flex space-x-1">
                                 <input type="number" id="weight" name="weight" min="30" max="300" step="0.1"
-                                       class="flex-1 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('weight') border-red-300 @enderror"
+                                       class="flex-1 px-3 py-2.5 border border-gray-300 rounded-l-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('weight') border-red-300 @enderror"
                                        value="{{ old('weight', $user->weight) }}"
                                        placeholder="65">
                                 <select name="weight_unit" 
-                                        class="px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                        class="px-3 py-2.5 border border-gray-300 rounded-r-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50">
                                     <option value="kg" {{ old('weight_unit', $user->weight_unit ?? 'kg') == 'kg' ? 'selected' : '' }}>kg</option>
                                     <option value="lbs" {{ old('weight_unit', $user->weight_unit) == 'lbs' ? 'selected' : '' }}>lbs</option>
                                 </select>
@@ -328,12 +306,14 @@
         <!-- Right Column: Dietary Preferences & Actions -->
         <div class="space-y-6">
             <!-- Dietary Preferences -->
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                <div class="px-4 py-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                        <svg class="h-4 w-4 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
+                <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
+                    <h2 class="text-base font-semibold text-gray-900 flex items-center">
+                        <div class="p-2 bg-green-100 rounded-lg mr-3">
+                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
                         Dietary Preferences & Budget
                     </h2>
                 </div>
@@ -347,15 +327,15 @@
                                 <span class="text-gray-500 text-sm">₱</span>
                             </div>
                             <input type="number" id="daily_budget" name="daily_budget" min="100" max="2000" step="10"
-                                   class="w-full pl-6 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors @error('daily_budget') border-red-300 @enderror"
+                                   class="w-full pl-7 pr-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('daily_budget') border-red-300 @enderror"
                                    value="{{ old('daily_budget', $user->daily_budget) }}"
                                    placeholder="300">
                         </div>
-                        <div class="mt-2 grid grid-cols-2 gap-1">
-                            <button type="button" class="budget-preset px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors" data-value="200">₱200</button>
-                            <button type="button" class="budget-preset px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors" data-value="300">₱300</button>
-                            <button type="button" class="budget-preset px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors" data-value="500">₱500</button>
-                            <button type="button" class="budget-preset px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors" data-value="800">₱800</button>
+                        <div class="mt-3 grid grid-cols-4 gap-2">
+                            <button type="button" class="budget-preset px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-green-100 hover:text-green-700 hover:border-green-300 border-2 border-transparent rounded-lg transition-all" data-value="200">₱200</button>
+                            <button type="button" class="budget-preset px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-green-100 hover:text-green-700 hover:border-green-300 border-2 border-transparent rounded-lg transition-all" data-value="300">₱300</button>
+                            <button type="button" class="budget-preset px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-green-100 hover:text-green-700 hover:border-green-300 border-2 border-transparent rounded-lg transition-all" data-value="500">₱500</button>
+                            <button type="button" class="budget-preset px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-green-100 hover:text-green-700 hover:border-green-300 border-2 border-transparent rounded-lg transition-all" data-value="800">₱800</button>
                         </div>
                         @error('daily_budget')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -365,82 +345,12 @@
                     <!-- Dietary Preferences -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Dietary Preferences</label>
-                        <p class="text-xs text-gray-500 mb-3">Select all that apply to get personalized meal recommendations</p>
+                        <p class="text-sm text-gray-600 mb-3">Tell us about your dietary preferences to get better meal recommendations</p>
                         
-                        @php
-                            $userPreferences = old('dietary_preferences', $user->dietary_preferences ?? []);
-                            
-                            $preferenceCategories = [
-                                'Diet Types' => [
-                                    'vegetarian' => ['🥬', 'Vegetarian', 'No meat, fish, or poultry'],
-                                    'vegan' => ['🌱', 'Vegan', 'No animal products'],
-                                    'pescatarian' => ['🐟', 'Pescatarian', 'Fish but no meat'],
-                                    'keto' => ['🥑', 'Keto', 'Very low carb, high fat'],
-                                    'paleo' => ['🥩', 'Paleo', 'Whole foods, no processed'],
-                                    'mediterranean' => ['🫒', 'Mediterranean', 'Heart-healthy, olive oil based']
-                                ],
-                                'Food Restrictions' => [
-                                    'gluten_free' => ['🌾', 'Gluten Free', 'No wheat, barley, rye'],
-                                    'dairy_free' => ['🥛', 'Dairy Free', 'No milk products'],
-                                    'nut_free' => ['🥜', 'Nut Free', 'No tree nuts or peanuts'],
-                                    'shellfish_free' => ['🦐', 'Shellfish Free', 'No shellfish'],
-                                    'soy_free' => ['🫘', 'Soy Free', 'No soy products'],
-                                    'egg_free' => ['🥚', 'Egg Free', 'No eggs or egg products']
-                                ],
-                                'Nutritional Goals' => [
-                                    'low_carb' => ['⚡', 'Low Carb', 'Reduced carbohydrates'],
-                                    'high_protein' => ['💪', 'High Protein', 'Extra protein for fitness'],
-                                    'low_sodium' => ['�', 'Low Sodium', 'Reduced salt intake'],
-                                    'heart_healthy' => ['❤️', 'Heart Healthy', 'Good for cardiovascular health'],
-                                    'diabetic_friendly' => ['�', 'Diabetic Friendly', 'Low glycemic index'],
-                                    'weight_loss' => ['📉', 'Weight Loss', 'Calorie-controlled portions']
-                                ]
-                            ];
-                        @endphp
-                        
-                        <div class="space-y-4">
-                            @foreach($preferenceCategories as $categoryName => $preferences)
-                                <div class="space-y-2">
-                                    <h4 class="text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ $categoryName }}</h4>
-                                    <div class="grid grid-cols-1 gap-2">
-                                        @foreach($preferences as $value => $info)
-                                            <label class="relative group flex items-center p-2.5 border rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200 {{ in_array($value, $userPreferences) ? 'bg-green-50 border-green-300' : 'border-gray-200' }}">
-                                                <input type="checkbox" name="dietary_preferences[]" value="{{ $value }}" 
-                                                       class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
-                                                       {{ in_array($value, $userPreferences) ? 'checked' : '' }}>
-                                                <span class="text-sm mr-2 ml-2">{{ $info[0] }}</span>
-                                                <div class="flex-1">
-                                                    <span class="text-sm font-medium text-gray-900">{{ $info[1] }}</span>
-                                                    <div class="text-xs text-gray-500">{{ $info[2] }}</div>
-                                                </div>
-                                                <!-- Visual indicator for checked state -->
-                                                <div class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <div class="w-2 h-2 rounded-full {{ in_array($value, $userPreferences) ? 'bg-green-500' : 'bg-gray-300' }}"></div>
-                                                </div>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        
-                        <!-- Preferences Summary -->
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <div class="flex items-start gap-2">
-                                <span class="text-blue-600 text-sm">💡</span>
-                                <div class="text-xs text-blue-700">
-                                    <p class="font-medium mb-1">Personalized Meal Planning</p>
-                                    <ul class="space-y-1">
-                                        <li>• Meal suggestions will match your dietary preferences</li>
-                                        <li>• Recipes filtered to avoid restricted ingredients</li>
-                                        <li>• Nutritional goals incorporated into planning</li>
-                                        <li id="preference-count" class="font-medium">
-                                            {{ count($userPreferences) }} preference{{ count($userPreferences) !== 1 ? 's' : '' }} selected
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                        <textarea name="dietary_preferences" 
+                                  rows="4"
+                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('dietary_preferences') border-red-300 @enderror"
+                                  placeholder="E.g., I'm vegetarian, avoid spicy food, prefer low-carb meals, allergic to peanuts, etc.">{{ old('dietary_preferences', is_string($user->dietary_preferences) ? $user->dietary_preferences : '') }}</textarea>
                         
                         @error('dietary_preferences')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -450,12 +360,14 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                <div class="px-4 py-3 bg-gradient-to-r from-green-50 to-blue-50 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                        <svg class="h-4 w-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
-                        </svg>
+            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
+                <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
+                    <h2 class="text-base font-semibold text-gray-900 flex items-center">
+                        <div class="p-2 bg-green-100 rounded-lg mr-3">
+                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
                         Actions
                     </h2>
                 </div>
@@ -473,15 +385,15 @@
                     <!-- Action Buttons -->
                     <div class="space-y-2">
                         <button type="submit" 
-                                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-md hover:shadow-lg"
+                                class="w-full inline-flex justify-center items-center px-5 py-3 border border-transparent text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                                 id="save-button">
-                            <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                             </svg>
                             <span id="save-text">Save Changes</span>
                         </button>
                         <a href="{{ route('profile.show') }}" 
-                           class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                           class="w-full inline-flex justify-center items-center px-5 py-3 border-2 border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all">
                             <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -629,8 +541,12 @@
                 budgetInput.value = value;
                 
                 // Visual feedback
-                budgetPresets.forEach(p => p.classList.remove('bg-green-200', 'text-green-800'));
-                this.classList.add('bg-green-200', 'text-green-800');
+                budgetPresets.forEach(p => {
+                    p.classList.remove('bg-green-100', 'text-green-700', 'border-green-400', 'font-semibold');
+                    p.classList.add('bg-gray-100');
+                });
+                this.classList.remove('bg-gray-100');
+                this.classList.add('bg-green-100', 'text-green-700', 'border-green-400', 'font-semibold');
                 
                 // Trigger input event for any listeners
                 budgetInput.dispatchEvent(new Event('input'));

@@ -1,21 +1,24 @@
 [phases.setup]
 nixPkgs = ['nodejs', 'php82', 'php82Packages.composer']
-aptPkgs = ['php8.2-pgsql', 'php8.2-mysql']
 
 [phases.install]
 cmds = [
-    'composer install --no-dev --optimize-autoloader --no-interaction --no-scripts',
-    'npm ci --include=dev --silent',
-    'npm run build --silent'
+    'composer install --no-dev --optimize-autoloader --no-interaction',
+    'npm ci --include=dev',
+    'npm run build'
 ]
 
 [phases.build]
 cmds = [
+    'echo "Creating .env file..."',
+    'cat > .env << EOF\nAPP_NAME=StudEats\nAPP_ENV=production\nAPP_DEBUG=false\nAPP_KEY=\nLOG_CHANNEL=errorlog\nEOF',
+    'cat .env',
     'mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache',
-    'chmod -R 775 storage bootstrap/cache',
+    'chmod -R 777 storage bootstrap/cache',
     'chmod +x start-railway.sh',
-    'rm -rf node_modules ~/.npm'
+    'chmod +x post-deploy.sh',
+    'ls -la'
 ]
 
 [start]
-cmd = './start-railway.sh'
+cmd = 'bash start-railway.sh'

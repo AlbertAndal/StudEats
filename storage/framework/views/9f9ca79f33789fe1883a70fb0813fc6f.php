@@ -63,7 +63,6 @@
                     </div>
                     <div class="hidden md:flex items-center space-x-6">
                         <a href="#features" class="text-gray-700 hover:text-green-600 text-sm font-medium">Features</a>
-                        <a href="<?php echo e(route('recipes.index')); ?>" class="text-gray-700 hover:text-green-600 text-sm font-medium">Meals</a>
                         <a href="#faq" class="text-gray-700 hover:text-green-600 text-sm font-medium">FAQ</a>
                     </div>
                     <div class="flex items-center space-x-3">
@@ -125,12 +124,9 @@
                             <p class="mt-8 sm:mt-10 md:mt-12 text-base text-gray-600 sm:text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed sm:leading-relaxed md:leading-relaxed px-4">
                                 Helping students eat smarter and spend wiser with healthy, budget-friendly meal plans made for college students
                             </p>
-                            <div class="mt-10 sm:mt-12 md:mt-14 lg:mt-16 flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
-                                <a href="<?php echo e(route('register')); ?>" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 transition-colors shadow-lg hover:shadow-xl">
+                            <div class="mt-10 sm:mt-12 md:mt-14 lg:mt-16 flex justify-center px-4">
+                                <a href="<?php echo e(route('register')); ?>" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 transition-colors shadow-lg hover:shadow-xl">
                                     Sign Up Now
-                                </a>
-                                <a href="<?php echo e(route('recipes.index')); ?>" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 transition-colors">
-                                    Browse Sample Meals
                                 </a>
                             </div>
                         </div>
@@ -588,12 +584,9 @@
                 <p class="mt-4 text-lg leading-6 text-green-100">
                     Join fellow Filipino students who've transformed their eating habits with StudEats.
                 </p>
-                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="<?php echo e(route('register')); ?>" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-green-700 bg-white hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-colors">
+                <div class="mt-8 flex justify-center">
+                    <a href="<?php echo e(route('register')); ?>" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-green-700 bg-white hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-colors shadow-lg hover:shadow-xl">
                         Create Free Account
-                    </a>
-                    <a href="<?php echo e(route('recipes.index')); ?>" class="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-base font-medium rounded-md text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-colors">
-                        Browse Sample Meals
                     </a>
                 </div>
             </div>

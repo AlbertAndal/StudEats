@@ -29,7 +29,7 @@ class SecurityMonitorController extends Controller
         $csrfErrors = $this->getCsrfErrorStats($startTime);
         
         // Get session statistics
-        $sessionStats = $this->getSessionStats();
+        $sessionStats = $this->getSessionStatistics();
         
         // Get security alerts
         $alerts = $this->getSecurityAlerts($startTime);
@@ -92,9 +92,9 @@ class SecurityMonitorController extends Controller
     }
 
     /**
-     * Get session statistics
+     * Get session statistics (private helper)
      */
-    private function getSessionStats()
+    private function getSessionStatistics()
     {
         try {
             $sessionCount = DB::table('sessions')->count();
@@ -202,5 +202,140 @@ class SecurityMonitorController extends Controller
         $stats = $this->getCsrfErrorStats($startTime);
         
         return response()->json($stats);
+    }
+
+    /**
+     * Get dashboard statistics API
+     */
+    public function getStats(Request $request)
+    {
+        $csrfStats = $this->getCsrfErrorStats(now()->subDay());
+        $sessionStats = $this->getSessionStatistics();
+        $alerts = $this->getSecurityAlerts(now()->subDay());
+
+        return response()->json([
+            'csrf_errors_today' => $csrfStats['total'],
+            'active_sessions' => $sessionStats['active_sessions'],
+            'security_alerts' => count($alerts),
+            'session_health' => $sessionStats['error'] ?? 'Good',
+        ]);
+    }
+
+    /**
+     * Get CSRF errors API
+     */
+    public function getCsrfErrors(Request $request)
+    {
+        $csrfStats = $this->getCsrfErrorStats(now()->subDay());
+        
+        $errors = collect($csrfStats['details'])->map(function ($error) {
+            // Parse IP and URL from log line if available
+            $line = $error['line'];
+            $ip = 'N/A';
+            $url = 'N/A';
+            $userAgent = 'N/A';
+            
+            // Extract IP if present in log
+            if (preg_match('/\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/', $line, $matches)) {
+                $ip = $matches[0];
+            }
+            
+            // Extract URL if present
+            if (preg_match('/url:([^\s]+)/', $line, $matches)) {
+                $url = $matches[1];
+            }
+            
+            return [
+                'timestamp' => $error['timestamp']->format('Y-m-d H:i:s'),
+                'ip' => $ip,
+                'url' => $url,
+                'user_agent' => $userAgent,
+            ];
+        })->take(20); // Limit to 20 recent errors
+
+        return response()->json([
+            'errors' => $errors->values()->toArray(),
+        ]);
+    }
+
+    /**
+     * Get session statistics API
+     */
+    public function getSessionStats(Request $request)
+    {
+        $sessionStats = $this->getSessionStatistics();
+        
+        return response()->json([
+            'total_sessions_24h' => $sessionStats['total_sessions'],
+            'expired_sessions' => max(0, $sessionStats['total_sessions'] - $sessionStats['active_sessions']),
+            'avg_session_duration' => config('session.lifetime') . ' min',
+            'peak_sessions' => $sessionStats['active_sessions'],
+        ]);
+    }
+
+    /**
+     * Export security report
+     */
+    public function exportReport(Request $request)
+    {
+        $csrfStats = $this->getCsrfErrorStats(now()->subWeek());
+        $sessionStats = $this->getSessionStatistics();
+        $alerts = $this->getSecurityAlerts(now()->subWeek());
+        
+        $report = [
+            'generated_at' => now()->toDateTimeString(),
+            'period' => 'Last 7 days',
+            'csrf_errors' => $csrfStats,
+            'session_stats' => $sessionStats,
+            'security_alerts' => $alerts,
+        ];
+        
+        $filename = 'security_report_' . now()->format('Y-m-d_H-i-s') . '.json';
+        
+        return response()->json($report)
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+
+    /**
+     * Test security configuration
+     */
+    public function testSecurity(Request $request)
+    {
+        $tests = [];
+        
+        // Test CSRF token functionality
+        $tests['csrf_token'] = [
+            'status' => csrf_token() ? 'pass' : 'fail',
+            'message' => csrf_token() ? 'CSRF token generation working' : 'CSRF token generation failed',
+        ];
+        
+        // Test session functionality
+        try {
+            DB::table('sessions')->count();
+            $tests['sessions'] = [
+                'status' => 'pass',
+                'message' => 'Session storage accessible',
+            ];
+        } catch (\Exception $e) {
+            $tests['sessions'] = [
+                'status' => 'fail',
+                'message' => 'Session storage not accessible: ' . $e->getMessage(),
+            ];
+        }
+        
+        // Test session configuration
+        $lifetime = config('session.lifetime');
+        $tests['session_config'] = [
+            'status' => $lifetime >= 60 ? 'pass' : 'warning',
+            'message' => $lifetime >= 60 ? 'Session lifetime is appropriate' : 'Session lifetime may be too short',
+        ];
+        
+        $allPassed = collect($tests)->every(fn($test) => $test['status'] === 'pass');
+        
+        return response()->json([
+            'success' => true,
+            'message' => $allPassed ? 'All security tests passed' : 'Some security tests failed or have warnings',
+            'tests' => $tests,
+        ]);
     }
 }

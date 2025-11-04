@@ -183,47 +183,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Dietary Preferences Section -->
-                    <div class="space-y-4 pt-4 border-t border-border">
-                        <div class="mb-4">
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-900">Food Preferences (Optional)</h3>
-                                <p class="text-xs text-gray-500">Quick selection to personalize your experience</p>
-                            </div>
-                        </div>
-                        
-                        @php($prefs = old('dietary_preferences', []))
-                        
-                        <!-- Compact Dietary Preferences -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            @foreach([
-                                'vegetarian' => ['🥬', 'Vegetarian'],
-                                'vegan' => ['🌱', 'Vegan'],
-                                'keto' => ['🥑', 'Keto'],
-                                'gluten_free' => ['🌾', 'Gluten Free'],
-                                'dairy_free' => ['🥛', 'Dairy Free'],
-                                'high_protein' => ['💪', 'High Protein'],
-                                'low_carb' => ['⚡', 'Low Carb'],
-                                'heart_healthy' => ['❤️', 'Heart Healthy']
-                            ] as $val => $config)
-                                <label class="flex items-center gap-2 p-2 border border-gray-200 rounded-md hover:border-green-300 hover:bg-green-50 transition-all cursor-pointer">
-                                    <input type="checkbox" name="dietary_preferences[]" value="{{ $val }}" class="h-3 w-3 rounded border-gray-300 text-green-600 focus:ring-1 focus:ring-green-500" {{ in_array($val, $prefs) ? 'checked' : '' }}>
-                                    <span class="text-sm">{{ $config[0] }}</span>
-                                    <span class="text-xs font-medium text-gray-700 truncate">{{ $config[1] }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                        
-                        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
-                            <div class="flex items-center gap-2 text-xs text-green-700">
-                                <span>💡</span>
-                                <span class="font-medium">Get personalized recommendations • Filter recipes • Save time planning</span>
-                            </div>
-                        </div>
-                        
-                        @error('dietary_preferences')<p class="text-xs text-destructive mt-1">{{ $message }}</p>@enderror
-                    </div>
 
                     <!-- Submit Button -->
                     <button type="submit" class="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 transform hover:scale-[1.01]">

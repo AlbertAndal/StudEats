@@ -47,7 +47,7 @@ class ProfileController extends Controller
             'activity_level' => $request->activity_level,
             'daily_budget' => $request->daily_budget,
             'timezone' => $request->timezone,
-            'dietary_preferences' => $request->dietary_preferences ?? [],
+            'dietary_preferences' => $request->dietary_preferences ?? '',
         ]);
         
         if ($request->ajax()) {
