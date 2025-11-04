@@ -63,13 +63,26 @@ class AuthController extends Controller
 
         try {
             // Generate and send OTP for email verification
-            $this->otpService->generateAndSendVerificationLink($user->email, $request);
+            $otp = $this->otpService->generateAndSendVerificationLink($user->email, $request);
             
             // Store pending verification email in session
             $request->session()->put('pending_verification_email', $user->email);
             
-            // Send welcome email (optional)
-            $this->emailService->sendAccountConfirmation($user);
+            // In development/testing, store OTP code in session for easy access
+            if (!app()->environment('production')) {
+                $request->session()->put('dev_otp_code', $otp->otp_code);
+                $request->session()->put('dev_otp_expires', $otp->expires_at->toDateTimeString());
+            }
+            
+            // Send welcome email (optional, don't let it block registration)
+            try {
+                $this->emailService->sendAccountConfirmation($user);
+            } catch (\Exception $emailEx) {
+                Log::warning('Welcome email failed but continuing registration', [
+                    'user_id' => $user->id,
+                    'error' => $emailEx->getMessage(),
+                ]);
+            }
             
         } catch (\Exception $e) {
             Log::warning('Failed to send verification email', [
