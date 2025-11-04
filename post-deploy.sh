@@ -8,3 +8,8 @@ echo "Migrations complete!"
 echo "Creating storage symlink..."
 php artisan storage:link --force
 echo "Storage symlink created!"
+
+# Seed default admin account
+echo "Setting up default admin account..."
+php artisan db:seed --class=AdminSeeder --force
+echo "Admin account setup complete!"
