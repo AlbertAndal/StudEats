@@ -3,38 +3,48 @@
 @section('title', 'User Management')
 
 @section('content')
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <!-- Page Header -->
-        <div class="mb-8">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
-                    <p class="mt-2 text-gray-600">Manage user accounts, roles, and permissions</p>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="exportUsers()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                        <svg class="w-4 h-4 lucide lucide-download" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7,10 12,15 17,10"/>
-                            <line x1="12" x2="12" y1="15" y2="3"/>
+<!-- Admin Header -->
+<div class="bg-white shadow-sm border-b border-gray-200 mb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
                         </svg>
-                        Export
-                    </button>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">User Management</h1>
+                    <p class="text-sm text-gray-600">Manage user accounts, roles, and permissions</p>
                 </div>
             </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="exportUsers()" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Export
+                </button>
+            </div>
         </div>
+    </div>
+</div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white shadow rounded-lg p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-lg">
-                        <svg class="w-6 h-6 text-blue-600 lucide lucide-users" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="m22 21-2-2a4 4 0 0 0-4-4h-1"/>
-                            <circle cx="16" cy="7" r="3"/>
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle stroke-linecap="round" stroke-linejoin="round" cx="9" cy="7" r="4"></circle>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M22 21l-2-2a4 4 0 0 0-4-4h-1"></path>
+                            <circle stroke-linecap="round" stroke-linejoin="round" cx="16" cy="7" r="3"></circle>
                         </svg>
                     </div>
                     <div class="ml-4">
@@ -44,9 +54,9 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-                <div class="flex items-center">
-                    <div class="p-3 bg-green-100 rounded-lg">
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 bg-green-100 rounded-lg">
                         <svg class="w-6 h-6 text-green-600 lucide lucide-user-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                             <circle cx="9" cy="7" r="4"/>
@@ -77,25 +87,29 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-                <div class="flex items-center">
-                    <div class="p-3 bg-purple-100 rounded-lg">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-sm font-medium text-gray-500">Admins</h3>
-                        <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['admins']) }}</p>
-                    </div>
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 bg-purple-100 rounded-lg">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Admins</h3>
+                    <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['admins']) }}</p>
                 </div>
             </div>
         </div>
+        </div>
 
-        <!-- Filters and Search -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-            <div class="p-6">
-                <form method="GET" class="flex flex-wrap gap-4">
+    <!-- Filters Card -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Filter Users</h3>
+            <p class="mt-1 text-sm text-gray-600">Search and filter user accounts</p>
+        </div>
+        <div class="px-6 py-4">
+            <form method="GET" class="flex flex-wrap gap-4">
                     <div class="flex-1 min-w-64">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Search Users</label>
                         <div class="relative">
@@ -141,8 +155,8 @@
             </div>
         </div>
 
-        <!-- Users Table -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <!-- Users Table -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -211,16 +225,12 @@
                                                     </svg>
                                                 </button>
                                             @else
-                                                <form method="POST" action="{{ route('admin.users.activate', $user) }}" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" onclick="return confirm('Are you sure you want to activate this user?')"
-                                                            class="text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-50" title="Activate User">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                        </svg>
-                                                    </button>
-                                                </form>
+                                                <button onclick="showActivateModal('{{ $user->id }}')" 
+                                                        class="text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-50" title="Activate User">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                </button>
                                             @endif
                                         @endif
                                     </div>
@@ -251,10 +261,26 @@
     </div>
 
 <!-- Suspend User Modal -->
-<div id="suspendModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
-        <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Suspend User</h3>
+<div id="suspendModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="suspendModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Suspend User</h3>
+                    <p class="text-sm text-gray-600">
+                        Please provide a reason for suspending this user.
+                    </p>
+                </div>
+            </div>
+            
             <form id="suspendForm" method="POST">
                 @csrf
                 @method('PATCH')
@@ -262,11 +288,59 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Reason for suspension</label>
                     <textarea name="reason" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" rows="3" placeholder="Enter reason for suspension..."></textarea>
                 </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closeSuspendModal()" class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Suspend User</button>
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeSuspendModal()" 
+                            class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 shadow-lg">
+                        Suspend User
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Activate User Modal -->
+<div id="activateModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="activateModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Activate User</h3>
+                    <p class="text-sm text-gray-600">
+                        Are you sure you want to activate this user? They will regain access to their account.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeActivateModal()" 
+                        class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+                <form id="activateForm" method="POST" class="flex-1">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" 
+                            class="w-full px-4 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 shadow-lg">
+                        Activate User
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -274,22 +348,71 @@
 <script>
 function showSuspendModal(userId) {
     document.getElementById('suspendForm').action = `/admin/users/${userId}/suspend`;
-    document.getElementById('suspendModal').classList.remove('hidden');
+    const modal = document.getElementById('suspendModal');
+    const modalContent = document.getElementById('suspendModalContent');
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
 }
 
 function closeSuspendModal() {
-    document.getElementById('suspendModal').classList.add('hidden');
+    const modal = document.getElementById('suspendModal');
+    const modalContent = document.getElementById('suspendModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }, 300);
+}
+
+function showActivateModal(userId) {
+    document.getElementById('activateForm').action = `/admin/users/${userId}/activate`;
+    const modal = document.getElementById('activateModal');
+    const modalContent = document.getElementById('activateModalContent');
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeActivateModal() {
+    const modal = document.getElementById('activateModal');
+    const modalContent = document.getElementById('activateModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }, 300);
 }
 
 function exportUsers() {
-    // Implementation for exporting users data
-    alert('Export functionality would be implemented here');
+    // Get current filters
+    const params = new URLSearchParams(window.location.search);
+    
+    // Redirect to export endpoint with current filters
+    window.location.href = `/admin/users/export?${params.toString()}`;
 }
 
 // Close modal on escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeSuspendModal();
+        closeActivateModal();
     }
 });
 </script>

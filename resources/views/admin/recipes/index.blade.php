@@ -3,27 +3,36 @@
 @section('title', 'Recipe Management')
 
 @section('content')
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <!-- Page Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Recipe Management</h1>
-                <p class="mt-2 text-gray-600">Manage all recipes and meal options in the system</p>
+<!-- Admin Header -->
+<div class="bg-white shadow-sm border-b border-gray-200 mb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-blue-100 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Recipe Management</h1>
+                    <p class="text-sm text-gray-600">Manage all recipes and meal options</p>
+                </div>
             </div>
             <a href="{{ route('admin.recipes.create') }}" 
-               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                <svg class="w-5 h-5 mr-2 lucide lucide-plus" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14"/>
-                    <path d="M12 5v14"/>
+               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-sm">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Add New Recipe
             </a>
         </div>
+    </div>
+</div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white shadow rounded-lg p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-lg">
                         <svg class="w-6 h-6 text-blue-600 lucide lucide-book-open" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -36,9 +45,9 @@
                         <p class="text-sm text-gray-600">Total Recipes</p>
                     </div>
                 </div>
-            </div>
+        </div>
             
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="bg-white shadow rounded-lg p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-green-100 rounded-lg">
                         <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -50,9 +59,9 @@
                         <p class="text-sm text-gray-600">Featured</p>
                     </div>
                 </div>
-            </div>
+        </div>
             
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="bg-white shadow rounded-lg p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-yellow-100 rounded-lg">
                         <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -65,9 +74,9 @@
                         <p class="text-sm text-gray-600">Cuisine Types</p>
                     </div>
                 </div>
-            </div>
+        </div>
             
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="bg-white shadow rounded-lg p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-purple-100 rounded-lg">
                         <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -79,11 +88,20 @@
                         <p class="text-sm text-gray-600">Total Plans</p>
                     </div>
                 </div>
-            </div>
         </div>
+    </div>
 
-        <!-- Search and Filter Bar -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+    <!-- Search and Filter Bar -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 flex items-center gap-3">
+                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+                </svg>
+                Search & Filters
+            </h3>
+        </div>
+        <div class="px-6 py-4">
             <form method="GET" action="{{ route('admin.recipes.index') }}" class="space-y-4 sm:space-y-0 sm:flex sm:items-end sm:gap-4">
                 <div class="flex-1">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Search Recipes</label>
@@ -138,9 +156,10 @@
                 </div>
             </form>
         </div>
+    </div>
 
-        <!-- Recipe Table -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <!-- Recipe Table -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <h3 class="text-lg font-semibold text-gray-900">
@@ -265,6 +284,7 @@
                                             </svg>
                                         </a>
                     <button data-toggle-featured="{{ $recipe->id }}" 
+                        data-recipe-name="{{ e($recipe->name) }}"
                         class="p-2 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50 rounded-lg transition-colors" title="Toggle Featured">
                                             @if($recipe->is_featured)
                                                 <!-- Solid Star (featured) -->
@@ -320,13 +340,13 @@
             @endif
         </div>
     </div>
+</div>
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 p-4 transition-opacity duration-300" style="display: none;">
-    <div class="flex items-center justify-center min-h-full">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all duration-300 scale-95 modal-content">
-        <!-- Modal Header with Icon -->
-        <div class="p-6 pb-4">
+<div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="modalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
             <div class="flex items-start mb-4">
                 <div class="flex-shrink-0">
                     <div class="p-3 bg-red-100 rounded-full">
@@ -337,35 +357,66 @@
                 </div>
                 <div class="ml-4 flex-1">
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Recipe</h3>
-                    <p class="text-gray-600 leading-relaxed">
+                    <p class="text-sm text-gray-600">
                         Are you sure you want to delete <span class="font-semibold text-gray-900">'<span id="deleteRecipeName"></span>'</span>?
                     </p>
                     <p class="text-sm text-red-600 font-medium mt-2">
-                        ⚠️ This action cannot be undone.
+                        This action cannot be undone.
                     </p>
                 </div>
             </div>
-        </div>
-        
-        <!-- Modal Actions -->
-        <div class="bg-gray-50 px-6 py-4 rounded-b-2xl flex gap-3">
-            <button onclick="closeDeleteModal()" 
-                    class="flex-1 px-5 py-2.5 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
-                Cancel
-            </button>
-            <form id="deleteForm" method="POST" class="flex-1">
-                @csrf
-                @method('DELETE')
-                <button type="submit" 
-                        class="w-full px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-lg hover:shadow-xl">
-                    <span class="flex items-center justify-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
-                        </svg>
-                        Delete Recipe
-                    </span>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeDeleteModal()" 
+                        class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
                 </button>
-            </form>
+                <form id="deleteForm" method="POST" class="flex-1">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" 
+                            class="w-full px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 shadow-lg">
+                        Confirm Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Featured Confirmation Modal -->
+<div id="featuredModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="featuredModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-yellow-100 rounded-full">
+                        <svg class="w-7 h-7 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Toggle Featured Status</h3>
+                    <p class="text-sm text-gray-600">
+                        Are you sure you want to change the featured status of <span class="font-semibold text-gray-900">'<span id="featuredRecipeName"></span>'</span>?
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeFeaturedModal()" 
+                        class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+                <button onclick="confirmToggleFeatured()" 
+                        class="flex-1 px-4 py-2.5 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-lg">
+                    Confirm
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -378,7 +429,27 @@ function changePerPage(value) {
     window.location.href = url.toString();
 }
 
-function toggleFeatured(recipeId) {
+function toggleFeatured(recipeId, recipeName) {
+    // Store the recipe ID and name for confirmation
+    window.pendingFeaturedToggle = { recipeId, recipeName };
+    
+    // Show the confirmation modal
+    document.getElementById('featuredRecipeName').textContent = recipeName;
+    const modal = document.getElementById('featuredModal');
+    const modalContent = document.getElementById('featuredModalContent');
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function confirmToggleFeatured() {
+    const { recipeId } = window.pendingFeaturedToggle;
+    
     fetch(`/admin/recipes/${recipeId}/toggle-featured`, {
         method: 'POST',
         headers: {
@@ -386,16 +457,38 @@ function toggleFeatured(recipeId) {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
+            closeFeaturedModal();
             window.location.reload();
+        } else {
+            throw new Error(data.message || 'Failed to update featured status');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Failed to update featured status');
+        alert('Failed to update featured status: ' + error.message);
+        closeFeaturedModal();
     });
+}
+
+function closeFeaturedModal() {
+    const modal = document.getElementById('featuredModal');
+    const modalContent = document.getElementById('featuredModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }, 300);
 }
 
 function deleteRecipe(recipeId, recipeName) {
@@ -403,34 +496,28 @@ function deleteRecipe(recipeId, recipeName) {
     document.getElementById('deleteForm').action = `/admin/recipes/${recipeId}`;
     
     const modal = document.getElementById('deleteModal');
-    modal.classList.remove('hidden');
-    modal.style.display = 'block';
+    const modalContent = document.getElementById('modalContent');
     
-    // Trigger animation
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    // Trigger animation after a small delay
     setTimeout(() => {
         modal.style.opacity = '1';
-        const content = modal.querySelector('.modal-content');
-        if (content) {
-            content.style.transform = 'scale(1)';
-        }
+        modalContent.style.transform = 'scale(1)';
     }, 10);
-    
-    // Prevent body scroll when modal is open
-    document.body.style.overflow = 'hidden';
 }
 
 function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
+    const modalContent = document.getElementById('modalContent');
+    
+    // Animate out
     modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
     
-    const content = modal.querySelector('.modal-content');
-    if (content) {
-        content.style.transform = 'scale(0.95)';
-    }
-    
-    // Restore body scroll
-    document.body.style.overflow = '';
-    
+    // Hide after animation
     setTimeout(() => {
         modal.classList.add('hidden');
         modal.style.display = 'none';
@@ -459,7 +546,8 @@ document.addEventListener('click', function(e) {
     const featureBtn = e.target.closest('[data-toggle-featured]');
     if (featureBtn) {
         const id = featureBtn.getAttribute('data-toggle-featured');
-        toggleFeatured(id);
+        const name = featureBtn.getAttribute('data-recipe-name');
+        toggleFeatured(id, name);
         return;
     }
     const deleteBtn = e.target.closest('[data-delete-recipe]');

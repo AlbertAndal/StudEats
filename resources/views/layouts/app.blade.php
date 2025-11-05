@@ -72,12 +72,20 @@
                                class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('recipes.*') ? 'border-green-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
                                 Recipes
                             </a>
+                            <a href="{{ route('contact.show') }}" 
+                               class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('contact.*') ? 'border-green-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
+                                Contact Us
+                            </a>
                         </div>
                         @else
                         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                             <a href="{{ route('recipes.index') }}" 
                                class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('recipes.*') ? 'border-green-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
                                 Recipes
+                            </a>
+                            <a href="{{ route('contact.show') }}" 
+                               class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('contact.*') ? 'border-green-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
+                                Contact Us
                             </a>
                         </div>
                         @endauth
@@ -134,45 +142,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        @if(Auth::user()->dietary_preferences && trim(Auth::user()->dietary_preferences) !== '')
-                                        <!-- Dietary Preferences Quick View -->
-                                        <div class="px-4 py-3 border-b border-gray-100">
-                                            <div class="flex items-center justify-between mb-2">
-                                                <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Dietary Preferences</h3>
-                                                <span class="text-xs text-gray-500">Configured</span>
-                                            </div>
-                                            <div class="bg-green-50 rounded-lg p-2 border border-green-200">
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-sm flex-shrink-0">🍽️</span>
-                                                    <p class="text-xs text-green-700 leading-relaxed">
-                                                        {{ Str::limit(Auth::user()->dietary_preferences, 80) }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2">
-                                                <a href="{{ route('profile.edit') }}" 
-                                                   class="text-xs text-green-600 hover:text-green-700 font-medium">
-                                                    Update preferences →
-                                                </a>
-                                            </div>
-                                        </div>
-                                        @else
-                                        <!-- No Dietary Preferences -->
-                                        <div class="px-4 py-3 border-b border-gray-100">
-                                            <div class="flex items-center justify-between mb-2">
-                                                <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Dietary Preferences</h3>
-                                            </div>
-                                            <div class="text-center py-2">
-                                                <div class="text-gray-400 mb-1">🍽️</div>
-                                                <p class="text-xs text-gray-500 mb-2">No preferences set</p>
-                                                <a href="{{ route('profile.edit') }}" 
-                                                   class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 rounded transition-colors">
-                                                    + Add preferences
-                                                </a>
-                                            </div>
-                                        </div>
-                                        @endif
                                         
                                         <!-- Quick Stats -->
                                         @if(Auth::user()->daily_budget)
@@ -269,6 +238,10 @@
                        class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium {{ request()->routeIs('recipes.*') ? 'bg-green-50 border-green-500 text-green-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }}">
                         Recipes
                     </a>
+                    <a href="{{ route('contact.show') }}" 
+                       class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium {{ request()->routeIs('contact.*') ? 'bg-green-50 border-green-500 text-green-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }}">
+                        Contact Us
+                    </a>
                 </div>
                 <div class="pt-4 pb-3 border-t border-gray-200">
                     <div class="flex items-center px-4">
@@ -312,6 +285,10 @@
                        class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium {{ request()->routeIs('recipes.*') ? 'bg-green-50 border-green-500 text-green-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }}">
                         Recipes
                     </a>
+                    <a href="{{ route('contact.show') }}" 
+                       class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium {{ request()->routeIs('contact.*') ? 'bg-green-50 border-green-500 text-green-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }}">
+                        Contact Us
+                    </a>
                 </div>
                 <div class="pt-4 pb-3 border-t border-gray-200">
                     <div class="space-y-1 px-2">
@@ -339,6 +316,15 @@
                     </div>
                 </div>
             @endif
+
+            <!-- Page Header -->
+            @isset($header)
+                <header class="bg-white shadow-sm border-b border-gray-200">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
 
             @yield('content')
         </main>

@@ -192,6 +192,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // User Management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/export', [AdminUserController::class, 'export'])->name('users.export');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
     Route::patch('/users/{user}/suspend', [AdminUserController::class, 'suspend'])->name('users.suspend');
     Route::patch('/users/{user}/activate', [AdminUserController::class, 'activate'])->name('users.activate');

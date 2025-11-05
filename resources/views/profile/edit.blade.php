@@ -39,10 +39,11 @@
 @endpush
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+<div class="min-h-full bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <!-- Email Verification Status Alert -->
     @if(!$user->email_verified_at)
-    <div class="mb-6 bg-orange-50 border-l-4 border-orange-400 rounded-r-lg p-4 shadow-sm">
+    <div class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-orange-400 p-4 rounded-lg shadow-sm">
         <div class="flex items-start gap-3">
             <div class="flex-shrink-0">
                 <svg class="h-5 w-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +57,7 @@
                 </p>
                 <div class="mt-3">
                     <a href="{{ route('email.verify.form') }}" 
-                       class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">
+                       class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">
                         <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -67,22 +68,33 @@
         </div>
     </div>
     @else
-    <div class="mb-6 bg-green-50 border-l-4 border-green-400 rounded-r-lg p-3 shadow-sm">
-        <div class="flex items-center gap-2">
-            <svg class="h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+    <div class="mb-3 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm">
+        <div class="flex items-center">
+            <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
-            <p class="text-sm font-medium text-green-800">
-                Account verified • All features enabled
+            <p class="ml-3 text-sm font-medium text-green-800">
+                ✓ Your email address is verified and your account is fully secure!
             </p>
         </div>
     </div>
     @endif
 
-    <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Profile</h1>
-        <p class="text-base text-gray-600 max-w-2xl">Update your personal information and health metrics to get better meal recommendations tailored to your budget.</p>
+    <!-- Page Header -->
+    <div class="md:flex md:items-center md:justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Edit Profile</h1>
+            <p class="mt-1 text-sm text-gray-600">Update your personal information and health metrics to get better meal recommendations.</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <a href="{{ route('profile.show') }}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Profile
+            </a>
+        </div>
     </div>
 
     <!-- Loading Overlay -->
@@ -103,16 +115,21 @@
         <!-- Left Column: Personal Information -->
         <div class="space-y-6">
             <!-- Personal Information -->
-            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
-                <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
-                    <h2 class="text-base font-semibold text-gray-900 flex items-center">
-                        <div class="p-2 bg-green-100 rounded-lg mr-3">
-                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                            </svg>
+            <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+                <div class="px-4 py-3 bg-gradient-to-r from-blue-50/50 to-white border-b border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                                <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
                         </div>
-                        Personal Information
-                    </h2>
+                        <div class="flex-1">
+                            <h2 class="text-base font-semibold text-gray-900 leading-5">Personal Information</h2>
+                            <p class="text-xs text-gray-500">Basic details about your account</p>
+                        </div>
+                    </div>
                 </div>
             
                 <div class="p-4 space-y-4">
@@ -219,16 +236,21 @@
             </div>
 
             <!-- Physical Information -->
-            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
-                <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
-                    <h2 class="text-base font-semibold text-gray-900 flex items-center">
-                        <div class="p-2 bg-green-100 rounded-lg mr-3">
-                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+            <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+                <div class="px-4 py-3 bg-gradient-to-r from-emerald-50/50 to-white border-b border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                                <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                            </div>
                         </div>
-                        Physical Information
-                    </h2>
+                        <div class="flex-1">
+                            <h2 class="text-base font-semibold text-gray-900 leading-5">Physical Information</h2>
+                            <p class="text-xs text-gray-500">Height, weight, and activity level</p>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="p-4 space-y-4">
@@ -306,16 +328,24 @@
         <!-- Right Column: Budget & Actions -->
         <div class="space-y-6">
             <!-- Budget Settings -->
-            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
-                <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
-                    <h2 class="text-base font-semibold text-gray-900 flex items-center">
-                        <div class="p-2 bg-green-100 rounded-lg mr-3">
-                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                            </svg>
+            <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+                <div class="px-4 py-3 bg-gradient-to-r from-green-50/50 to-white border-b border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 bg-green-500/10 rounded-lg flex items-center justify-center">
+                                <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <line x1="12" y1="2" x2="12" y2="22" stroke-width="2.5"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-width="2"></path>
+                                    <line x1="6" y1="9" x2="14" y2="9" stroke-width="1.5"></line>
+                                    <line x1="6" y1="12" x2="14" y2="12" stroke-width="1.5"></line>
+                                </svg>
+                            </div>
                         </div>
-                        Budget Settings
-                    </h2>
+                        <div class="flex-1">
+                            <h2 class="text-base font-semibold text-gray-900 leading-5">Budget Settings</h2>
+                            <p class="text-xs text-gray-500">Daily food budget management</p>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="p-4 space-y-4">
@@ -345,16 +375,21 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
-                <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
-                    <h2 class="text-base font-semibold text-gray-900 flex items-center">
-                        <div class="p-2 bg-green-100 rounded-lg mr-3">
-                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
-                            </svg>
+            <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+                <div class="px-4 py-3 bg-gradient-to-r from-purple-50/50 to-white border-b border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                                <svg class="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
                         </div>
-                        Actions
-                    </h2>
+                        <div class="flex-1">
+                            <h2 class="text-base font-semibold text-gray-900 leading-5">Actions</h2>
+                            <p class="text-xs text-gray-500">Save or cancel changes</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="p-4 space-y-2">
                     <!-- Success Message Container -->
@@ -389,6 +424,7 @@
             </div>
         </div>
     </form>
+    </div>
 </div>
 @endsection
 

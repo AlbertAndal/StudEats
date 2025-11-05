@@ -85,23 +85,50 @@
     @endphp
 
     @if($dailyBudget)
-    <div class="mb-6" aria-label="Daily budget usage" role="region">
-        <div class="flex items-center justify-between mb-1">
-            <div class="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <x-icon name="currency-dollar" class="w-4 h-4 text-green-600" />
-                <span>Daily Budget</span>
+    <div class="mb-6 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-6" aria-label="Daily budget usage" role="region">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+                <div class="h-10 w-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                    <x-icon name="currency-dollar" class="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900">Daily Budget</h3>
+                    <p class="text-xs text-gray-500">Track your spending for today</p>
+                </div>
             </div>
-            <div class="text-xs text-gray-500">
-                ₱{{ number_format($totalCost,2) }} / ₱{{ number_format($dailyBudget,2) }}
-                <span class="ml-2 {{ $remainingClass }}">
-                    @if($remaining>0) ₱{{ number_format($remaining,2) }} left @else Over budget @endif
+            <div class="text-right">
+                <div class="text-2xl font-bold text-gray-900">₱{{ number_format($totalCost, 2) }}</div>
+                <div class="text-xs text-gray-500">of ₱{{ number_format($dailyBudget, 2) }}</div>
+            </div>
+        </div>
+        
+        @php $pctWidth = (int)$budgetPct; @endphp
+        <div class="relative">
+            <div class="h-3 w-full rounded-full bg-gray-100 overflow-hidden shadow-inner" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $pctWidth }}" aria-label="Budget used {{ $pctWidth }} percent">
+                <div class="h-full {{ $budgetBarColor }} transition-all duration-500 rounded-full" data-pct="{{ $pctWidth }}"></div>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+                <span class="text-xs font-medium text-gray-600">{{ $pctWidth }}% used</span>
+                <span class="text-xs font-semibold {{ $remainingClass }}">
+                    @if($remaining > 0)
+                        <span class="inline-flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            ₱{{ number_format($remaining, 2) }} remaining
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            Over budget by ₱{{ number_format(abs($remaining), 2) }}
+                        </span>
+                    @endif
                 </span>
             </div>
         </div>
-        @php $pctWidth = (int)$budgetPct; @endphp
-        <div class="h-2 w-full rounded-full bg-gray-100 overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $pctWidth }}" aria-label="Budget used {{ $pctWidth }} percent">
-            <div class="h-full {{ $budgetBarColor }} transition-all duration-500" data-pct="{{ $pctWidth }}"></div>
-        </div>
+        
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('[data-pct]').forEach(el => {
@@ -109,10 +136,25 @@
                 });
             });
         </script>
+        
         @if($budgetPct >= 90)
-            <p class="mt-2 text-xs text-red-600 flex items-center gap-1"><x-icon name="exclamation-circle" class="w-4 h-4" /> Approaching or exceeding budget threshold.</p>
+            <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p class="text-sm text-red-700 flex items-center gap-2">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <span><strong>Budget Alert:</strong> You're approaching or exceeding your daily budget limit.</span>
+                </p>
+            </div>
         @elseif($budgetPct >= 60)
-            <p class="mt-2 text-xs text-amber-600 flex items-center gap-1"><x-icon name="exclamation-circle" class="w-4 h-4" /> Budget more than half used.</p>
+            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p class="text-sm text-amber-700 flex items-center gap-2">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <span><strong>Reminder:</strong> You've used more than half of your daily budget.</span>
+                </p>
+            </div>
         @endif
     </div>
     @endif

@@ -122,10 +122,8 @@
             <div class="bg-white shadow rounded-lg">
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">CSRF Errors Timeline</h3>
-                    <div class="h-64 flex items-center justify-center bg-gray-50 rounded">
-                        <div id="csrf-timeline-chart" class="w-full h-full">
-                            <p class="text-gray-500">Loading chart...</p>
-                        </div>
+                    <div class="h-64">
+                        <canvas id="csrf-timeline-chart"></canvas>
                     </div>
                 </div>
             </div>
@@ -243,7 +241,10 @@
 </div>
 
 <!-- JavaScript for Security Monitor -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+let csrfChart = null;
+
 document.addEventListener('DOMContentLoaded', function() {
     // Load initial data
     refreshAllData();
@@ -253,13 +254,141 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update timestamp every second
     setInterval(updateLastUpdatedTime, 1000);
+    
+    // Initialize chart
+    initCsrfTimelineChart();
 });
+
+function initCsrfTimelineChart() {
+    const ctx = document.getElementById('csrf-timeline-chart');
+    if (!ctx) return;
+    
+    csrfChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'CSRF Errors',
+                data: [],
+                borderColor: 'rgb(239, 68, 68)',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                tension: 0.3,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: 'rgb(239, 68, 68)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    cornerRadius: 6,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            return 'Errors: ' + context.parsed.y;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            return Number.isInteger(value) ? value : null;
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+    
+    // Load initial chart data
+    loadCsrfChartData();
+}
 
 function refreshAllData() {
     loadDashboardStats();
     loadCsrfErrors();
     loadSessionStats();
+    loadCsrfChartData();
     updateLastUpdatedTime();
+}
+
+function loadCsrfChartData() {
+    fetch('/admin/security-monitor/csrf-errors')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (csrfChart && data.errors) {
+                // Group errors by hour
+                const hourlyData = {};
+                const now = new Date();
+                
+                // Initialize last 24 hours with 0
+                for (let i = 23; i >= 0; i--) {
+                    const hour = new Date(now - i * 3600000);
+                    const hourLabel = hour.getHours().toString().padStart(2, '0') + ':00';
+                    hourlyData[hourLabel] = 0;
+                }
+                
+                // Count errors per hour
+                data.errors.forEach(error => {
+                    const errorDate = new Date(error.timestamp);
+                    const hourLabel = errorDate.getHours().toString().padStart(2, '0') + ':00';
+                    if (hourlyData.hasOwnProperty(hourLabel)) {
+                        hourlyData[hourLabel]++;
+                    }
+                });
+                
+                // Update chart
+                const labels = Object.keys(hourlyData);
+                const values = Object.values(hourlyData);
+                
+                csrfChart.data.labels = labels;
+                csrfChart.data.datasets[0].data = values;
+                csrfChart.update('none'); // Update without animation for better performance
+            }
+        })
+        .catch(error => {
+            console.error('Error loading CSRF chart data:', error);
+        });
 }
 
 function updateLastUpdatedTime() {

@@ -95,7 +95,14 @@ class MealPlanController extends Controller
         // Get user's BMI status for display
         $bmiStatus = $user->getBMIStatus();
 
-        return view('meal-plans.create', compact('meals', 'bmiStatus'));
+        // Get existing meal plans for the selected date
+        $selectedDate = request('date', now()->format('Y-m-d'));
+        $existingMealTypes = $user->mealPlans()
+            ->where('scheduled_date', $selectedDate)
+            ->pluck('meal_type')
+            ->toArray();
+
+        return view('meal-plans.create', compact('meals', 'bmiStatus', 'existingMealTypes'));
     }
 
     /**

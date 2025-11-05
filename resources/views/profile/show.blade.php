@@ -172,99 +172,139 @@
                             </div>
                         </div>
                         <div class="px-4 py-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                            <dl class="space-y-4">
                                 <!-- Full Name -->
-                                <div class="flex items-center gap-2 py-2">
-                                    <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                    </svg>
-                                    <div class="flex-1">
-                                        <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Full Name</dt>
-                                        <dd class="text-sm font-semibold text-gray-900">{{ $user->name }}</dd>
+                                <div class="flex items-start py-2 border-b border-gray-100 last:border-0">
+                                    <div class="flex items-center gap-3 w-full">
+                                        <div class="flex-shrink-0">
+                                            <div class="h-10 w-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</dt>
+                                            <dd class="mt-0.5 text-base font-semibold text-gray-900">{{ $user->name }}</dd>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Email Address -->
-                                <div class="flex items-center gap-2 py-2">
-                                    <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
-                                    </svg>
-                                    <div class="flex-1">
-                                        <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</dt>
-                                        <dd class="text-sm font-semibold text-gray-900 break-words">{{ $user->email }}</dd>
+                                <div class="flex items-start py-2 border-b border-gray-100 last:border-0">
+                                    <div class="flex items-center gap-3 w-full">
+                                        <div class="flex-shrink-0">
+                                            <div class="h-10 w-10 bg-purple-50 rounded-lg flex items-center justify-center">
+                                                <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Email</dt>
+                                            <dd class="mt-0.5 text-sm font-medium text-gray-900 break-all">{{ $user->email }}</dd>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Gender -->
-                                <div class="flex items-center gap-2 py-2">
-                                    <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13.5 5.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-                                    </svg>
-                                    <div class="flex-1">
-                                        <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Gender</dt>
-                                        <dd class="text-sm text-gray-900">
-                                            @if($user->gender)
-                                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium {{ $user->gender === 'male' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700' }}">
-                                                    {{ ucfirst($user->gender) }}
-                                                </span>
-                                            @else
-                                                <span class="text-gray-400 italic text-xs">Not specified</span>
-                                            @endif
-                                        </dd>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <!-- Gender -->
+                                    <div class="flex items-start py-2">
+                                        <div class="flex items-center gap-3 w-full">
+                                            <div class="flex-shrink-0">
+                                                <div class="h-10 w-10 bg-pink-50 rounded-lg flex items-center justify-center">
+                                                    <svg class="h-5 w-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13.5 5.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</dt>
+                                                <dd class="mt-0.5">
+                                                    @if($user->gender)
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $user->gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800' }}">
+                                                            {{ ucfirst($user->gender) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-gray-400 italic text-xs">Not set</span>
+                                                    @endif
+                                                </dd>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Age -->
-                                <div class="flex items-center gap-2 py-2">
-                                    <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    <div class="flex-1">
-                                        <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</dt>
-                                        <dd class="text-sm font-semibold text-gray-900">
-                                            @if($user->age)
-                                                {{ $user->age }} years old
-                                            @else
-                                                <span class="text-gray-400 italic text-xs">Not specified</span>
-                                            @endif
-                                        </dd>
+                                    <!-- Age -->
+                                    <div class="flex items-start py-2">
+                                        <div class="flex items-center gap-3 w-full">
+                                            <div class="flex-shrink-0">
+                                                <div class="h-10 w-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                                                    <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Age</dt>
+                                                <dd class="mt-0.5 text-base font-semibold text-gray-900">
+                                                    @if($user->age)
+                                                        {{ $user->age }} years
+                                                    @else
+                                                        <span class="text-gray-400 italic text-xs">Not set</span>
+                                                    @endif
+                                                </dd>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Daily Budget -->
-                                <div class="flex items-center gap-2 py-2">
-                                    <svg class="h-4 w-4 text-gray-400 flex-shrink-0" aria-label="Daily budget icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                    </svg>
-                                    <div class="flex-1">
-                                        <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Daily Budget</dt>
-                                        <dd class="text-sm text-gray-900">
-                                            @if($user->daily_budget)
-                                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
-                                                    ₱{{ number_format($user->daily_budget, 0) }}
-                                                </span>
-                                            @else
-                                                <span class="text-gray-400 italic text-xs">Not specified</span>
-                                            @endif
-                                        </dd>
+                                <div class="flex items-start py-2 border-t border-gray-100">
+                                    <div class="flex items-center gap-3 w-full">
+                                        <div class="flex-shrink-0">
+                                            <div class="h-10 w-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                                <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <line x1="12" y1="2" x2="12" y2="22" stroke-width="2.5"></line>
+                                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-width="2"></path>
+                                                    <line x1="6" y1="9" x2="14" y2="9" stroke-width="1.5"></line>
+                                                    <line x1="6" y1="12" x2="14" y2="12" stroke-width="1.5"></line>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Budget</dt>
+                                            <dd class="mt-0.5">
+                                                @if($user->daily_budget)
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800">
+                                                        ₱{{ number_format($user->daily_budget, 0) }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-gray-400 italic text-xs">Not set</span>
+                                                @endif
+                                            </dd>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Member Since -->
-                                <div class="flex items-center gap-2 py-2">
-                                    <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <div class="flex-1">
-                                        <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Member Since</dt>
-                                        <dd class="text-sm text-gray-900">
-                                            <span class="font-medium">{{ $user->created_at->format('M d, Y') }}</span>
-                                            <span class="text-xs text-gray-500 block">{{ $user->created_at->diffForHumans() }}</span>
-                                        </dd>
+                                <div class="flex items-start py-2 border-t border-gray-100">
+                                    <div class="flex items-center gap-3 w-full">
+                                        <div class="flex-shrink-0">
+                                            <div class="h-10 w-10 bg-gray-50 rounded-lg flex items-center justify-center">
+                                                <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Member Since</dt>
+                                            <dd class="mt-0.5">
+                                                <span class="text-base font-semibold text-gray-900">{{ $user->created_at->format('M d, Y') }}</span>
+                                                <span class="text-xs text-gray-500 ml-2">({{ $user->created_at->diffForHumans() }})</span>
+                                            </dd>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </dl>
                             </div>
                         </div>
                     </section>
@@ -290,7 +330,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="px-8 py-6">
+                        <div class="px-4 py-4">
                             @if($user->height && $user->weight)
                                 @php
                                     $bmi = $user->calculateBMI();
@@ -304,10 +344,11 @@
                                         $weightInKg = $user->weight_unit === 'lbs' ? $user->weight * 0.453592 : $user->weight;
                                         
                                         if ($user->gender === 'male') {
-                                            $basalMetabolicRate = 88.362 + (13.397 * $weightInKg) + (4.799 * $heightInCm) - (5.677 * $user->age);
+                                            $bmr = 88.362 + (13.397 * $weightInKg) + (4.799 * $heightInCm) - (5.677 * $user->age);
                                         } else {
-                                            $basalMetabolicRate = 447.593 + (9.247 * $weightInKg) + (3.098 * $heightInCm) - (4.330 * $user->age);
+                                            $bmr = 447.593 + (9.247 * $weightInKg) + (3.098 * $heightInCm) - (4.330 * $user->age);
                                         }
+                                        $basalMetabolicRate = $bmr;
                                     }
                                     
                                     $activityMultiplier = 1.2;
@@ -318,150 +359,129 @@
                                     $estimatedCalories = $basalMetabolicRate * $activityMultiplier;
                                 @endphp
                                 
-                                <dl class="space-y-5">
-                                    <!-- Height -->
-                                    <div class="flex flex-col sm:flex-row sm:items-center py-3 border-b border-gray-100">
-                                        <dt class="flex items-center gap-2 text-sm font-semibold text-gray-600 uppercase tracking-wide sm:w-48 mb-2 sm:mb-0">
-                                            <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-6m0 0l5 6m-5-6v18"/>
-                                            </svg>
-                                            Height
-                                        </dt>
-                                        <dd class="text-base text-gray-900 sm:flex-1">
-                                            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                                                {{ $user->height }} {{ $user->height_unit }}
-                                            </span>
-                                        </dd>
-                                    </div>
-
-                                    <!-- Weight -->
-                                    <div class="flex flex-col sm:flex-row sm:items-center py-3 border-b border-gray-100">
-                                        <dt class="flex items-center gap-2 text-sm font-semibold text-gray-600 uppercase tracking-wide sm:w-48 mb-2 sm:mb-0">
-                                            <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
-                                            </svg>
-                                            Weight
-                                        </dt>
-                                        <dd class="text-base text-gray-900 sm:flex-1">
-                                            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-purple-50 text-purple-700 border border-purple-200">
-                                                {{ $user->weight }} {{ $user->weight_unit }}
-                                            </span>
-                                        </dd>
-                                    </div>
-
-                                    <!-- BMI -->
-                                    <div class="flex flex-col sm:flex-row sm:items-center py-3 border-b border-gray-100">
-                                        <dt class="flex items-center gap-2 text-sm font-semibold text-gray-600 uppercase tracking-wide sm:w-48 mb-2 sm:mb-0">
-                                            <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                            </svg>
-                                            BMI
-                                        </dt>
-                                        <dd class="text-base text-gray-900 sm:flex-1">
-                                            @if($bmi)
-                                                <div class="flex items-center gap-3">
-                                                    <span class="text-xl font-bold text-gray-900">{{ number_format($bmi, 1) }}</span>
-                                                    @php
-                                                        $bmiColorClass = '';
-                                                        $bmiIcon = '';
-                                                        if ($bmiCategory === 'Underweight') {
-                                                            $bmiColorClass = 'bg-blue-50 text-blue-700 border-blue-200';
-                                                            $bmiIcon = 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
-                                                        } elseif ($bmiCategory === 'Normal') {
-                                                            $bmiColorClass = 'bg-green-50 text-green-700 border-green-200';
-                                                            $bmiIcon = 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
-                                                        } elseif ($bmiCategory === 'Overweight') {
-                                                            $bmiColorClass = 'bg-yellow-50 text-yellow-700 border-yellow-200';
-                                                            $bmiIcon = 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z';
-                                                        } else {
-                                                            $bmiColorClass = 'bg-red-50 text-red-700 border-red-200';
-                                                            $bmiIcon = 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
-                                                        }
-                                                    @endphp
-                                                    <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold border {{ $bmiColorClass }}">
-                                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $bmiIcon }}"/>
+                                <dl class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <!-- Height -->
+                                        <div class="flex items-start py-2">
+                                            <div class="flex items-center gap-3 w-full">
+                                                <div class="flex-shrink-0">
+                                                    <div class="h-10 w-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                                                         </svg>
-                                                        {{ $bmiCategory }}
-                                                    </span>
+                                                    </div>
                                                 </div>
-                                            @endif
-                                        </dd>
+                                                <div class="flex-1 min-w-0">
+                                                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Height</dt>
+                                                    <dd class="mt-0.5">
+                                                        <div class="text-base font-bold text-gray-900">{{ $user->height }} {{ $user->height_unit }}</div>
+                                                    </dd>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Weight -->
+                                        <div class="flex items-start py-2">
+                                            <div class="flex items-center gap-3 w-full">
+                                                <div class="flex-shrink-0">
+                                                    <div class="h-10 w-10 bg-purple-50 rounded-lg flex items-center justify-center">
+                                                        <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Weight</dt>
+                                                    <dd class="mt-0.5">
+                                                        <div class="text-base font-bold text-gray-900">{{ $user->weight }} {{ $user->weight_unit }}</div>
+                                                    </dd>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    @php
+                                        $bmiColorMap = [
+                                            'Underweight' => 'blue',
+                                            'Normal' => 'green',
+                                            'Overweight' => 'yellow',
+                                            'Obese' => 'red'
+                                        ];
+                                        $bmiColor = $bmiColorMap[$bmiCategory] ?? 'gray';
+                                    @endphp
+
+                                    <!-- BMI Card -->
+                                    @if($bmi)
+                                    <div class="border-t border-gray-100 pt-4">
+                                        <div class="bg-gradient-to-r from-{{ $bmiColor }}-50/50 to-white rounded-lg p-4 border border-{{ $bmiColor }}-100">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="h-12 w-12 bg-{{ $bmiColor }}-500/10 rounded-lg flex items-center justify-center">
+                                                        <svg class="h-6 w-6 text-{{ $bmiColor }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-xs font-medium text-gray-500 uppercase tracking-wider">Body Mass Index</div>
+                                                        <div class="flex items-baseline gap-2 mt-1">
+                                                            <span class="text-2xl font-bold text-gray-900">{{ $bmi }}</span>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-{{ $bmiColor }}-100 text-{{ $bmiColor }}-800">
+                                                                {{ $bmiCategory }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
 
                                     <!-- Activity Level -->
-                                    <div class="flex flex-col sm:flex-row sm:items-center py-3 border-b border-gray-100">
-                                        <dt class="flex items-center gap-2 text-sm font-semibold text-gray-600 uppercase tracking-wide sm:w-48 mb-2 sm:mb-0">
-                                            <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                            </svg>
-                                            Activity Level
-                                        </dt>
-                                        <dd class="text-base text-gray-900 sm:flex-1">
-                                            @if($user->activity_level)
-                                                @php
-                                                    $activityColorClass = 'bg-indigo-50 text-indigo-700 border-indigo-200';
-                                                    switch($user->activity_level) {
-                                                        case 'sedentary':
-                                                            $activityColorClass = 'bg-gray-50 text-gray-700 border-gray-200';
-                                                            break;
-                                                        case 'lightly_active':
-                                                            $activityColorClass = 'bg-blue-50 text-blue-700 border-blue-200';
-                                                            break;
-                                                        case 'moderately_active':
-                                                            $activityColorClass = 'bg-green-50 text-green-700 border-green-200';
-                                                            break;
-                                                        case 'very_active':
-                                                            $activityColorClass = 'bg-orange-50 text-orange-700 border-orange-200';
-                                                            break;
-                                                    }
-                                                @endphp
-                                                <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold border {{ $activityColorClass }}">
-                                                    {{ ucwords(str_replace('_', ' ', $user->activity_level)) }}
-                                                </span>
-                                            @else
-                                                <span class="text-gray-400 italic text-sm">Not specified</span>
-                                            @endif
-                                        </dd>
+                                    <div class="flex items-start py-2 border-t border-gray-100">
+                                        <div class="flex items-center gap-3 w-full">
+                                            <div class="flex-shrink-0">
+                                                <div class="h-10 w-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                                                    <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Activity Level</dt>
+                                                <dd class="mt-0.5">
+                                                    @if($user->activity_level)
+                                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-800">
+                                                            {{ ucwords(str_replace('_', ' ', $user->activity_level)) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-gray-400 italic text-xs">Not set</span>
+                                                    @endif
+                                                </dd>
+                                            </div>
+                                        </div>
                                     </div>
 
+                                    <!-- Daily Calorie Target -->
                                     @if($estimatedCalories > 0)
-                                    <!-- Recommended Daily Calories -->
-                                    <div class="flex flex-col py-4 bg-gradient-to-r from-emerald-50/50 to-green-50/50 rounded-xl border border-emerald-200 px-6 mt-2">
-                                        <dt class="flex items-center gap-2 text-sm font-semibold text-emerald-700 uppercase tracking-wide mb-3">
-                                            <svg class="h-5 w-5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/>
-                                            </svg>
-                                            Recommended Daily Calories
-                                        </dt>
-                                                </span>
-                                            @else
-                                                <span class="text-gray-400 italic text-sm">Not specified</span>
-                                            @endif
-                                        </dd>
-                                    </div>
-
-                                    @if($estimatedCalories > 0)
-                                    <!-- Recommended Daily Calories -->
-                                    <div class="flex flex-col py-4 bg-gradient-to-r from-emerald-50/50 to-green-50/50 rounded-xl border border-emerald-200 px-6 mt-2">
-                                        <dt class="flex items-center gap-2 text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
-                                            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/>
-                                            </svg>
-                                            Recommended Daily Calories
-                                        </dt>
-                                        <dd class="flex items-center justify-between">
-                                            <div class="flex items-center space-x-2">
-                                                <span class="text-3xl font-bold text-emerald-800">{{ number_format($estimatedCalories, 0) }}</span>
-                                                <span class="text-lg text-emerald-600 font-medium">calories/day</span>
+                                    <div class="flex items-start py-2 border-t border-gray-100">
+                                        <div class="flex items-center gap-3 w-full">
+                                            <div class="flex-shrink-0">
+                                                <div class="h-10 w-10 bg-orange-50 rounded-lg flex items-center justify-center">
+                                                    <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/>
+                                                    </svg>
+                                                </div>
                                             </div>
-                                            <div class="text-right">
-                                                <div class="text-sm text-emerald-600 font-medium">BMR: {{ number_format($basalMetabolicRate, 0) }}</div>
-                                                <div class="text-xs text-emerald-500">Activity Factor: {{ $activityMultiplier }}x</div>
+                                            <div class="flex-1 min-w-0">
+                                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Calorie Target</dt>
+                                                <dd class="mt-0.5">
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-800">
+                                                        {{ number_format($estimatedCalories) }} cal/day
+                                                    </span>
+                                                </dd>
                                             </div>
-                                        </dd>
+                                        </div>
                                     </div>
                                     @endif
                                 </dl>
@@ -624,26 +644,6 @@
                                         <a href="{{ route('profile.change-password') }}" 
                                            class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
                                             Change Password
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="h-5 w-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                                        </svg>
-                                        <div>
-                                            <dt class="text-sm font-medium text-gray-900">Password</dt>
-                                            <dd class="text-xs text-gray-500 mt-0.5">Secure your account access</dd>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <a href="{{ route('profile.change-password') }}" 
-                                           class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
-                                            <svg class="-ml-0.5 mr-1 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                                            </svg>
-                                            Change
                                         </a>
                                     </div>
                                 </div>

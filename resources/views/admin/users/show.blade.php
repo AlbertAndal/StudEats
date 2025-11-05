@@ -3,61 +3,65 @@
 @section('title', 'User Details - ' . $user->name)
 
 @section('content')
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <!-- Page Header -->
-        <div class="mb-8">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('admin.users.index') }}" 
-                       class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
-                        <svg class="w-6 h-6 lucide lucide-arrow-left" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m12 19-7-7 7-7"/>
-                            <path d="M19 12H5"/>
+<!-- Admin Header -->
+<div class="bg-white shadow-sm border-b border-gray-200 mb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+            <div class="flex items-center space-x-4">
+                <a href="{{ route('admin.users.index') }}" 
+                   class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Users
+                </a>
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                    </a>
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-900">User Details</h1>
-                        <p class="mt-2 text-gray-600">Complete information about {{ $user->name }}</p>
                     </div>
                 </div>
-                <div class="flex gap-3">
-                    @if($user->id !== auth()->id())
-                        @if($user->is_active)
-                            <button onclick="showSuspendModal()" 
-                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                                <svg class="w-4 h-4 lucide lucide-user-x" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="9" cy="7" r="4"/>
-                                    <line x1="17" x2="22" y1="8" y2="13"/>
-                                    <line x1="22" x2="17" y1="8" y2="13"/>
-                                </svg>
-                                Suspend User
-                            </button>
-                        @else
-                            <form method="POST" action="{{ route('admin.users.activate', $user) }}" class="inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" onclick="return confirm('Are you sure you want to activate this user?')"
-                                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                                    <svg class="w-4 h-4 lucide lucide-user-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="9" cy="7" r="4"/>
-                                        <polyline points="16,11 18,13 22,9"/>
-                                    </svg>
-                                    Activate User
-                                </button>
-                            </form>
-                        @endif
-                    @endif
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">User Details</h1>
+                    <p class="text-sm text-gray-600">Complete information about {{ $user->name }}</p>
                 </div>
             </div>
+            <div class="flex items-center space-x-3">
+                @if($user->id !== auth()->id())
+                    @if($user->is_active)
+                        <button onclick="showSuspendModal()" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"/>
+                            </svg>
+                            Suspend User
+                        </button>
+                    @else
+                        <form method="POST" action="{{ route('admin.users.activate', $user) }}" class="inline">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" onclick="return confirm('Are you sure you want to activate this user?')"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Activate User
+                            </button>
+                        </form>
+                    @endif
+                @endif
+            </div>
         </div>
+    </div>
+</div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- User Profile Card -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- User Profile Card -->
+        <div class="lg:col-span-1">
+            <div class="bg-white shadow rounded-lg p-6">
                     <div class="text-center">
                         <!-- Avatar -->
                         <div class="h-24 w-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
@@ -149,8 +153,8 @@
 
             <!-- Activity & Stats -->
             <div class="lg:col-span-2">
-                <!-- Activity Stats -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <!-- Activity Stats -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
                     <h4 class="text-lg font-semibold text-gray-900 mb-4">Activity Overview</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="text-center">
@@ -185,8 +189,16 @@
 
                 <!-- Recent Meal Plans -->
                 @if($user->mealPlans->count() > 0)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Recent Meal Plans</h4>
+                    <div class="bg-white shadow rounded-lg">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 flex items-center gap-3">
+                                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                                Recent Meal Plans
+                            </h3>
+                        </div>
+                        <div class="px-6 py-4">
                         <div class="space-y-4">
                             @foreach($user->mealPlans->take(5) as $mealPlan)
                                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -213,8 +225,17 @@
 
                 <!-- Admin Logs -->
                 @if($user->adminLogs->count() > 0)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Admin Activity Log</h4>
+                    <div class="bg-white shadow rounded-lg">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 flex items-center gap-3">
+                                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                                Admin Activity Log
+                            </h3>
+                        </div>
+                        <div class="px-6 py-4">
+
                         <div class="space-y-3">
                             @foreach($user->adminLogs->take(10) as $log)
                                 <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
@@ -235,6 +256,8 @@
                 @endif
             </div>
         </div>
+                    </div>
+                </div>
     </div>
 
     <!-- Suspend User Modal -->

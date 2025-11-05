@@ -165,4 +165,70 @@ class AdminUserController extends Controller
 
         return back()->with('success', 'User deleted successfully.');
     }
+
+    public function export(Request $request)
+    {
+        $query = User::query();
+
+        // Apply same filters as index
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('role') && $request->role !== 'all') {
+            $query->where('role', $request->role);
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'suspended') {
+                $query->where('is_active', false);
+            }
+        }
+
+        $users = $query->latest()->get();
+
+        // Create CSV
+        $filename = 'users_export_' . date('Y-m-d_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function() use ($users) {
+            $file = fopen('php://output', 'w');
+            
+            // Add CSV headers
+            fputcsv($file, ['ID', 'Name', 'Email', 'Role', 'Status', 'Email Verified', 'Created At', 'Last Login']);
+            
+            // Add data rows
+            foreach ($users as $user) {
+                fputcsv($file, [
+                    $user->id,
+                    $user->name,
+                    $user->email,
+                    ucfirst($user->role),
+                    $user->is_active ? 'Active' : 'Suspended',
+                    $user->email_verified_at ? 'Yes' : 'No',
+                    $user->created_at->format('Y-m-d H:i:s'),
+                    $user->last_login_at ? $user->last_login_at->format('Y-m-d H:i:s') : 'Never',
+                ]);
+            }
+            
+            fclose($file);
+        };
+
+        AdminLog::createLog(
+            Auth::id(),
+            'users_exported',
+            "Exported " . $users->count() . " users to CSV"
+        );
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

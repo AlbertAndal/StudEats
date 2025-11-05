@@ -6,26 +6,26 @@
 <div class="min-h-screen bg-gray-50 py-12 overflow-x-hidden">
     <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-            <div class="px-8 py-6 border-b border-gray-200">
-                <div class="flex items-center">
+        <div class="mb-8">
+            <div class="bg-gradient-to-r from-purple-50/50 to-white border-b border-gray-200 rounded-t-lg px-8 py-6">
+                <div class="flex items-center gap-4">
                     <div class="flex-shrink-0">
-                        <div class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="h-12 w-12 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                            <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </div>
                     </div>
-                    <div class="ml-4">
+                    <div class="flex-1">
                         <h1 class="text-3xl font-bold text-gray-900">Terms of Service</h1>
-                        <p class="mt-2 text-sm text-gray-600">Last updated: {{ date('F j, Y') }}</p>
+                        <p class="mt-1 text-gray-600">Last updated: {{ date('F j, Y') }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Content -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
             <div class="px-4 py-8 sm:px-8">
                 <div class="prose prose-lg prose-gray max-w-none overflow-hidden">
                     <style>
@@ -98,10 +98,10 @@
 
                     <section class="mb-8">
                         <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Health and Dietary Information</h2>
-                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-4">
+                        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100/50 border border-yellow-200 rounded-lg p-6 mb-4">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                     </svg>
                                 </div>
@@ -196,14 +196,31 @@
                         <p class="text-gray-700 leading-relaxed mb-4">
                             If you have any questions about these Terms of Service, please contact us:
                         </p>
-                        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                            <ul class="text-gray-700 space-y-2">
-                                <li><strong>Email:</strong> legal@studeats.com</li>
-                                <li><strong>Support:</strong> support@studeats.com</li>
-                                <li><strong>Address:</strong> StudEats Legal Team<br>
-                                123 University Avenue<br>
-                                Metro Manila, Philippines</li>
-                            </ul>
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-lg p-6 border border-purple-200">
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0">
+                                    <div class="h-10 w-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                        <svg class="h-5 w-5 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <ul class="text-purple-900 space-y-2">
+                                        <li class="flex items-center gap-2">
+                                            <strong>Email:</strong> 
+                                            <a href="mailto:legal@studeats.com" class="text-purple-700 hover:text-purple-800 hover:underline">legal@studeats.com</a>
+                                        </li>
+                                        <li class="flex items-center gap-2">
+                                            <strong>Support:</strong> 
+                                            <a href="mailto:support@studeats.com" class="text-purple-700 hover:text-purple-800 hover:underline">support@studeats.com</a>
+                                        </li>
+                                        <li><strong>Address:</strong> StudEats Legal Team<br>
+                                        123 University Avenue<br>
+                                        Metro Manila, Philippines</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </section>
 
@@ -219,7 +236,7 @@
         <!-- Back to Home -->
         <div class="mt-8 text-center">
             <a href="{{ route('dashboard') }}" 
-               class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
+               class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
                 <svg class="-ml-1 mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>

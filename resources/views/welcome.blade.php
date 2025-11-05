@@ -64,6 +64,7 @@
                     <div class="hidden md:flex items-center space-x-6">
                         <a href="#features" class="text-gray-700 hover:text-green-600 text-sm font-medium">Features</a>
                         <a href="#faq" class="text-gray-700 hover:text-green-600 text-sm font-medium">FAQ</a>
+                        <a href="{{ route('contact.show') }}" class="text-gray-700 hover:text-green-600 text-sm font-medium">Contact Us</a>
                     </div>
                     <div class="flex items-center space-x-3">
                         @auth
@@ -157,7 +158,7 @@
                             <div class="slideshow-container rounded-2xl overflow-hidden shadow-2xl bg-gray-100 aspect-square">
                                 <!-- Slide 1 -->
                                 <div class="slide fade active">
-                                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?auto=format&fit=crop&w=800&q=80" 
+                                    <img src="https://images.unsplash.com/photo-1606787366850-de6330128bfc?auto=format&fit=crop&w=800&q=80" 
                                          alt="Budget-friendly Filipino meal" 
                                          class="w-full h-full object-cover">
                                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
@@ -642,7 +643,6 @@
                     <div class="col-span-1">
                         <h3 class="text-sm font-semibold text-white tracking-wider uppercase mb-4">Support</h3>
                         <ul class="space-y-3">
-                            <li><a href="mailto:studeats23@gmail.com?subject=Help%20Request" class="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
                             <li><a href="{{ route('contact.show') }}" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
                             <li><a href="{{ route('privacy-policy') }}" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
                             <li><a href="{{ route('terms-of-service') }}" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>

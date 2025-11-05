@@ -3,50 +3,94 @@
 @section('title', 'Add New Recipe')
 
 @section('content')
-<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8" role="region" aria-labelledby="page-title">
-    <div class="mb-8">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 id="page-title" class="text-3xl font-bold text-gray-900">Add New Recipe</h1>
-                <p class="mt-2 text-gray-600">Create a new recipe with ingredients, instructions, and nutritional information.</p>
+<style>
+/* Remove spinner arrows from number inputs in readonly nutrition fields */
+input[type=number].no-spinners::-webkit-outer-spin-button,
+input[type=number].no-spinners::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number].no-spinners {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+</style>
+
+<!-- Admin Header -->
+<div class="bg-white shadow-sm border-b border-gray-200 mb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Add New Recipe</h1>
+                    <p class="text-sm text-gray-600">Create a new recipe with ingredients, instructions, and nutritional information</p>
+                </div>
             </div>
-            <a href="{{ route('admin.recipes.index') }}" 
-               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                Back to Recipes
-            </a>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('admin.recipes.index') }}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Recipes
+                </a>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-        <form action="{{ route('admin.recipes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8" novalidate>
-            @csrf
-            @if ($errors->any())
-                <div class="p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive">
-                    <h2 class="font-semibold text-red-800 mb-2 text-sm">There were some problems with your input:</h2>
-                    <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <form action="{{ route('admin.recipes.store') }}" method="POST" enctype="multipart/form-data" novalidate>
+        @csrf
+        @if ($errors->any())
+            <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">There were errors with your submission</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            @endif
-            
-            <!-- Basic Information -->
-            <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
+            </div>
+        @endif
+        
+        <!-- Two Column Admin Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column -->
+            <div class="space-y-6">
+                <!-- Basic Information Card -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Basic Information</h3>
+                        <p class="mt-1 text-sm text-gray-600">Enter the basic details for this recipe</p>
+                    </div>
+                    <div class="px-6 py-4 space-y-4">
+                        <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Recipe Name</label>
-               <input type="text" 
-                   id="name" 
-                   name="name" 
-                   value="{{ old('name') }}" 
-                   required maxlength="150"
-                   aria-required="true"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="text" 
+                               id="name" 
+                               name="name" 
+                               value="{{ old('name') }}" 
+                               required maxlength="150"
+                               aria-required="true"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         @error('name')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -54,14 +98,14 @@
 
                     <div>
                         <label for="cuisine_type" class="block text-sm font-medium text-gray-700 mb-2">Cuisine Type</label>
-               <input type="text" 
-                   id="cuisine_type" 
-                   name="cuisine_type" 
-                   value="{{ old('cuisine_type') }}" 
-                   placeholder="e.g., Filipino, Italian, Chinese"
-                   required maxlength="80"
-                   aria-required="true"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="text" 
+                               id="cuisine_type" 
+                               name="cuisine_type" 
+                               value="{{ old('cuisine_type') }}" 
+                               placeholder="e.g., Filipino, Italian, Chinese"
+                               required maxlength="80"
+                               aria-required="true"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         @error('cuisine_type')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -69,10 +113,10 @@
 
                     <div>
                         <label for="difficulty" class="block text-sm font-medium text-gray-700 mb-2">Difficulty Level</label>
-            <select id="difficulty" 
-                name="difficulty" 
-                required aria-required="true"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select id="difficulty" 
+                                name="difficulty" 
+                                required aria-required="true"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="">Select difficulty</option>
                             <option value="easy" {{ old('difficulty') == 'easy' ? 'selected' : '' }}>Easy</option>
                             <option value="medium" {{ old('difficulty') == 'medium' ? 'selected' : '' }}>Medium</option>
@@ -100,11 +144,11 @@
                         @enderror
                     </div>
 
-                    <div class="md:col-span-2">
+                    <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
                         <textarea id="description" 
                                   name="description" 
-                                  rows="3" 
+                                  rows="4" 
                                   required maxlength="500"
                                   aria-required="true"
                                   placeholder="Brief description of the recipe (max 500 characters)..."
@@ -137,169 +181,99 @@
                             Mark as Featured Recipe
                         </label>
                     </div>
-                </div>
-            </div>
-
-            <!-- Recipe Details -->
-            <div class="border-t border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Recipe Details</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div>
-                        <label for="prep_time" class="block text-sm font-medium text-gray-700 mb-2">Prep Time (minutes)</label>
-               <input type="number" 
-                   id="prep_time" 
-                   name="prep_time" 
-                   value="{{ old('prep_time') }}" 
-                   min="1" max="1440"
-                   required aria-required="true"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        @error('prep_time')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="cook_time" class="block text-sm font-medium text-gray-700 mb-2">Cook Time (minutes)</label>
-               <input type="number" 
-                   id="cook_time" 
-                   name="cook_time" 
-                   value="{{ old('cook_time') }}" 
-                   min="1" max="1440"
-                   required aria-required="true"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        @error('cook_time')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="servings" class="block text-sm font-medium text-gray-700 mb-2">Servings</label>
-               <input type="number" 
-                   id="servings" 
-                   name="servings" 
-                   value="{{ old('servings') }}" 
-                   min="1" max="100"
-                   required aria-required="true"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        @error('servings')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
                     </div>
                 </div>
 
-                <div class="space-y-6">
-                    <div>
-                        <!-- Ingredients Section -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                            <div class="px-6 py-4 border-b border-gray-200">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-1">Recipe Ingredients</h3>
-                                <p class="text-sm text-gray-600">Add ingredients with quantities - prices and nutrition will be calculated automatically</p>
-                            </div>
-                            
-                            <div class="p-6 space-y-4">
-                                <!-- Ingredients Header -->
-                                <div class="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wide border-b border-gray-200 pb-2">
-                                    <div class="col-span-4">Ingredient Name</div>
-                                    <div class="col-span-2 text-center">Quantity</div>
-                                    <div class="col-span-2 text-center">Unit</div>
-                                    <div class="col-span-2 text-center">Unit Price</div>
-                                    <div class="col-span-2 text-center">Total Price</div>
-                                </div>
-                                
-                                <!-- Ingredients Grid Container -->
-                                <div class="space-y-3">
-                                    <div id="ingredients-container" class="min-h-[80px]">
-                                        <!-- Ingredients will be added here dynamically -->
-                                        <div class="text-center py-6 text-gray-400">
-                                            <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6h.008v.008H15.75V12zm0 3h.008v.008H15.75V15zm0 3h.008v.008H15.75V18zm-12-3h3.75m0 0h3.75m0 0v3.75M5.25 15V9.75M5.25 15a2.25 2.25 0 01-2.25-2.25V9.75A2.25 2.25 0 015.25 7.5h3.75"/>
-                                            </svg>
-                                            <p class="text-sm font-medium text-gray-500">No ingredients added yet</p>
-                                            <p class="text-xs text-gray-400 mt-1">Click "Add Ingredient" to get started</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Total Price Display -->
-                                <div class="border-t border-gray-200 pt-4">
-                                    <div class="flex justify-between items-center bg-green-50 px-4 py-3 rounded-lg">
-                                        <span class="text-sm font-medium text-gray-700">Total Recipe Cost:</span>
-                                        <span id="total-recipe-cost" class="text-lg font-bold text-green-600">₱0.00</span>
-                                    </div>
-                                    <div class="flex justify-between items-center bg-blue-50 px-4 py-3 rounded-lg mt-2">
-                                        <span class="text-sm font-medium text-gray-700">Cost per Serving:</span>
-                                        <span id="cost-per-serving" class="text-lg font-bold text-blue-600">₱0.00</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Add Ingredient Button -->
-                                <div class="pt-4">
-                                    <button type="button" 
-                                            onclick="addIngredient()"
-                                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                        </svg>
-                                        Add Ingredient
-                                    </button>
-                                </div>
-                            </div>
-                            </div>
+                <!-- Recipe Details Card -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Recipe Details</h3>
+                        <p class="mt-1 text-sm text-gray-600">Timing, servings, cost and cooking instructions</p>
+                    </div>
+                    <div class="px-6 py-4 space-y-4">
+                        <div>
+                            <label for="prep_time" class="block text-sm font-medium text-gray-700 mb-2">Prep Time (minutes)</label>
+                            <input type="number" 
+                                   id="prep_time" 
+                                   name="prep_time" 
+                                   value="{{ old('prep_time') }}" 
+                                   min="1" max="1440"
+                                   required aria-required="true"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            @error('prep_time')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
-                        @error('ingredients')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        <p class="mt-2 text-xs text-gray-500">
-                            💡 Tip: Estimated cost is optional but helps with budget planning. Live prices from Bantay Presyo will override these when available.
-                        </p>
-                    </div>
 
-                    <div>
-                        <label for="instructions" class="block text-sm font-medium text-gray-700 mb-2">Instructions</label>
-                        <textarea id="instructions" 
-                                  name="instructions" 
-                                  rows="8" 
-                                  required aria-required="true"
-                                  placeholder="Step-by-step cooking instructions... One step per line."
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('instructions') }}</textarea>
-                        @error('instructions')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                        <div>
+                            <label for="cook_time" class="block text-sm font-medium text-gray-700 mb-2">Cook Time (minutes)</label>
+                            <input type="number" 
+                                   id="cook_time" 
+                                   name="cook_time" 
+                                   value="{{ old('cook_time') }}" 
+                                   min="1" max="1440"
+                                   required aria-required="true"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            @error('cook_time')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Hidden servings field - always 1 person -->
+                        <input type="hidden" id="servings" name="servings" value="1">
+
+                        <div>
+                            <label for="instructions" class="block text-sm font-medium text-gray-700 mb-2">Instructions</label>
+                            <textarea id="instructions" 
+                                      name="instructions" 
+                                      rows="12" 
+                                      required aria-required="true"
+                                      placeholder="Step-by-step cooking instructions... One step per line."
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('instructions') }}</textarea>
+                            @error('instructions')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Nutritional Information -->
-            <div class="border-t border-gray-200 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Nutritional Information (per serving)</h3>
-                        <p class="text-sm text-gray-600 mt-1">Calculated automatically from ingredients using USDA nutrition database</p>
+            
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Nutritional Information Card -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900">Nutritional Information</h3>
+                                <p class="mt-1 text-sm text-gray-600">Automatically calculated from ingredients via USDA database</p>
+                            </div>
+                            <button type="button" 
+                                    id="calculate-nutrition-btn"
+                                    onclick="calculateNutrition()"
+                                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                Calculate
+                            </button>
+                        </div>
                     </div>
-                    <button type="button" 
-                            id="calculate-nutrition-btn"
-                            onclick="calculateNutrition()"
-                            class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                        </svg>
-                        Calculate Nutrition
-                    </button>
-                </div>
-                
-                <!-- Nutrition Loading Indicator -->
-                <div id="nutrition-loading" class="hidden text-center py-8">
-                    <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-white bg-green-500 transition ease-in-out duration-150">
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Calculating nutrition from USDA database...
+                    <div class="px-6 py-4">
+                    
+                    <!-- Nutrition Loading Indicator -->
+                    <div id="nutrition-loading" class="hidden text-center py-8">
+                        <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-white bg-green-500 transition ease-in-out duration-150">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Calculating nutrition from USDA database...
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Nutrition Results -->
-                <div id="nutrition-results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Nutrition Results -->
+                    <div id="nutrition-results" class="grid grid-cols-2 gap-4 mt-4">
                     <div>
                         <label for="calories" class="block text-sm font-medium text-gray-700 mb-2">Calories</label>
                         <input type="number" 
@@ -309,7 +283,8 @@
                                min="0" max="5000"
                                required aria-required="true"
                                readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                               class="no-spinners w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">Automatically calculated from ingredients</p>
                         @error('calories')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -325,7 +300,8 @@
                                min="0" max="500"
                                required aria-required="true"
                                readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                               class="no-spinners w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">Automatically calculated from ingredients</p>
                         @error('protein')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -341,7 +317,8 @@
                                min="0" max="1000"
                                required aria-required="true"
                                readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                               class="no-spinners w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">Automatically calculated from ingredients</p>
                         @error('carbs')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -357,7 +334,8 @@
                                min="0" max="500"
                                required aria-required="true"
                                readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                               class="no-spinners w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">Automatically calculated from ingredients</p>
                         @error('fats')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -372,7 +350,8 @@
                                step="0.1" 
                                min="0" max="200"
                                readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                               class="no-spinners w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">Automatically calculated from ingredients</p>
                         @error('fiber')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -387,7 +366,8 @@
                                step="0.1" 
                                min="0" max="500"
                                readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                               class="no-spinners w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">Automatically calculated from ingredients</p>
                         @error('sugar')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -401,34 +381,95 @@
                                value="{{ old('sodium') }}" 
                                min="0" max="100000"
                                readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                               class="no-spinners w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">Automatically calculated from ingredients</p>
                         @error('sodium')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
                 
-                <!-- Nutrition Status Messages -->
-                <div id="nutrition-status" class="mt-4"></div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="border-t border-gray-200 p-6">
-                <div class="flex items-center justify-end gap-4">
-                    <a href="{{ route('admin.recipes.index') }}" 
-                       class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium rounded-lg transition-colors">
-                        Cancel
-                    </a>
-                    <button type="submit" 
-                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                        </svg>
-                        Create Recipe
-                    </button>
+                        <!-- Nutrition Status Messages -->
+                        <div id="nutrition-status" class="mt-4"></div>
+                    </div>
+                </div>
+                
+                <!-- Recipe Ingredients Card -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Recipe Ingredients</h3>
+                        <p class="mt-1 text-sm text-gray-600">Add ingredients with quantities - prices and nutrition calculated automatically</p>
+                    </div>
+                    
+                    <div class="p-6 space-y-4">
+                        <!-- Ingredients Header -->
+                        <div class="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wide border-b border-gray-200 pb-2">
+                            <div class="col-span-3">Ingredient Name</div>
+                            <div class="col-span-2 text-center">Quantity</div>
+                            <div class="col-span-2 text-center">Unit</div>
+                            <div class="col-span-2 text-center">Unit Price</div>
+                            <div class="col-span-2 text-center">Total Price</div>
+                            <div class="col-span-1"></div>
+                        </div>
+                        
+                        <!-- Ingredients Grid Container -->
+                        <div class="space-y-3">
+                            <div id="ingredients-container" class="min-h-[80px]">
+                                <!-- Ingredients will be added here dynamically -->
+                                <div class="text-center py-6 text-gray-400">
+                                    <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6h.008v.008H15.75V12zm0 3h.008v.008H15.75V15zm0 3h.008v.008H15.75V18zm-12-3h3.75m0 0h3.75m0 0v3.75M5.25 15V9.75M5.25 15a2.25 2.25 0 01-2.25-2.25V9.75A2.25 2.25 0 015.25 7.5h3.75"/>
+                                    </svg>
+                                    <p class="text-sm font-medium text-gray-500">No ingredients added yet</p>
+                                    <p class="text-xs text-gray-400 mt-1">Click "Add Ingredient" to get started</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Price Display -->
+                        <div class="border-t border-gray-200 pt-4">
+                            <div class="flex justify-between items-center bg-green-50 px-4 py-3 rounded-lg">
+                                <span class="text-sm font-medium text-gray-700">Total Recipe Cost:</span>
+                                <span id="total-recipe-cost" class="text-lg font-bold text-green-600">₱0.00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Add Ingredient Button -->
+                        <div class="pt-4">
+                            <button type="button" 
+                                    onclick="addIngredient()"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                </svg>
+                                Add Ingredient
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                    @error('ingredients')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
-        </form>
+        </div>
+        
+        <!-- Admin Form Actions -->
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200 mt-8">
+            <button type="submit" 
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Create Recipe
+            </button>
+            <a href="{{ route('admin.recipes.index') }}" 
+               class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
     </div>
 </div>
 
@@ -442,7 +483,7 @@ function createIngredientRow(name = '', quantity = '', unit = '', unitPrice = ''
 
     // Ingredient Name input with autocomplete
     const nameDiv = document.createElement('div');
-    nameDiv.className = 'col-span-4';
+    nameDiv.className = 'col-span-3';
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.name = 'ingredient_names[]';
@@ -469,19 +510,50 @@ function createIngredientRow(name = '', quantity = '', unit = '', unitPrice = ''
     quantityInput.addEventListener('input', () => updateRowPrice(wrapper));
     quantityDiv.appendChild(quantityInput);
 
-    // Unit input with datalist
+    // Unit select dropdown with common options
     const unitDiv = document.createElement('div');
     unitDiv.className = 'col-span-2';
-    const unitInput = document.createElement('input');
-    unitInput.type = 'text';
-    unitInput.name = 'ingredient_units[]';
-    unitInput.required = true;
-    unitInput.maxLength = 50;
-    unitInput.placeholder = 'kg, cups, tbsp';
-    unitInput.list = 'units-list';
-    unitInput.className = 'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200';
-    unitInput.value = unit;
-    unitDiv.appendChild(unitInput);
+    const unitSelect = document.createElement('select');
+    unitSelect.name = 'ingredient_units[]';
+    unitSelect.required = true;
+    unitSelect.className = 'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200';
+    unitSelect.value = unit;
+    
+    // Add unit options
+    const units = [
+        { value: '', text: 'Select unit...' },
+        { value: 'kg', text: 'Kilogram (kg)' },
+        { value: 'g', text: 'Gram (g)' },
+        { value: 'lb', text: 'Pound (lb)' },
+        { value: 'oz', text: 'Ounce (oz)' },
+        { value: 'L', text: 'Liter (L)' },
+        { value: 'mL', text: 'Milliliter (mL)' },
+        { value: 'cup', text: 'Cup' },
+        { value: 'cups', text: 'Cups' },
+        { value: 'tbsp', text: 'Tablespoon (tbsp)' },
+        { value: 'tsp', text: 'Teaspoon (tsp)' },
+        { value: 'pcs', text: 'Pieces (pcs)' },
+        { value: 'pieces', text: 'Pieces' },
+        { value: 'can', text: 'Can' },
+        { value: 'pack', text: 'Pack' },
+        { value: 'bunch', text: 'Bunch' },
+        { value: 'cloves', text: 'Cloves' },
+        { value: 'head', text: 'Head' },
+        { value: 'slice', text: 'Slice' },
+        { value: 'slices', text: 'Slices' }
+    ];
+    
+    units.forEach(unitOption => {
+        const option = document.createElement('option');
+        option.value = unitOption.value;
+        option.textContent = unitOption.text;
+        if (unit === unitOption.value) {
+            option.selected = true;
+        }
+        unitSelect.appendChild(option);
+    });
+    
+    unitDiv.appendChild(unitSelect);
 
     // Unit Price display (read-only)
     const unitPriceDiv = document.createElement('div');
@@ -503,7 +575,7 @@ function createIngredientRow(name = '', quantity = '', unit = '', unitPrice = ''
 
     // Total Price display (read-only)
     const totalPriceDiv = document.createElement('div');
-    totalPriceDiv.className = 'col-span-1';
+    totalPriceDiv.className = 'col-span-2';
     const totalPriceDisplay = document.createElement('input');
     totalPriceDisplay.type = 'text';
     totalPriceDisplay.readonly = true;
@@ -654,7 +726,6 @@ function updateTotalCost() {
 async function calculateNutrition() {
     const container = document.getElementById('ingredients-container');
     const rows = container.querySelectorAll('.ingredient-item');
-    const servingsInput = document.getElementById('servings');
     
     if (rows.length === 0) {
         showNutritionMessage('Please add ingredients first.', 'error');
@@ -700,7 +771,7 @@ async function calculateNutrition() {
             },
             body: JSON.stringify({
                 ingredients: ingredients,
-                servings: parseInt(servingsInput?.value) || 1
+                servings: 1
             })
         });
         

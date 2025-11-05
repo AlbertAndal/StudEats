@@ -27,13 +27,20 @@
             <form action="{{ route('meal-plans.store') }}" method="POST" id="meal-plan-form">
                 @csrf
                 
-                <div class="bg-white shadow rounded-lg mb-6 relative schedule-details-container">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                            <h2 class="text-lg font-semibold text-gray-900 text-left">Schedule Details</h2>
+                <div class="bg-white shadow-sm border border-gray-200 rounded-lg mb-6 overflow-hidden hover:shadow-md transition-shadow duration-200">
+                    <div class="px-6 py-4 bg-gradient-to-r from-green-50/50 to-white border-b border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 bg-green-500/10 rounded-lg flex items-center justify-center">
+                                    <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h2 class="text-base font-semibold text-gray-900 leading-5">Schedule Details</h2>
+                                <p class="text-xs text-gray-500">When would you like to have this meal?</p>
+                            </div>
                         </div>
                     </div>
                     
@@ -41,18 +48,22 @@
                         <!-- Date & Time Selection -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="scheduled_date" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
+                                <label for="scheduled_date" class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Date
                                 </label>
-                                <input type="date" id="scheduled_date" name="scheduled_date" required
-                                       class="block w-full px-4 py-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition-all duration-200 @error('scheduled_date') border-red-300 focus:ring-red-500 focus:border-red-300 @enderror"
-                                       value="{{ request('date', now()->format('Y-m-d')) }}">
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <input type="date" id="scheduled_date" name="scheduled_date" required
+                                           class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm transition-all duration-200 @error('scheduled_date') border-red-300 focus:ring-red-500 focus:border-red-300 @enderror"
+                                           value="{{ request('date', now()->format('Y-m-d')) }}">
+                                </div>
                                 @error('scheduled_date')
                                     <p class="mt-2 text-sm text-red-600 flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                         {{ $message }}
@@ -61,52 +72,75 @@
                             </div>
 
                             <div>
-                                <label for="scheduled_time" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    Time (Optional)
+                                <label for="scheduled_time" class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                                    Time <span class="text-gray-400 normal-case">(Optional)</span>
                                 </label>
-                                <input type="time" id="scheduled_time" name="scheduled_time"
-                                       class="block w-full px-4 py-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition-all duration-200 hover:border-gray-400 focus:outline-none"
-                                       placeholder="Select time"
-                                       aria-label="Select scheduled time"
-                                       data-tooltip="Choose a specific time for your meal (optional)">
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <input type="time" id="scheduled_time" name="scheduled_time"
+                                           class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm transition-all duration-200"
+                                           placeholder="Select time">
+                                </div>
+                                <p class="mt-1.5 text-xs text-gray-500">Choose when you plan to eat this meal</p>
                             </div>
                         </div>
 
                         <!-- Meal Type Selection -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                </svg>
+                            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
                                 Meal Type
                             </label>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 @php
                                     $mealTypes = [
-                                        'breakfast' => ['icon' => '🌅', 'label' => 'Breakfast', 'color' => 'yellow'],
-                                        'lunch' => ['icon' => '☀️', 'label' => 'Lunch', 'color' => 'orange'],
-                                        'dinner' => ['icon' => '🌙', 'label' => 'Dinner', 'color' => 'purple'],
-                                        'snack' => ['icon' => '🍎', 'label' => 'Snack', 'color' => 'green']
+                                        'breakfast' => ['icon' => '🌅', 'label' => 'Breakfast', 'color' => 'yellow', 'time' => '08:00'],
+                                        'lunch' => ['icon' => '☀️', 'label' => 'Lunch', 'color' => 'orange', 'time' => '12:00'],
+                                        'dinner' => ['icon' => '🌙', 'label' => 'Dinner', 'color' => 'purple', 'time' => '18:00'],
+                                        'snack' => ['icon' => '🍎', 'label' => 'Snack', 'color' => 'green', 'time' => '15:00']
                                     ];
                                 @endphp
                                 @foreach($mealTypes as $type => $details)
-                                    <label class="relative cursor-pointer">
+                                    @php
+                                        $isExisting = in_array($type, $existingMealTypes ?? []);
+                                    @endphp
+                                    <label class="relative {{ $isExisting ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} group">
                                         <input type="radio" name="meal_type" value="{{ $type }}" 
                                                class="sr-only peer" 
-                                               {{ request('meal_type') == $type ? 'checked' : '' }} required>
-                                        <div class="border-2 border-gray-200 rounded-lg p-4 text-center hover:border-{{ $details['color'] }}-300 peer-checked:border-{{ $details['color'] }}-500 peer-checked:bg-{{ $details['color'] }}-50 transition-all duration-200">
-                                            <div class="text-2xl mb-2">{{ $details['icon'] }}</div>
-                                            <div class="text-sm font-medium text-gray-700 peer-checked:text-{{ $details['color'] }}-700">{{ $details['label'] }}</div>
+                                               data-suggested-time="{{ $details['time'] }}"
+                                               {{ request('meal_type') == $type ? 'checked' : '' }}
+                                               {{ $isExisting ? 'disabled' : '' }} required>
+                                        <div class="border-2 {{ $isExisting ? 'border-red-300 bg-red-50' : 'border-gray-200' }} rounded-lg p-4 text-center {{ $isExisting ? '' : 'hover:border-'.$details['color'].'-300 hover:shadow-md' }} peer-checked:border-{{ $details['color'] }}-500 peer-checked:bg-{{ $details['color'] }}-50 peer-checked:shadow-sm transition-all duration-200 peer-disabled:opacity-60">
+                                            <div class="text-3xl mb-2">{{ $details['icon'] }}</div>
+                                            <div class="text-sm font-semibold {{ $isExisting ? 'text-red-700' : 'text-gray-700' }} peer-checked:text-{{ $details['color'] }}-700">{{ $details['label'] }}</div>
+                                            <div class="text-xs {{ $isExisting ? 'text-red-600' : 'text-gray-500' }} mt-1 peer-checked:text-{{ $details['color'] }}-600">
+                                                {{ $isExisting ? 'Already scheduled' : $details['time'] }}
+                                            </div>
                                         </div>
+                                        @if($isExisting)
+                                            <!-- Already scheduled indicator -->
+                                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-sm">
+                                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </div>
+                                        @else
+                                            <!-- Selection checkmark -->
+                                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-{{ $details['color'] }}-500 rounded-full hidden peer-checked:flex items-center justify-center shadow-sm">
+                                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </div>
+                                        @endif
                                     </label>
                                 @endforeach
                             </div>
                             @error('meal_type')
                                 <p class="mt-2 text-sm text-red-600 flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                     {{ $message }}
@@ -422,6 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = document.getElementById('submit-btn');
     const formValidation = document.getElementById('form-validation');
     const mealTypeInputs = document.querySelectorAll('input[name="meal_type"]');
+    const dateInput = document.getElementById('scheduled_date');
     
     let selectedMealId = mealIdInput.value;
 
@@ -456,44 +491,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle meal type changes
     mealTypeInputs.forEach(input => {
-        input.addEventListener('change', validateForm);
+        input.addEventListener('change', function() {
+            if (!this.disabled) {
+                validateForm();
+                
+                // Auto-fill suggested time if time input is empty
+                const timeInput = document.getElementById('scheduled_time');
+                const suggestedTime = this.dataset.suggestedTime;
+                
+                if (!timeInput.value && suggestedTime) {
+                    timeInput.value = suggestedTime;
+                    // Add visual feedback
+                    timeInput.classList.add('border-green-300', 'bg-green-50');
+                    setTimeout(() => {
+                        timeInput.classList.remove('border-green-300', 'bg-green-50');
+                    }, 1000);
+                }
+            }
+        });
+        
+        // Prevent clicks on disabled meal types
+        if (input.disabled) {
+            input.parentElement.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Show tooltip or message
+                const label = this.querySelector('.text-xs');
+                if (label) {
+                    const originalText = label.textContent;
+                    label.textContent = 'Meal already scheduled!';
+                    label.classList.add('font-bold');
+                    setTimeout(() => {
+                        label.textContent = originalText;
+                        label.classList.remove('font-bold');
+                    }, 2000);
+                }
+            });
+        }
     });
     
     // Enhanced time input functionality
     const timeInput = document.getElementById('scheduled_time');
-    
-    // Add common meal times for quick selection
-    function addTimeQuickSelect() {
-        const timeContainer = timeInput.parentElement;
-        const quickTimesDiv = document.createElement('div');
-        quickTimesDiv.className = 'mt-2 flex flex-wrap gap-2';
-        
-        const commonTimes = [
-            { label: 'Breakfast', time: '08:00', icon: '🌅' },
-            { label: 'Lunch', time: '12:00', icon: '☀️' },
-            { label: 'Dinner', time: '18:00', icon: '🌙' },
-            { label: 'Snack', time: '15:00', icon: '🍎' }
-        ];
-        
-        commonTimes.forEach(timeOption => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'inline-flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200';
-            button.innerHTML = `${timeOption.icon} ${timeOption.label} (${timeOption.time})`;
-            button.addEventListener('click', () => {
-                timeInput.value = timeOption.time;
-                timeInput.dispatchEvent(new Event('change'));
-            });
-            quickTimesDiv.appendChild(button);
-        });
-        
-        timeContainer.appendChild(quickTimesDiv);
-    }
-    
-    // Add quick time selection if on desktop
-    if (window.innerWidth >= 768) {
-        addTimeQuickSelect();
-    }
     
     // Enhanced mobile touch handling
     timeInput.addEventListener('focus', function() {
@@ -609,6 +647,20 @@ document.addEventListener('DOMContentLoaded', function() {
             preSelectedMeal.classList.add('border-green-500', 'bg-green-50', 'ring-2', 'ring-green-200');
             preSelectedMeal.querySelector('.selected-indicator')?.classList.remove('hidden');
         }
+    }
+    
+    // Handle date changes - reload page to check for existing meals on new date
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('date', this.value);
+            // Preserve meal_id if present
+            const mealId = mealIdInput.value;
+            if (mealId) {
+                currentUrl.searchParams.set('meal_id', mealId);
+            }
+            window.location.href = currentUrl.toString();
+        });
     }
     
     // Initialize form validation

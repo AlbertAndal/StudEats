@@ -13,7 +13,6 @@
         </div>
         <div class="relative z-10 flex flex-col h-full">
             <div class="flex items-center gap-3 text-2xl font-semibold">
-                <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">🍽️</span>
                 StudEats
             </div>
             <div class="mt-auto">
@@ -34,7 +33,6 @@
     <div class="flex flex-col justify-center px-6 py-12 md:px-12 lg:px-20 bg-background">
         <div class="w-full max-w-md mx-auto">
             <div class="md:hidden mb-8 flex items-center gap-2 justify-center">
-                <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-2xl">🍽️</span>
                 <span class="text-xl font-semibold">StudEats</span>
             </div>
 

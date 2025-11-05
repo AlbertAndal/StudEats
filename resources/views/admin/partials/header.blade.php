@@ -101,80 +101,116 @@
                         </div>
                         <div class="max-h-80 overflow-y-auto">
                             <div id="notificationList">
-                                <!-- Sample notifications -->
-                                <div class="p-5 border-b border-gray-100 hover:bg-gray-50 cursor-pointer notification-item transition-colors" data-read="false">
-                                    <div class="flex items-start space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                <svg class="w-5 h-5 text-blue-600 lucide lucide-user-plus" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                                    <circle cx="9" cy="7" r="4"/>
-                                                    <line x1="19" x2="19" y1="8" y2="14"/>
-                                                    <line x1="22" x2="16" y1="11" y2="11"/>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-semibold text-gray-900 mb-1">New User Registration</p>
-                                            <p class="text-sm text-gray-600 leading-relaxed">John Albert Andal just registered for an account</p>
-                                            <p class="text-xs text-gray-400 mt-2 font-medium">2 minutes ago</p>
-                                        </div>
-                                        <div class="flex-shrink-0">
-                                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                                @php
+                                    // Get recent users (last 24 hours)
+                                    $recentUsers = \App\Models\User::where('created_at', '>=', now()->subDay())
+                                        ->where('role', '!=', 'admin')
+                                        ->where('role', '!=', 'super_admin')
+                                        ->orderBy('created_at', 'desc')
+                                        ->take(3)
+                                        ->get();
+                                    
+                                    // Get recent recipes (last 24 hours)
+                                    $recentRecipes = \App\Models\Meal::where('created_at', '>=', now()->subDay())
+                                        ->orderBy('created_at', 'desc')
+                                        ->take(3)
+                                        ->get();
+                                    
+                                    // Combine and sort by created_at
+                                    $notifications = collect();
+                                    
+                                    foreach ($recentUsers as $user) {
+                                        $notifications->push([
+                                            'type' => 'user',
+                                            'data' => $user,
+                                            'created_at' => $user->created_at,
+                                        ]);
+                                    }
+                                    
+                                    foreach ($recentRecipes as $recipe) {
+                                        $notifications->push([
+                                            'type' => 'recipe',
+                                            'data' => $recipe,
+                                            'created_at' => $recipe->created_at,
+                                        ]);
+                                    }
+                                    
+                                    $notifications = $notifications->sortByDesc('created_at')->take(5);
+                                    $hasNotifications = $notifications->isNotEmpty();
+                                @endphp
                                 
-                                <div class="p-5 border-b border-gray-100 hover:bg-gray-50 cursor-pointer notification-item transition-colors" data-read="false">
-                                    <div class="flex items-start space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                                                <svg class="w-5 h-5 text-orange-600 lucide lucide-alert-triangle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                                                    <path d="M12 9v4"/>
-                                                    <path d="m12 17 .01 0"/>
-                                                </svg>
+                                @if($hasNotifications)
+                                    @foreach($notifications as $notification)
+                                        @if($notification['type'] === 'user')
+                                            <div class="p-5 border-b border-gray-100 hover:bg-gray-50 cursor-pointer notification-item transition-colors" 
+                                                 data-read="false" 
+                                                 data-url="{{ route('admin.users.show', $notification['data']->id) }}">
+                                                <div class="flex items-start space-x-4">
+                                                    <div class="flex-shrink-0">
+                                                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                                            <svg class="w-5 h-5 text-blue-600 lucide lucide-user-plus" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                                                <circle cx="9" cy="7" r="4"/>
+                                                                <line x1="19" x2="19" y1="8" y2="14"/>
+                                                                <line x1="22" x2="16" y1="11" y2="11"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-semibold text-gray-900 mb-1">New User Registration</p>
+                                                        <p class="text-sm text-gray-600 leading-relaxed">{{ $notification['data']->name }} just registered for an account</p>
+                                                        <p class="text-xs text-gray-400 mt-2 font-medium">{{ $notification['data']->created_at->diffForHumans() }}</p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-semibold text-gray-900 mb-1">System Alert</p>
-                                            <p class="text-sm text-gray-600 leading-relaxed">Email service experiencing delays - some notifications may be delayed</p>
-                                            <p class="text-xs text-gray-400 mt-2 font-medium">5 minutes ago</p>
-                                        </div>
-                                        <div class="flex-shrink-0">
-                                            <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="p-5 border-b border-gray-100 hover:bg-gray-50 cursor-pointer notification-item transition-colors opacity-75" data-read="true">
-                                    <div class="flex items-start space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                                <svg class="w-5 h-5 text-green-600 lucide lucide-chef-hat" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
-                                                    <line x1="6" x2="18" y1="17" y2="17"/>
-                                                </svg>
+                                        @elseif($notification['type'] === 'recipe')
+                                            <div class="p-5 border-b border-gray-100 hover:bg-gray-50 cursor-pointer notification-item transition-colors" 
+                                                 data-read="false"
+                                                 data-url="{{ route('admin.recipes.show', $notification['data']->id) }}">
+                                                <div class="flex items-start space-x-4">
+                                                    <div class="flex-shrink-0">
+                                                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                                            <svg class="w-5 h-5 text-green-600 lucide lucide-chef-hat" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
+                                                                <line x1="6" x2="18" y1="17" y2="17"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-semibold text-gray-900 mb-1">New Recipe Added</p>
+                                                        <p class="text-sm text-gray-600 leading-relaxed">{{ $notification['data']->name }} recipe has been published</p>
+                                                        <p class="text-xs text-gray-400 mt-2 font-medium">{{ $notification['data']->created_at->diffForHumans() }}</p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-semibold text-gray-700 mb-1">New Recipe Added</p>
-                                            <p class="text-sm text-gray-500 leading-relaxed">Chicken Adobo recipe has been published and is now available</p>
-                                            <p class="text-xs text-gray-400 mt-2 font-medium">1 hour ago</p>
-                                        </div>
+                                        @endif
+                                    @endforeach
+                                @else
+                                    <div class="p-8 text-center">
+                                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                        </svg>
+                                        <p class="text-sm text-gray-500 font-medium">No new notifications</p>
+                                        <p class="text-xs text-gray-400 mt-1">You're all caught up!</p>
                                     </div>
-                                </div>
+                                @endif
                             </div>
                         </div>
                         <div class="p-5 border-t border-gray-200 bg-gray-50">
-                            <a href="#" class="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center justify-center py-2 px-4 rounded-md hover:bg-blue-50 transition-colors">
+                            <button type="button" onclick="viewAllNotifications()" class="w-full text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center justify-center py-2 px-4 rounded-md hover:bg-blue-50 transition-colors">
                                 <svg class="w-4 h-4 mr-2 lucide lucide-external-link" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M15 3h6v6"/>
                                     <path d="M10 14 21 3"/>
                                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                                 </svg>
                                 View all notifications
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -231,6 +267,16 @@ function closeNotifications() {
     button.classList.remove('bg-gray-100');
 }
 
+function viewAllNotifications() {
+    console.log('View all notifications clicked');
+    // Close the dropdown first
+    closeNotifications();
+    
+    // For now, navigate to users page (or create a dedicated notifications page)
+    // You can change this to your actual notifications page route
+    window.location.href = '{{ route("admin.users.index") }}';
+}
+
 function markAllAsRead() {
     const notifications = document.querySelectorAll('.notification-item[data-read="false"]');
     const badge = document.getElementById('notificationBadge');
@@ -266,6 +312,21 @@ function markNotificationRead(element) {
     }
 }
 
+function handleNotificationClick(element, url) {
+    // Mark as read
+    if (element.getAttribute('data-read') === 'false') {
+        markNotificationRead(element);
+    }
+    
+    // Close dropdown and navigate
+    closeNotifications();
+    
+    // Navigate to the URL
+    if (url) {
+        window.location.href = url;
+    }
+}
+
 function updateNotificationCount() {
     const unreadNotifications = document.querySelectorAll('.notification-item[data-read="false"]');
     const badge = document.getElementById('notificationBadge');
@@ -287,6 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
         notificationBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             toggleNotifications();
+            console.log('Notification bell clicked - dropdown toggled');
         });
         console.log('Notifications: Button event listener attached');
     } else {
@@ -296,17 +358,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mark all read button click handler
     const markAllReadBtn = document.getElementById('markAllReadBtn');
     if (markAllReadBtn) {
-        markAllReadBtn.addEventListener('click', markAllAsRead);
+        markAllReadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            markAllAsRead();
+        });
         console.log('Notifications: Mark all read button event listener attached');
     }
     
     // Add click handlers to notification items
     const notificationItems = document.querySelectorAll('.notification-item');
-    notificationItems.forEach(item => {
-        item.addEventListener('click', function() {
-            if (this.getAttribute('data-read') === 'false') {
-                markNotificationRead(this);
-            }
+    console.log('Found ' + notificationItems.length + ' notification items');
+    notificationItems.forEach((item, index) => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Notification item ' + index + ' clicked');
+            
+            // Get the URL from data attribute
+            const url = this.getAttribute('data-url');
+            console.log('Navigating to: ' + url);
+            handleNotificationClick(this, url);
         });
     });
     
@@ -323,6 +395,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    console.log('Admin Header: All event listeners initialized');
+    console.log('Admin Header: All event listeners initialized successfully');
 });
 </script>

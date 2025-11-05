@@ -106,8 +106,10 @@
             <polyline points="12,6 12,12 16,14"/>
             @break
         @case('DollarSign')
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            <line x1="12" y1="2" x2="12" y2="22" stroke-width="2"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-width="2"/>
+            <line x1="6" y1="9" x2="14" y2="9" stroke-width="1.5"/>
+            <line x1="6" y1="12" x2="14" y2="12" stroke-width="1.5"/>
             @break
         @case('Zap')
             <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>

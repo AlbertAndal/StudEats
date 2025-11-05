@@ -6,26 +6,26 @@
 <div class="min-h-screen bg-gray-50 py-12 overflow-x-hidden">
     <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-            <div class="px-8 py-6 border-b border-gray-200">
-                <div class="flex items-center">
+        <div class="mb-8">
+            <div class="bg-gradient-to-r from-blue-50/50 to-white border-b border-gray-200 rounded-t-lg px-8 py-6">
+                <div class="flex items-center gap-4">
                     <div class="flex-shrink-0">
-                        <div class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="h-12 w-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                             </svg>
                         </div>
                     </div>
-                    <div class="ml-4">
+                    <div class="flex-1">
                         <h1 class="text-3xl font-bold text-gray-900">Privacy Policy</h1>
-                        <p class="mt-2 text-sm text-gray-600">Last updated: {{ date('F j, Y') }}</p>
+                        <p class="mt-1 text-gray-600">Last updated: {{ date('F j, Y') }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Content -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
             <div class="px-4 py-8 sm:px-8">
                 <div class="prose prose-lg prose-gray max-w-none overflow-hidden">
                     <style>
@@ -158,13 +158,27 @@
                         <p class="text-gray-700 leading-relaxed mb-4">
                             If you have any questions about this Privacy Policy or our data practices, please contact us:
                         </p>
-                        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                            <ul class="text-gray-700 space-y-2">
-                                <li><strong>Email:</strong> privacy@studeats.com</li>
-                                <li><strong>Address:</strong> StudEats Privacy Team<br>
-                                123 University Avenue<br>
-                                Metro Manila, Philippines</li>
-                            </ul>
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-lg p-6 border border-blue-200">
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0">
+                                    <div class="h-10 w-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                        <svg class="h-5 w-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <ul class="text-blue-900 space-y-2">
+                                        <li class="flex items-center gap-2">
+                                            <strong>Email:</strong> 
+                                            <a href="mailto:privacy@studeats.com" class="text-blue-700 hover:text-blue-800 hover:underline">privacy@studeats.com</a>
+                                        </li>
+                                        <li><strong>Address:</strong> StudEats Privacy Team<br>
+                                        123 University Avenue<br>
+                                        Metro Manila, Philippines</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -174,7 +188,7 @@
         <!-- Back to Home -->
         <div class="mt-8 text-center">
             <a href="{{ route('dashboard') }}" 
-               class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
+               class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
                 <svg class="-ml-1 mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>

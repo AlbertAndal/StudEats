@@ -92,13 +92,9 @@
                                            class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300"
                                            placeholder="e.g., Chicken Adobo">
                                     @error('name')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Servings</label>
-                                    <input type="number" name="servings" value="{{ old('servings', $recipe->recipe->servings ?? '') }}" min="1" max="20"
-                                           class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-center transition-all duration-200 bg-white hover:border-gray-300"
-                                           placeholder="4">
-                                    @error('servings')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                                    
+                                    <!-- Hidden servings field - always 1 person -->
+                                    <input type="hidden" name="servings" value="1">
                                 </div>
                             </div>
 
@@ -292,13 +288,8 @@
                                     </button>
                                 </div>
                                 <div>
-                                    <div class="bg-gray-50/50 border border-gray-100 rounded-lg p-3">
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Servings</label>
-                                        <input type="number" name="servings" id="recipe-servings" 
-                                               value="{{ old('servings', $recipe->recipe->servings ?? 4) }}" 
-                                               class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-center transition-all duration-200 bg-white hover:border-gray-300" 
-                                               min="1" max="20" placeholder="4">
-                                    </div>
+                                    <!-- Servings hidden - always 1 person -->
+                                    <input type="hidden" name="servings" id="recipe-servings" value="1">
                                 </div>
                             </div>
                             
