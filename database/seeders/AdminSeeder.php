@@ -24,12 +24,21 @@ class AdminSeeder extends Seeder
         $existingAdmin = User::where('email', $adminEmail)->first();
 
         if ($existingAdmin) {
-            Log::info('Default admin account already exists', [
+            // UPDATE existing admin to ensure password is correct
+            $existingAdmin->update([
+                'password' => Hash::make($adminPassword),
+                'email_verified_at' => now(),
+                'role' => 'super_admin',
+                'is_active' => true,
+            ]);
+
+            Log::info('Default admin account updated', [
                 'email' => $adminEmail,
                 'admin_id' => $existingAdmin->id,
             ]);
             
-            $this->command->warn('Default admin account already exists: ' . $adminEmail);
+            $this->command->warn('Default admin account already exists - password reset to default');
+            $this->displayCredentials($adminEmail, $adminPassword);
             return;
         }
 
@@ -51,12 +60,20 @@ class AdminSeeder extends Seeder
         ]);
 
         $this->command->info('✓ Default admin account created successfully');
+        $this->displayCredentials($adminEmail, $adminPassword);
+    }
+
+    /**
+     * Display admin credentials in a formatted box.
+     */
+    private function displayCredentials(string $email, string $password): void
+    {
         $this->command->line('');
         $this->command->line('===========================================');
         $this->command->line('   DEFAULT ADMIN CREDENTIALS');
         $this->command->line('===========================================');
-        $this->command->line('Email:    ' . $adminEmail);
-        $this->command->line('Password: ' . $adminPassword);
+        $this->command->line('Email:    ' . $email);
+        $this->command->line('Password: ' . $password);
         $this->command->line('Role:     Super Admin');
         $this->command->line('===========================================');
         $this->command->line('');

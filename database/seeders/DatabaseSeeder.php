@@ -13,7 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // IMPORTANT: Create default admin account first
+        // IMPORTANT: Create/update default admin account first
+        // This will reset the password if admin already exists
         $this->call([
             AdminSeeder::class,
         ]);
