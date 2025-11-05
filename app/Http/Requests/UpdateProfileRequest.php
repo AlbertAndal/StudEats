@@ -41,7 +41,7 @@ class UpdateProfileRequest extends FormRequest
             'activity_level' => 'nullable|string|in:sedentary,lightly_active,moderately_active,very_active,extremely_active',
             'daily_budget' => 'nullable|numeric|min:100|max:2000',
             'timezone' => 'nullable|string|max:255',
-            'dietary_preferences' => 'nullable|string|max:1000',
+
         ];
     }
 
@@ -75,8 +75,7 @@ class UpdateProfileRequest extends FormRequest
             'daily_budget.min' => 'Daily budget must be at least ₱100.',
             'daily_budget.max' => 'Daily budget cannot exceed ₱2,000.',
             'timezone.max' => 'Timezone name is too long.',
-            'dietary_preferences.string' => 'Dietary preferences must be text.',
-            'dietary_preferences.max' => 'Dietary preferences cannot exceed 1000 characters.',
+
         ];
     }
 
@@ -99,7 +98,7 @@ class UpdateProfileRequest extends FormRequest
             'activity_level' => 'activity level',
             'daily_budget' => 'daily budget',
             'timezone' => 'timezone',
-            'dietary_preferences' => 'dietary preferences',
+
         ];
     }
 }

@@ -674,11 +674,7 @@
                                     $recommendations[] = 'Complete your health profile';
                                 }
                                 
-                                if ($user->dietary_preferences && trim($user->dietary_preferences) !== '') {
-                                    $securityScore += 15; // Profile completeness
-                                } else {
-                                    $recommendations[] = 'Add dietary preferences';
-                                }
+
                                 
                                 $scoreColor = 'text-red-600';
                                 $scoreBg = 'bg-red-100';
@@ -924,26 +920,7 @@
             observer.observe(section);
         });
 
-        // Enhanced dietary preference tooltips
-        const preferenceItems = document.querySelectorAll('.group.relative');
-        preferenceItems.forEach(item => {
-            item.addEventListener('mouseenter', function() {
-                const tooltip = this.querySelector('.absolute.bottom-full');
-                if (tooltip) {
-                    tooltip.style.opacity = '1';
-                    tooltip.style.transform = 'translateX(-50%) translateY(-2px)';
-                    tooltip.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-                }
-            });
-            
-            item.addEventListener('mouseleave', function() {
-                const tooltip = this.querySelector('.absolute.bottom-full');
-                if (tooltip) {
-                    tooltip.style.opacity = '0';
-                    tooltip.style.transform = 'translateX(-50%) translateY(0)';
-                }
-            });
-        });
+
 
         // Keyboard navigation improvements
         document.addEventListener('keydown', function(e) {

@@ -82,7 +82,7 @@
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Profile</h1>
-        <p class="text-base text-gray-600 max-w-2xl">Update your personal information and preferences to get better meal recommendations tailored to your dietary needs and budget.</p>
+        <p class="text-base text-gray-600 max-w-2xl">Update your personal information and health metrics to get better meal recommendations tailored to your budget.</p>
     </div>
 
     <!-- Loading Overlay -->
@@ -303,18 +303,18 @@
             </div>
         </div>
 
-        <!-- Right Column: Dietary Preferences & Actions -->
+        <!-- Right Column: Budget & Actions -->
         <div class="space-y-6">
-            <!-- Dietary Preferences -->
+            <!-- Budget Settings -->
             <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
                 <div class="px-5 py-4 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200">
                     <h2 class="text-base font-semibold text-gray-900 flex items-center">
                         <div class="p-2 bg-green-100 rounded-lg mr-3">
                             <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                             </svg>
                         </div>
-                        Dietary Preferences & Budget
+                        Budget Settings
                     </h2>
                 </div>
                 
@@ -338,21 +338,6 @@
                             <button type="button" class="budget-preset px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-green-100 hover:text-green-700 hover:border-green-300 border-2 border-transparent rounded-lg transition-all" data-value="800">₱800</button>
                         </div>
                         @error('daily_budget')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Dietary Preferences -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Dietary Preferences</label>
-                        <p class="text-sm text-gray-600 mb-3">Tell us about your dietary preferences to get better meal recommendations</p>
-                        
-                        <textarea name="dietary_preferences" 
-                                  rows="4"
-                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all @error('dietary_preferences') border-red-300 @enderror"
-                                  placeholder="E.g., I'm vegetarian, avoid spicy food, prefer low-carb meals, allergic to peanuts, etc.">{{ old('dietary_preferences', is_string($user->dietary_preferences) ? $user->dietary_preferences : '') }}</textarea>
-                        
-                        @error('dietary_preferences')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
