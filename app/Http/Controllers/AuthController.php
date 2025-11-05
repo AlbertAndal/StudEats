@@ -68,11 +68,6 @@ class AuthController extends Controller
             // Store pending verification email in session
             $request->session()->put('pending_verification_email', $user->email);
             
-            // TEMPORARY: Always store OTP code in session for testing (until email is working)
-            // TODO: Remove this after email configuration is verified working
-            $request->session()->put('dev_otp_code', $otp->otp_code);
-            $request->session()->put('dev_otp_expires', $otp->expires_at->toDateTimeString());
-            
             // Send welcome email (optional, don't let it block registration)
             try {
                 $this->emailService->sendAccountConfirmation($user);
