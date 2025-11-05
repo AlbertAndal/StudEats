@@ -9,7 +9,7 @@ echo "Creating storage symlink..."
 php artisan storage:link --force
 echo "Storage symlink created!"
 
-# Seed default admin account
+# Ensure admin account exists and reset password
 echo "Setting up default admin account..."
-php artisan db:seed --class=AdminSeeder --force
+php artisan admin:reset-password admin@studeats.com --no-interaction
 echo "Admin account setup complete!"
