@@ -264,3 +264,21 @@ Route::get('/health', function () {
         ], 503);
     }
 });
+
+// Laravel Cloud Debug Route (remove after use)
+Route::get('/debug-deployment', function () {
+    return response()->json([
+        'app_name' => config('app.name'),
+        'app_env' => config('app.env'),
+        'app_debug' => config('app.debug'),
+        'app_key_set' => !empty(config('app.key')),
+        'database_configured' => !empty(config('database.connections.mysql.host')),
+        'mail_configured' => !empty(config('mail.mailers.smtp.host')),
+        'php_version' => PHP_VERSION,
+        'laravel_version' => app()->version(),
+        'storage_writeable' => is_writable(storage_path()),
+        'cache_writeable' => is_writable(storage_path('framework/cache')),
+        'session_writeable' => is_writable(storage_path('framework/sessions')),
+        'timestamp' => now()->toISOString()
+    ]);
+});
