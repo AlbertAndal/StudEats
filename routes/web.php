@@ -62,6 +62,69 @@ Route::get('/test-nutrition-api', function () {
     return view('test-nutrition-api');
 })->middleware(['auth', 'admin'])->name('test.nutrition.api');
 
+// Emergency Admin Creator Route (DELETE AFTER USE!)
+Route::match(['GET', 'POST'], '/emergency-create-admin', function (\Illuminate\Http\Request $request) {
+    if ($request->isMethod('post')) {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:6',
+                'role' => 'required|in:admin,super_admin',
+            ]);
+            
+            $admin = \App\Models\User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => \Hash::make($validated['password']),
+                'email_verified_at' => now(),
+                'role' => $validated['role'],
+                'is_active' => true,
+                'timezone' => 'Asia/Manila',
+            ]);
+            
+            return redirect()->route('emergency.admin.create')
+                ->with('success', "Admin created! Email: {$admin->email} | Role: {$admin->role}");
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage())->withInput();
+        }
+    }
+    
+    return view('emergency-admin-create');
+})->name('emergency.admin.create');
+
+// Emergency Admin Password Reset Route (DELETE AFTER USE!)
+Route::get('/emergency-reset-admin', function () {
+    try {
+        $admin = \App\Models\User::where('email', 'admin@studeats.com')->first();
+        
+        if ($admin) {
+            $admin->update([
+                'password' => \Hash::make('admin123'),
+                'email_verified_at' => now(),
+                'role' => 'super_admin',
+                'is_active' => true,
+            ]);
+            $message = "✅ Admin password reset! Email: admin@studeats.com | Password: admin123";
+        } else {
+            $admin = \App\Models\User::create([
+                'name' => 'StudEats Admin',
+                'email' => 'admin@studeats.com',
+                'password' => \Hash::make('admin123'),
+                'email_verified_at' => now(),
+                'role' => 'super_admin',
+                'is_active' => true,
+                'timezone' => 'Asia/Manila',
+            ]);
+            $message = "✅ Admin created! Email: admin@studeats.com | Password: admin123";
+        }
+        
+        return view('emergency-admin-reset', ['message' => $message, 'admin' => $admin]);
+    } catch (\Exception $e) {
+        return view('emergency-admin-reset', ['error' => $e->getMessage()]);
+    }
+})->name('emergency.admin.reset');
+
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
