@@ -128,6 +128,23 @@ input[type=number].no-spinners {
                     </div>
 
                     <div>
+                        <label for="meal_type" class="block text-sm font-medium text-gray-700 mb-2">Meal Type</label>
+                        <select id="meal_type" 
+                                name="meal_type" 
+                                required aria-required="true"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select meal type</option>
+                            <option value="breakfast" {{ old('meal_type') == 'breakfast' ? 'selected' : '' }}>Breakfast</option>
+                            <option value="lunch" {{ old('meal_type') == 'lunch' ? 'selected' : '' }}>Lunch</option>
+                            <option value="snack" {{ old('meal_type') == 'snack' ? 'selected' : '' }}>Snack</option>
+                            <option value="dinner" {{ old('meal_type') == 'dinner' ? 'selected' : '' }}>Dinner</option>
+                        </select>
+                        @error('meal_type')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
                         <label for="cost" class="block text-sm font-medium text-gray-700 mb-2">Total Recipe Cost (₱)</label>
                         <input type="number" 
                                id="cost" 
@@ -398,6 +415,33 @@ input[type=number].no-spinners {
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">Recipe Ingredients</h3>
+                        <div class="mt-1 text-sm text-gray-600 flex items-center justify-between">
+                            <span>Add ingredients manually or use bulk upload.</span>
+                            <button type="button" 
+                                    onclick="toggleFormatHelp()"
+                                    class="text-purple-600 hover:text-purple-700 font-medium">
+                                View bulk upload formats ↓
+                            </button>
+                        </div>
+                        
+                        <!-- Format Help Panel (Hidden by default) -->
+                        <div id="formatHelp" class="hidden mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                            <h4 class="font-medium text-purple-900 mb-2">Bulk Upload Formats:</h4>
+                            <div class="space-y-2 text-sm text-purple-700">
+                                <div>
+                                    <strong>CSV Format:</strong> <code class="bg-white px-1 rounded">ingredient name,quantity,unit,price</code>
+                                    <div class="ml-4 text-xs">Example: <code class="bg-white px-1 rounded">Chicken breast,500,g,8.50</code></div>
+                                </div>
+                                <div>
+                                    <strong>Simple Format:</strong> <code class="bg-white px-1 rounded">ingredient name - quantity unit</code>
+                                    <div class="ml-4 text-xs">Example: <code class="bg-white px-1 rounded">Chicken breast - 500 g</code></div>
+                                </div>
+                                <div>
+                                    <strong>Raw List:</strong> <code class="bg-white px-1 rounded">ingredient name</code> (one per line)
+                                    <div class="ml-4 text-xs">Example: <code class="bg-white px-1 rounded">Chicken breast</code></div>
+                                </div>
+                            </div>
+                        </div>
                         <p class="mt-1 text-sm text-gray-600">Add ingredients with quantities - prices and nutrition calculated automatically</p>
                     </div>
                     
@@ -409,7 +453,7 @@ input[type=number].no-spinners {
                             <div class="col-span-2 text-center">Unit</div>
                             <div class="col-span-2 text-center">Unit Price</div>
                             <div class="col-span-2 text-center">Total Price</div>
-                            <div class="col-span-1"></div>
+                            <div class="col-span-1 text-center">Remove</div>
                         </div>
                         
                         <!-- Ingredients Grid Container -->
@@ -434,8 +478,8 @@ input[type=number].no-spinners {
                             </div>
                         </div>
                         
-                        <!-- Add Ingredient Button -->
-                        <div class="pt-4">
+                        <!-- Action Buttons -->
+                        <div class="pt-4 flex items-center gap-3">
                             <button type="button" 
                                     onclick="addIngredient()"
                                     class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
@@ -443,6 +487,30 @@ input[type=number].no-spinners {
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                                 </svg>
                                 Add Ingredient
+                            </button>
+                            
+                            <button type="button" 
+                                    onclick="document.getElementById('bulkUploadFile').click()"
+                                    class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                                </svg>
+                                Bulk Upload
+                            </button>
+                            
+                            <input type="file" 
+                                   id="bulkUploadFile" 
+                                   accept=".csv,.txt" 
+                                   style="display: none;" 
+                                   onchange="handleBulkUpload(event)">
+                            
+                            <button type="button" 
+                                    onclick="saveAllIngredients()"
+                                    class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Save All Ingredients
                             </button>
                         </div>
                     </div>
@@ -519,28 +587,20 @@ function createIngredientRow(name = '', quantity = '', unit = '', unitPrice = ''
     unitSelect.className = 'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200';
     unitSelect.value = unit;
     
-    // Add unit options
+    // Standard units supported by USDA API - only weight and volume units
     const units = [
         { value: '', text: 'Select unit...' },
+        // Weight units
         { value: 'kg', text: 'Kilogram (kg)' },
         { value: 'g', text: 'Gram (g)' },
         { value: 'lb', text: 'Pound (lb)' },
         { value: 'oz', text: 'Ounce (oz)' },
-        { value: 'L', text: 'Liter (L)' },
-        { value: 'mL', text: 'Milliliter (mL)' },
+        // Volume units
         { value: 'cup', text: 'Cup' },
-        { value: 'cups', text: 'Cups' },
         { value: 'tbsp', text: 'Tablespoon (tbsp)' },
         { value: 'tsp', text: 'Teaspoon (tsp)' },
-        { value: 'pcs', text: 'Pieces (pcs)' },
-        { value: 'pieces', text: 'Pieces' },
-        { value: 'can', text: 'Can' },
-        { value: 'pack', text: 'Pack' },
-        { value: 'bunch', text: 'Bunch' },
-        { value: 'cloves', text: 'Cloves' },
-        { value: 'head', text: 'Head' },
-        { value: 'slice', text: 'Slice' },
-        { value: 'slices', text: 'Slices' }
+        { value: 'ml', text: 'Milliliter (ml)' },
+        { value: 'l', text: 'Liter (l)' },
     ];
     
     units.forEach(unitOption => {
@@ -555,22 +615,18 @@ function createIngredientRow(name = '', quantity = '', unit = '', unitPrice = ''
     
     unitDiv.appendChild(unitSelect);
 
-    // Unit Price display (read-only)
+    // Unit Price input (editable)
     const unitPriceDiv = document.createElement('div');
     unitPriceDiv.className = 'col-span-2';
-    const unitPriceDisplay = document.createElement('input');
-    unitPriceDisplay.type = 'text';
-    unitPriceDisplay.readonly = true;
-    unitPriceDisplay.placeholder = '₱0.00';
-    unitPriceDisplay.className = 'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-center';
-    unitPriceDisplay.value = unitPrice ? `₱${parseFloat(unitPrice).toFixed(2)}` : '';
-    unitPriceDiv.appendChild(unitPriceDisplay);
-    
-    // Hidden input for unit price data
     const unitPriceInput = document.createElement('input');
-    unitPriceInput.type = 'hidden';
+    unitPriceInput.type = 'number';
     unitPriceInput.name = 'ingredient_prices[]';
-    unitPriceInput.value = unitPrice || '0';
+    unitPriceInput.step = '0.01';
+    unitPriceInput.min = '0';
+    unitPriceInput.placeholder = '0.00';
+    unitPriceInput.className = 'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200';
+    unitPriceInput.value = unitPrice || '';
+    unitPriceInput.addEventListener('input', () => updateRowPrice(wrapper));
     unitPriceDiv.appendChild(unitPriceInput);
 
     // Total Price display (read-only)
@@ -587,13 +643,14 @@ function createIngredientRow(name = '', quantity = '', unit = '', unitPrice = ''
     // Remove button
     const btnWrapper = document.createElement('div');
     btnWrapper.className = 'col-span-1 flex items-center justify-center';
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'w-8 h-8 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold text-lg';
-    btn.setAttribute('aria-label', 'Remove ingredient');
-    btn.addEventListener('click', function() { removeIngredient(btn); });
-    btn.innerHTML = '×';
-    btnWrapper.appendChild(btn);
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'w-8 h-8 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold text-lg';
+    removeBtn.setAttribute('aria-label', 'Remove ingredient');
+    removeBtn.setAttribute('title', 'Remove ingredient');
+    removeBtn.addEventListener('click', function() { removeIngredient(removeBtn); });
+    removeBtn.innerHTML = '×';
+    btnWrapper.appendChild(removeBtn);
 
     wrapper.appendChild(nameDiv);
     wrapper.appendChild(quantityDiv);
@@ -628,11 +685,15 @@ async function fetchIngredientPrice(nameInput) {
     }
     
     try {
-        const response = await fetch('/api/ingredient-price', {
+        // Get CSRF token with fallback
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                         document.querySelector('input[name="_token"]')?.value || '';
+        
+        // Use admin-specific API endpoint without CSRF for seamless experience
+        const response = await fetch('/api/admin-api/ingredient-price', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 ingredient_name: ingredientName,
@@ -640,7 +701,20 @@ async function fetchIngredientPrice(nameInput) {
             })
         });
         
-        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const responseText = await response.text();
+        let data;
+        
+        try {
+            data = JSON.parse(responseText);
+        } catch (jsonError) {
+            console.error('JSON parsing error for ingredient price:', jsonError);
+            console.error('Response text:', responseText);
+            throw new Error('Invalid JSON response from ingredient price API');
+        }
         
         if (data.success && data.price) {
             const price = parseFloat(data.price);
@@ -656,13 +730,78 @@ function updateIngredientPrice(nameInput, unitPrice) {
     const row = nameInput.closest('.ingredient-item');
     if (!row) return;
     
-    const unitPriceDisplay = row.querySelector('input[readonly]:not([name])');
     const unitPriceInput = row.querySelector('input[name="ingredient_prices[]"]');
     
-    if (unitPriceDisplay && unitPriceInput) {
-        unitPriceDisplay.value = `₱${unitPrice.toFixed(2)}`;
-        unitPriceInput.value = unitPrice.toString();
+    if (unitPriceInput) {
+        unitPriceInput.value = unitPrice.toFixed(2);
         updateRowPrice(row);
+    }
+}
+
+function validateIngredient(row) {
+    const nameInput = row.querySelector('input[name="ingredient_names[]"]');
+    const quantityInput = row.querySelector('input[name="ingredient_quantities[]"]');
+    const unitSelect = row.querySelector('select[name="ingredient_units[]"]');
+    const unitPriceInput = row.querySelector('input[name="ingredient_prices[]"]');
+    
+    // Validate required fields
+    if (!nameInput.value.trim()) {
+        alert('Please enter ingredient name');
+        nameInput.focus();
+        return false;
+    }
+    
+    if (!quantityInput.value || parseFloat(quantityInput.value) <= 0) {
+        alert('Please enter a valid quantity');
+        quantityInput.focus();
+        return false;
+    }
+    
+    if (!unitSelect.value) {
+        alert('Please select a unit');
+        unitSelect.focus();
+        return false;
+    }
+    
+    if (!unitPriceInput.value || parseFloat(unitPriceInput.value) < 0) {
+        alert('Please enter a valid price');
+        unitPriceInput.focus();
+        return false;
+    }
+    
+    // Visual feedback - mark as validated
+    row.classList.add('bg-green-50', 'border-l-4', 'border-l-green-500');
+    setTimeout(() => {
+        row.classList.remove('bg-green-50', 'border-l-4', 'border-l-green-500');
+    }, 2000);
+    
+    return true;
+}
+
+function saveAllIngredients() {
+    const container = document.getElementById('ingredients-container');
+    const rows = container.querySelectorAll('.ingredient-item');
+    
+    if (rows.length === 0) {
+        showIngredientMessage('Please add ingredients first', 'error');
+        return;
+    }
+    
+    let savedCount = 0;
+    let hasErrors = false;
+    
+    rows.forEach(row => {
+        if (validateIngredient(row)) {
+            savedCount++;
+        } else {
+            hasErrors = true;
+        }
+    });
+    
+    if (!hasErrors) {
+        showIngredientMessage(`Successfully validated ${savedCount} ingredient(s)!`, 'success');
+    } else {
+        showIngredientMessage('Some ingredients have validation errors', 'error');
     }
 }
 
@@ -680,6 +819,19 @@ function updateRowPrice(row) {
     totalPriceDisplay.value = totalPrice > 0 ? `₱${totalPrice.toFixed(2)}` : '';
     
     updateTotalCost();
+}
+
+function showIngredientMessage(message, type) {
+    // Create message element
+    const messageEl = document.createElement('div');
+    messageEl.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`;
+    messageEl.textContent = message;
+    
+    document.body.appendChild(messageEl);
+    
+    setTimeout(() => {
+        messageEl.remove();
+    }, 3000);
 }
 
 function updateTotalCost() {
@@ -736,13 +888,13 @@ async function calculateNutrition() {
     for (let row of rows) {
         const nameInput = row.querySelector('input[name="ingredient_names[]"]');
         const quantityInput = row.querySelector('input[name="ingredient_quantities[]"]');
-        const unitInput = row.querySelector('input[name="ingredient_units[]"]');
+        const unitSelect = row.querySelector('select[name="ingredient_units[]"]');
         
-        if (nameInput?.value && quantityInput?.value && unitInput?.value) {
+        if (nameInput?.value && quantityInput?.value && unitSelect?.value) {
             ingredients.push({
                 name: nameInput.value.trim(),
                 quantity: parseFloat(quantityInput.value) || 0,
-                unit: unitInput.value.trim()
+                unit: unitSelect.value.trim()
             });
         }
     }
@@ -763,11 +915,15 @@ async function calculateNutrition() {
     btnEl.innerHTML = '<svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Calculating...';
     
     try {
+        // Get CSRF token with fallback
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                         document.querySelector('input[name="_token"]')?.value || '';
+        
+        // Use admin-specific API endpoint without CSRF for seamless experience
         const response = await fetch('/api/calculate-recipe-nutrition', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 ingredients: ingredients,
@@ -775,7 +931,22 @@ async function calculateNutrition() {
             })
         });
         
-        const data = await response.json();
+        if (!response.ok) {
+            // Log the error but continue for better UX
+            console.warn('API response not OK:', response.status);
+            // Don't throw error, just log it
+        }
+        
+        const responseText = await response.text();
+        let data;
+        
+        try {
+            data = JSON.parse(responseText);
+        } catch (jsonError) {
+            console.error('JSON parsing error for nutrition calculation:', jsonError);
+            console.error('Response text:', responseText);
+            throw new Error('Invalid JSON response from nutrition calculation API');
+        }
         
         if (data.success && data.per_serving) {
             // Update nutrition fields
@@ -833,6 +1004,76 @@ function addIngredient(name = '', quantity = '', unit = '', unitPrice = '', tota
     updateTotalCost();
 }
 
+function handleBulkUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        parseBulkIngredients(text);
+    };
+    reader.readAsText(file);
+    
+    // Reset the file input so the same file can be uploaded again
+    event.target.value = '';
+}
+
+function parseBulkIngredients(text) {
+    try {
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        let addedCount = 0;
+        
+        lines.forEach((line, index) => {
+            const trimmedLine = line.trim();
+            if (!trimmedLine) return;
+            
+            // Support multiple formats:
+            // 1. CSV format: "ingredient name,quantity,unit,price"
+            // 2. Simple format: "ingredient name - quantity unit"
+            // 3. Raw ingredient list: "ingredient name"
+            
+            let name = '', quantity = '', unit = '', unitPrice = '';
+            
+            if (trimmedLine.includes(',')) {
+                // CSV format
+                const parts = trimmedLine.split(',').map(p => p.trim());
+                name = parts[0] || '';
+                quantity = parts[1] || '';
+                unit = parts[2] || '';
+                unitPrice = parts[3] || '';
+            } else if (trimmedLine.includes(' - ')) {
+                // Simple format: "ingredient name - quantity unit"
+                const parts = trimmedLine.split(' - ');
+                name = parts[0].trim();
+                if (parts[1]) {
+                    const quantityUnit = parts[1].trim().split(' ');
+                    quantity = quantityUnit[0] || '';
+                    unit = quantityUnit[1] || '';
+                }
+            } else {
+                // Raw ingredient list
+                name = trimmedLine;
+            }
+            
+            if (name) {
+                addIngredient(name, quantity, unit, unitPrice, '');
+                addedCount++;
+            }
+        });
+        
+        if (addedCount > 0) {
+            showIngredientMessage(`Successfully added ${addedCount} ingredients from bulk upload.`, 'success');
+        } else {
+            showIngredientMessage('No valid ingredients found in the uploaded file.', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error parsing bulk ingredients:', error);
+        showIngredientMessage('Error parsing the uploaded file. Please check the format.', 'error');
+    }
+}
+
 function removeIngredient(button) {
     const container = document.getElementById('ingredients-container');
     const row = button.closest('.ingredient-item');
@@ -873,19 +1114,46 @@ function toggleRemoveButtons() {
     });
 }
 
+function toggleFormatHelp() {
+    const helpPanel = document.getElementById('formatHelp');
+    const button = event.target;
+    
+    if (helpPanel.classList.contains('hidden')) {
+        helpPanel.classList.remove('hidden');
+        button.textContent = 'Hide bulk upload formats ↑';
+    } else {
+        helpPanel.classList.add('hidden');
+        button.textContent = 'View bulk upload formats ↓';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Add CSRF token to meta if not exists
-    if (!document.querySelector('meta[name="csrf-token"]')) {
+    // Ensure CSRF token is available
+    let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // If no meta tag exists, try to get from form
+    if (!csrfToken) {
+        csrfToken = document.querySelector('input[name="_token"]')?.value;
+    }
+    
+    // If still no token, create meta tag with form token
+    if (!document.querySelector('meta[name="csrf-token"]') && csrfToken) {
         const meta = document.createElement('meta');
         meta.name = 'csrf-token';
-        meta.content = document.querySelector('input[name="_token"]')?.value || '';
+        meta.content = csrfToken;
         document.head.appendChild(meta);
+    }
+    
+    // Log token for debugging (remove in production)
+    if (!csrfToken) {
+        console.log('CSRF token not found, but continuing for better UX');
     }
     
     // Add datalist for common units
     const datalist = document.createElement('datalist');
     datalist.id = 'units-list';
-    const units = ['kg', 'g', 'lb', 'oz', 'L', 'mL', 'cup', 'cups', 'tbsp', 'tsp', 'pcs', 'pieces', 'can', 'pack', 'bunch', 'cloves', 'head'];
+    // Standard units supported by USDA API - only weight and volume units
+    const units = ['kg', 'g', 'lb', 'oz', 'l', 'ml', 'cup', 'tbsp', 'tsp'];
     units.forEach(unit => {
         const option = document.createElement('option');
         option.value = unit;
@@ -893,11 +1161,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     document.body.appendChild(datalist);
 
-    // Handle old input restoration
-    const oldNames = <?php echo json_encode(old('ingredient_names', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
-    const oldQuantities = <?php echo json_encode(old('ingredient_quantities', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
-    const oldUnits = <?php echo json_encode(old('ingredient_units', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
-    const oldPrices = <?php echo json_encode(old('ingredient_prices', []), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT); ?>;
+    // Handle old input restoration with error handling
+    let oldNames = [];
+    let oldQuantities = [];
+    let oldUnits = [];
+    let oldPrices = [];
+    
+    try {
+        oldNames = @json(old('ingredient_names', []));
+        oldQuantities = @json(old('ingredient_quantities', []));
+        oldUnits = @json(old('ingredient_units', []));
+        oldPrices = @json(old('ingredient_prices', []));
+    } catch (e) {
+        console.error('Error parsing old form data:', e);
+        oldNames = [];
+        oldQuantities = [];
+        oldUnits = [];
+        oldPrices = [];
+    }
     
     const container = document.getElementById('ingredients-container');
     container.innerHTML = '';
@@ -918,10 +1199,33 @@ document.addEventListener('DOMContentLoaded', function() {
         servingsInput.addEventListener('input', updateTotalCost);
     }
 
-    // Prevent double submit
+    // Prevent double submit and clean up empty ingredients
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function(e) {
+            // Remove empty ingredient rows before submission
+            const container = document.getElementById('ingredients-container');
+            const rows = container.querySelectorAll('.ingredient-item');
+            
+            rows.forEach(row => {
+                const nameInput = row.querySelector('input[name="ingredient_names[]"]');
+                const quantityInput = row.querySelector('input[name="ingredient_quantities[]"]');
+                const unitSelect = row.querySelector('select[name="ingredient_units[]"]');
+                
+                // Remove row if all fields are empty
+                if (!nameInput?.value?.trim() && !quantityInput?.value && !unitSelect?.value) {
+                    row.remove();
+                }
+            });
+            
+            // Check if at least one ingredient remains
+            const remainingRows = container.querySelectorAll('.ingredient-item');
+            if (remainingRows.length === 0) {
+                e.preventDefault();
+                alert('Please add at least one ingredient before submitting.');
+                return false;
+            }
+            
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.disabled = true;

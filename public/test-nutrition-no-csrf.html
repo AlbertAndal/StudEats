@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nutrition API Test - No CSRF</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffe6e6; color: #d00; }
+        .success { background: #e6ffe6; color: #0a0; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Nutrition API Test - No CSRF Required</h1>
+    
+    <div>
+        <h3>Test Recipe Nutrition Calculation</h3>
+        <button onclick="testRecipeNutrition()">Test Recipe Nutrition (No CSRF)</button>
+        <div id="recipeResult" class="result"></div>
+    </div>
+    
+    <div>
+        <h3>Test Ingredient Nutrition Calculation</h3>
+        <button onclick="testIngredientNutrition()">Test Ingredient Nutrition (No CSRF)</button>
+        <div id="ingredientResult" class="result"></div>
+    </div>
+
+    <script>
+        async function testRecipeNutrition() {
+            const resultDiv = document.getElementById('recipeResult');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('Sending request to nutrition API...');
+                const response = await fetch('/api/calculate-recipe-nutrition', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        // Intentionally NO CSRF token
+                    },
+                    body: JSON.stringify({
+                        ingredients: [
+                            { name: 'Chicken Breast', quantity: 100, unit: 'g' },
+                            { name: 'Rice', quantity: 50, unit: 'g' }
+                        ],
+                        servings: 1
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // First check if we got a response
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                // Try to parse as JSON
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    throw new Error(`Invalid JSON response: ${parseError.message}. Response: ${responseText}`);
+                }
+                
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = '<strong>SUCCESS!</strong><br><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+            } catch (error) {
+                console.error('Error details:', error);
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '<strong>ERROR:</strong> ' + error.message;
+            }
+        }
+        
+        async function testIngredientNutrition() {
+            const resultDiv = document.getElementById('ingredientResult');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('Sending ingredient request to nutrition API...');
+                const response = await fetch('/api/calculate-ingredient-nutrition', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        // Intentionally NO CSRF token
+                    },
+                    body: JSON.stringify({
+                        name: 'Chicken Breast',
+                        quantity: 100,
+                        unit: 'g'
+                    })
+                });
+                
+                console.log('Ingredient response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                // Try to parse as JSON
+                const responseText = await response.text();
+                console.log('Raw ingredient response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    throw new Error(`Invalid JSON response: ${parseError.message}. Response: ${responseText}`);
+                }
+                
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = '<strong>SUCCESS!</strong><br><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+            } catch (error) {
+                console.error('Ingredient error details:', error);
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '<strong>ERROR:</strong> ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

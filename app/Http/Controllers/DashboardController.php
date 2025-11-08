@@ -17,6 +17,12 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
+        // Super admins should not access user dashboard
+        if ($user->isSuperAdmin()) {
+            return redirect()->route('admin.dashboard')
+                ->with('info', 'Super admin accounts can only access the admin panel.');
+        }
+        
         // Get today's date
         $today = Carbon::now()->toDateString();
         

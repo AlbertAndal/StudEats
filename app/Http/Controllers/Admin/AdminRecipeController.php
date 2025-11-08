@@ -76,6 +76,7 @@ class AdminRecipeController extends Controller
             'cost' => 'required|numeric|min:0',
             'cuisine_type' => 'required|string|max:100',
             'difficulty' => 'required|in:easy,medium,hard',
+            'meal_type' => 'required|in:breakfast,lunch,snack,dinner',
             'is_featured' => 'boolean',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             
@@ -148,8 +149,9 @@ class AdminRecipeController extends Controller
                 'cost' => $validated['cost'],
                 'cuisine_type' => $validated['cuisine_type'],
                 'difficulty' => $validated['difficulty'],
+                'meal_type' => $validated['meal_type'],
                 'image_path' => $imagePath,
-                'is_featured' => $request->boolean('is_featured'),
+                'is_featured' => $validated['is_featured'] ?? false,
             ]);
 
             // Create recipe
@@ -211,6 +213,7 @@ class AdminRecipeController extends Controller
             'cost' => 'required|numeric|min:0',
             'cuisine_type' => 'required|string|max:100',
             'difficulty' => 'required|in:easy,medium,hard',
+            'meal_type' => 'required|in:breakfast,lunch,snack,dinner',
             'is_featured' => 'boolean',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             
@@ -290,6 +293,7 @@ class AdminRecipeController extends Controller
                 'cost' => $validated['cost'],
                 'cuisine_type' => $validated['cuisine_type'],
                 'difficulty' => $validated['difficulty'],
+                'meal_type' => $validated['meal_type'],
                 'image_path' => $validated['image_path'] ?? $recipe->image_path,
                 'is_featured' => $request->boolean('is_featured'),
             ]);

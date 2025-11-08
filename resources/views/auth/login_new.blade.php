@@ -39,6 +39,26 @@
                 <p class="mt-2 text-sm text-muted-foreground">Enter your credentials to access your account.</p>
             </div>
 
+            <!-- Authentication Errors -->
+            @if ($errors->any())
+                <div class="mt-6 rounded-md border border-red-200 bg-red-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <div class="text-sm font-medium text-red-600">
+                                @foreach ($errors->all() as $error)
+                                    <p class="mb-1 last:mb-0 text-red-600 font-semibold">{{ $error }}</p>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <form action="{{ route('login') }}" method="POST" class="mt-8 space-y-6">
                 @csrf
                 <div class="space-y-5">
@@ -47,7 +67,6 @@
                         <input id="email" name="email" type="email" autocomplete="email" required value="{{ old('email') }}"
                                class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
                                placeholder="name@example.com">
-                        @error('email')<p class="text-xs text-destructive mt-1">{{ $message }}</p>@enderror
                     </div>
                     
                     <div class="space-y-2">

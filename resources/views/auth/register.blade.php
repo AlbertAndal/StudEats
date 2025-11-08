@@ -60,8 +60,7 @@
                             <div class="space-y-1">
                                 <label for="email" class="text-sm font-medium">Email Address</label>
                                 <input id="email" name="email" type="email" autocomplete="email" required value="{{ old('email') }}" placeholder="you@example.com"
-                                       class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 @error('email') border-destructive @enderror">
-                                @error('email')<p class="text-xs text-destructive mt-1">{{ $message }}</p>@enderror
+                                       class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                             </div>
                         </div>
 

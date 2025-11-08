@@ -24,6 +24,10 @@ Route::get('/csrf-token', [SessionController::class, 'getCsrfToken'])->name('api
 Route::get('/session-check', [SessionController::class, 'checkSession'])->name('api.session-check');
 Route::post('/session-refresh', [SessionController::class, 'refreshSession'])->name('api.session-refresh');
 
-// Nutrition calculation API
+// Nutrition calculation API (no auth required for better UX)
 Route::post('/nutrition/calculate', [NutritionController::class, 'calculate'])->name('api.nutrition.calculate');
 Route::get('/nutrition/ingredients', [NutritionController::class, 'getIngredients'])->name('api.nutrition.ingredients');
+
+// Additional nutrition endpoints without CSRF/auth requirements  
+Route::post('/calculate-ingredient-nutrition', [\App\Http\Controllers\Api\NutritionApiController::class, 'calculateIngredient'])->name('api.calculate-ingredient-nutrition');
+Route::post('/calculate-recipe-nutrition', [\App\Http\Controllers\Api\NutritionApiController::class, 'calculateRecipe'])->name('api.calculate-recipe-nutrition');

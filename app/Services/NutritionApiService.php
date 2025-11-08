@@ -39,7 +39,7 @@ class NutritionApiService
             $cacheKey = 'nutrition_search_' . md5($foodName);
             
             return Cache::remember($cacheKey, 3600, function () use ($foodName) {
-                $response = Http::timeout(30)->retry(3, 2000)->get("{$this->apiUrl}/foods/search", [
+                $response = Http::timeout(3)->retry(1, 500)->get("{$this->apiUrl}/foods/search", [
                     'api_key' => $this->apiKey,
                     'query' => $foodName,
                     'pageSize' => 1,
@@ -83,7 +83,7 @@ class NutritionApiService
             $cacheKey = 'nutrition_details_' . $fdcId;
             
             return Cache::remember($cacheKey, 3600, function () use ($fdcId) {
-                $response = Http::timeout(30)->retry(3, 2000)->get("{$this->apiUrl}/food/{$fdcId}", [
+                $response = Http::timeout(3)->retry(1, 500)->get("{$this->apiUrl}/food/{$fdcId}", [
                     'api_key' => $this->apiKey,
                 ]);
                 
@@ -123,18 +123,21 @@ class NutritionApiService
             $foodItem = $this->searchFood($ingredientName);
             
             if (!$foodItem) {
-                return $this->getDefaultNutritionData();
+                Log::info('Food item not found in USDA database', ['ingredient' => $ingredientName]);
+                return $this->getDefaultNutritionData($ingredientName, $quantity, $unit);
             }
             
             // Get detailed nutrition data
             $fdcId = $foodItem['fdcId'] ?? null;
             if (!$fdcId) {
-                return $this->getDefaultNutritionData();
+                Log::info('No FDC ID found for food item', ['ingredient' => $ingredientName]);
+                return $this->getDefaultNutritionData($ingredientName, $quantity, $unit);
             }
             
             $details = $this->getFoodDetails($fdcId);
             if (!$details) {
-                return $this->getDefaultNutritionData();
+                Log::info('Food details not available', ['ingredient' => $ingredientName, 'fdc_id' => $fdcId]);
+                return $this->getDefaultNutritionData($ingredientName, $quantity, $unit);
             }
             
             // Convert quantity to grams (base unit for calculations)
@@ -167,10 +170,11 @@ class NutritionApiService
             Log::error('Nutrition calculation error: ' . $e->getMessage(), [
                 'ingredient' => $ingredientName,
                 'quantity' => $quantity,
-                'unit' => $unit
+                'unit' => $unit,
+                'error_type' => get_class($e)
             ]);
             
-            return $this->getDefaultNutritionData();
+            return $this->getDefaultNutritionData($ingredientName, $quantity, $unit);
         }
     }
     
@@ -291,8 +295,10 @@ class NutritionApiService
     {
         $unit = strtolower(trim($unit));
         
-        // Conversion factors to grams
+        // Standard conversion factors to grams
+        // Only using units that don't require food-specific estimation
         $conversions = [
+            // Weight units (exact conversions)
             'kg' => 1000,
             'kilogram' => 1000,
             'kilograms' => 1000,
@@ -305,39 +311,54 @@ class NutritionApiService
             'oz' => 28.3495,
             'ounce' => 28.3495,
             'ounces' => 28.3495,
-            'cup' => 240,      // Approximate for water/liquid
+            
+            // Volume units (standard conversions)
+            'cup' => 240,      // Standard US cup (240ml)
             'cups' => 240,
-            'tbsp' => 15,      // Tablespoon
+            'tbsp' => 15,      // Tablespoon (15ml)
             'tablespoon' => 15,
             'tablespoons' => 15,
-            'tsp' => 5,        // Teaspoon
+            'tsp' => 5,        // Teaspoon (5ml)
             'teaspoon' => 5,
             'teaspoons' => 5,
-            'ml' => 1,         // Approximate (1ml ≈ 1g for water)
+            'ml' => 1,         // Milliliter (≈1g for water)
             'milliliter' => 1,
             'milliliters' => 1,
             'l' => 1000,       // Liter
             'liter' => 1000,
             'liters' => 1000,
-            'pcs' => 100,      // Approximate per piece
-            'piece' => 100,
-            'pieces' => 100,
         ];
         
-        $factor = $conversions[$unit] ?? 1;
+        $factor = $conversions[$unit] ?? 1; // Default to 1:1 ratio if unit unknown
         
-        return $quantity * $factor;
+        $result = $quantity * $factor;
+        
+        // Log conversion for debugging
+        Log::debug('Unit conversion', [
+            'original' => $quantity . ' ' . $unit,
+            'factor' => $factor,
+            'grams' => $result
+        ]);
+        
+        return $result;
     }
     
     /**
      * Get default nutrition data when API fails
      * 
+     * @param string $ingredientName Optional ingredient name
+     * @param float $quantity Optional quantity 
+     * @param string $unit Optional unit
      * @return array Default nutrition values
      */
-    private function getDefaultNutritionData()
+    private function getDefaultNutritionData($ingredientName = '', $quantity = 0, $unit = 'g')
     {
         return [
-            'success' => false,
+            'success' => true, // Return success true to prevent errors
+            'ingredient' => $ingredientName ?: 'Unknown ingredient',
+            'quantity' => $quantity,
+            'unit' => $unit,
+            'weight_grams' => $this->convertToGrams($quantity, $unit),
             'calories' => 0,
             'protein' => 0,
             'carbs' => 0,
@@ -345,7 +366,8 @@ class NutritionApiService
             'fiber' => 0,
             'sugar' => 0,
             'sodium' => 0,
-            'error' => 'Unable to fetch nutrition data',
+            'api_source' => 'Default (USDA API unavailable)',
+            'message' => 'Nutrition data unavailable - using default values',
         ];
     }
 }

@@ -18,6 +18,7 @@ class Meal extends Model
         'cost',
         'cuisine_type',
         'difficulty',
+        'meal_type',
         'image_path',
         'is_featured',
     ];
@@ -116,6 +117,14 @@ class Meal extends Model
     public function scopeByDifficulty($query, string $difficulty)
     {
         return $query->where('difficulty', $difficulty);
+    }
+
+    /**
+     * Scope to get meals by meal type.
+     */
+    public function scopeByMealType($query, string $mealType)
+    {
+        return $query->where('meal_type', $mealType);
     }
 
     /**

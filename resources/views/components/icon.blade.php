@@ -3,7 +3,7 @@
     $iconMap = [
         // Dashboard Stats
         'clock' => 'Clock',
-        'currency-dollar' => 'DollarSign',
+        'currency-dollar' => 'PesoSign',
         'bolt' => 'Zap',
         'clipboard-document-list' => 'ClipboardList',
         
@@ -23,7 +23,7 @@
         'trash' => 'Trash2',
         'utensils' => 'Utensils',
         'squares-2x2' => 'Grid2X2',
-        'banknotes' => 'DollarSign',
+        'banknotes' => 'PesoSign',
         'clock' => 'Clock',
         'users' => 'Users',
         'bell' => 'Bell',
@@ -108,8 +108,10 @@
         @case('DollarSign')
             <line x1="12" y1="2" x2="12" y2="22" stroke-width="2"/>
             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-width="2"/>
-            <line x1="6" y1="9" x2="14" y2="9" stroke-width="1.5"/>
-            <line x1="6" y1="12" x2="14" y2="12" stroke-width="1.5"/>
+            @break
+        @case('PesoSign')
+            <line x1="12" y1="2" x2="12" y2="22" stroke-width="2"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-width="2"/>
             @break
         @case('Zap')
             <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>

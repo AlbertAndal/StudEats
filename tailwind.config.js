@@ -5,6 +5,7 @@ module.exports = {
     "./resources/**/*.js",
     "./resources/**/*.vue",
     "./app/**/*.php",
+    "./node_modules/flyonui/dist/js/*.js",
   ],
   theme: {
     extend: {
@@ -32,6 +33,13 @@ module.exports = {
     },
   },
   plugins: [
-    require('tailwindcss-animated')
+    require('tailwindcss-animated'),
+    require('daisyui'),
   ],
+  daisyui: {
+    themes: false, // Disable themes to use Tailwind colors
+    base: true, // Apply base styles
+    styled: true, // Include component styles
+    utils: true, // Include utility classes
+  },
 }

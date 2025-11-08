@@ -81,6 +81,12 @@ class RecipeController extends Controller
             ->limit(3)
             ->get();
 
-        return view('recipes.show', compact('meal', 'similarRecipes'));
+        // Get nutrient warnings based on PDRI
+        $nutrientWarnings = [];
+        if (auth()->check()) {
+            $nutrientWarnings = \App\Models\PdriReference::getNutrientWarnings($meal, auth()->user());
+        }
+
+        return view('recipes.show', compact('meal', 'similarRecipes', 'nutrientWarnings'));
     }
 }

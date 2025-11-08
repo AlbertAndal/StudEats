@@ -18,8 +18,58 @@
     <link rel="preload" href="https://fonts.gstatic.com/s/geist/v1/gyB-hkdavoI.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="https://fonts.gstatic.com/s/geist/v1/gyB4hkdavoI.woff2" as="font" type="font/woff2" crossorigin>
 
+    <!-- Intro.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Session Management Script for improved UX -->
+    <script>
+        // Extend session automatically to prevent timeouts
+        function keepSessionAlive() {
+            fetch('/api/csrf-token', {
+                method: 'GET',
+                credentials: 'same-origin'
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+            }).then(data => {
+                if (data && data.csrf_token) {
+                    // Update CSRF token in meta tag
+                    const metaTag = document.querySelector('meta[name="csrf-token"]');
+                    if (metaTag) {
+                        metaTag.setAttribute('content', data.csrf_token);
+                    }
+                    // Update CSRF tokens in forms
+                    document.querySelectorAll('input[name="_token"]').forEach(input => {
+                        input.value = data.csrf_token;
+                    });
+                }
+            }).catch(error => {
+                console.log('Session renewal skipped:', error.message);
+            });
+        }
+        
+        // Keep session alive every 30 minutes
+        setInterval(keepSessionAlive, 30 * 60 * 1000);
+        
+        // Refresh session on user activity
+        let activityTimer;
+        function resetActivityTimer() {
+            clearTimeout(activityTimer);
+            activityTimer = setTimeout(keepSessionAlive, 15 * 60 * 1000); // 15 minutes of inactivity
+        }
+        
+        // Listen for user activity
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+            document.addEventListener(event, resetActivityTimer, true);
+        });
+        
+        // Initial timer
+        resetActivityTimer();
+    </script>
     
     <!-- Fallback CSS for production if Vite assets fail to load -->
     @if(app()->environment('production'))
@@ -44,6 +94,9 @@
     @endif
 </head>
 <body class="font-sans antialiased bg-background text-foreground">
+    <!-- Page Loading Overlay -->
+    <x-page-loading />
+    
     <div class="min-h-screen">
         <!-- Navigation -->
         <nav class="bg-white border-b border-gray-200 shadow-sm">
@@ -71,10 +124,6 @@
                             <a href="{{ route('recipes.index') }}" 
                                class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('recipes.*') ? 'border-green-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
                                 Recipes
-                            </a>
-                            <a href="{{ route('contact.show') }}" 
-                               class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('contact.*') ? 'border-green-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
-                                Contact Us
                             </a>
                         </div>
                         @else
@@ -117,7 +166,7 @@
                                     </button>
                                     
                                     <!-- Dropdown menu -->
-                                    <div class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" 
+                                    <div class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50" 
                                          role="menu" 
                                          aria-orientation="vertical" 
                                          aria-labelledby="user-menu-button" 
@@ -237,10 +286,6 @@
                     <a href="{{ route('recipes.index') }}" 
                        class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium {{ request()->routeIs('recipes.*') ? 'bg-green-50 border-green-500 text-green-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }}">
                         Recipes
-                    </a>
-                    <a href="{{ route('contact.show') }}" 
-                       class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium {{ request()->routeIs('contact.*') ? 'bg-green-50 border-green-500 text-green-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }}">
-                        Contact Us
                     </a>
                 </div>
                 <div class="pt-4 pb-3 border-t border-gray-200">
@@ -469,6 +514,11 @@
             });
         }
     </script>
+    
+    <!-- Intro.js Script -->
+    <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+    
+    @stack('scripts')
 </body>
 </html>
 

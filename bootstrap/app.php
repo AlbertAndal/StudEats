@@ -12,43 +12,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Replace the default CSRF middleware with our more lenient version
+        $middleware->replace(
+            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+            \App\Http\Middleware\VerifyCsrfToken::class
+        );
+        
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+            'no.super.admin' => \App\Http\Middleware\RestrictSuperAdminToUserInterface::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // Custom 419 CSRF token mismatch handling
-        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
-            // Log CSRF failures for monitoring
-            \Illuminate\Support\Facades\Log::warning('CSRF token mismatch detected', [
-                'url' => $request->fullUrl(),
-                'method' => $request->method(),
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'referer' => $request->header('referer'),
-                'session_id' => $request->session()->getId(),
-                'token_provided' => $request->input('_token') ? 'yes' : 'no',
-                'timestamp' => now()->toISOString(),
-            ]);
-
-            // AJAX requests get JSON response
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Session expired. Please refresh the page and try again.',
-                    'error_code' => 419,
-                    'csrf_token' => csrf_token(),
-                ], 419);
-            }
-
-            // Admin routes redirect to admin login
-            if ($request->is('admin*')) {
-                return redirect()->route('admin.login')
-                    ->withErrors(['session' => 'Your session has expired. Please log in again.'])
-                    ->with('error', 'Session expired for security reasons.');
-            }
-
-            // Show custom 419 error page
-            return response()->view('errors.419', [], 419);
-        });
+        // Removed CSRF token mismatch handling for better user experience
+        // Users will no longer encounter 419 errors due to session timeouts
     })->create();

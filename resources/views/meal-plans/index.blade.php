@@ -1,3 +1,5 @@
+                    
+                    <svg class="w-5 h-5 text-green-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M16 13a2 2 0 1 0 0-4"/></svg>
 @extends('layouts.app')
 
 @section('title', 'Meal Plans')
@@ -18,11 +20,6 @@
                class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
                 <x-icon name="calendar-days" class="w-4 h-4 mr-2" />
                 Weekly View
-            </a>
-            <a href="{{ route('meal-plans.select', ['date' => $selectedDate->format('Y-m-d')]) }}" 
-               class="inline-flex items-center justify-center px-4 py-2 border border-green-300 text-sm font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100 transition-colors duration-200">
-                <x-icon name="rectangle-stack" class="w-4 h-4 mr-2" />
-                Select Meal Type
             </a>
             <a href="{{ route('meal-plans.create') }}" 
                class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors duration-200">
@@ -89,7 +86,7 @@
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
                 <div class="h-10 w-10 bg-green-500/10 rounded-lg flex items-center justify-center">
-                    <x-icon name="currency-dollar" class="w-5 h-5 text-green-600" />
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M16 13a2 2 0 1 0 0-4"/></svg>
                 </div>
                 <div>
                     <h3 class="text-base font-semibold text-gray-900">Daily Budget</h3>
@@ -252,7 +249,6 @@
                                                 <span>{{ $mealPlan->meal->nutritionalInfo->calories ?? 'N/A' }} cal</span>
                                             </div>
                                             <div class="flex items-center text-gray-600">
-                                                <x-icon name="currency-dollar" class="w-4 h-4 mr-1 text-green-500" />
                                                 <span>₱{{ $mealPlan->meal->cost }}</span>
                                             </div>
                                             @if($pctOfBudget !== null)
@@ -293,17 +289,13 @@
                                         <x-icon name="book-open" class="w-4 h-4 mr-2" />
                                         Recipe
                                     </a>
-                                    <form method="POST" action="{{ route('meal-plans.destroy', $mealPlan) }}" class="inline flex-1">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                class="w-full flex items-center justify-center px-3 py-2 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-300"
-                                                onclick="return confirm('Are you sure you want to remove this meal?')"
-                                                title="Remove meal">
-                                            <x-icon name="x-mark" class="w-4 h-4 mr-2" />
-                                            Remove
-                                        </button>
-                                    </form>
+                                    <button type="button" 
+                                            onclick="showRemoveMealModal('{{ $mealPlan->id }}', '{{ $mealPlan->meal->name }}', '{{ $mealPlan->meal_type }}', '{{ $selectedDate->format('M j, Y') }}')" 
+                                            class="flex-1 flex items-center justify-center px-3 py-2 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-300"
+                                            title="Remove meal">
+                                        <x-icon name="x-mark" class="w-4 h-4 mr-2" />
+                                        Remove
+                                    </button>
                                     </div>
                                 </div>
                             </div>
@@ -353,7 +345,7 @@
                         </div>
                         <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg border border-blue-100">
                             <div class="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-full">
-                                <x-icon name="currency-dollar" class="w-6 h-6 text-blue-600" />
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M16 13a2 2 0 1 0 0-4"/></svg>
                             </div>
                             <div class="text-2xl font-bold text-blue-600">
                                 ₱{{ $mealPlans->sum('meal.cost') ?? 0 }}
@@ -375,5 +367,191 @@
         </div>
     @endif
 </div>
+
+<!-- Meal Removal Confirmation Modal -->
+<div id="removeMealModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="hideRemoveMealModal()"></div>
+
+        <!-- Center the modal contents -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <!-- Modal panel -->
+        <div class="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div class="sm:flex sm:items-start">
+                <!-- Warning Icon -->
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                </div>
+                
+                <!-- Modal Content -->
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                        Remove Meal from Plan?
+                    </h3>
+                    <div class="mt-3">
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    <span id="modalMealIcon" class="text-2xl">🍽️</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900" id="modalMealName">Meal Name</p>
+                                    <p class="text-sm text-gray-500">
+                                        <span class="capitalize" id="modalMealType">meal type</span> • <span id="modalMealDate">Date</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500">
+                            This action cannot be undone. The meal will be permanently removed from your meal plan for this date.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Actions -->
+            <div class="mt-6 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <form id="removeMealForm" method="POST" action="" class="inline-flex w-full sm:w-auto">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" id="confirmRemoveBtn"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200">
+                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span class="btn-text">Yes, Remove Meal</span>
+                    </button>
+                </form>
+                <button type="button" 
+                        onclick="hideRemoveMealModal()" 
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors duration-200">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Modal Functionality -->
+<script>
+// Modal functionality for meal removal
+function showRemoveMealModal(mealPlanId, mealName, mealType, mealDate) {
+    // Update modal content
+    document.getElementById('modalMealName').textContent = mealName;
+    document.getElementById('modalMealType').textContent = mealType;
+    document.getElementById('modalMealDate').textContent = mealDate;
+    document.getElementById('removeMealForm').action = `/meal-plans/${mealPlanId}`;
+    
+    // Update meal type icon
+    const mealIcon = document.getElementById('modalMealIcon');
+    switch(mealType) {
+        case 'breakfast':
+            mealIcon.textContent = '🍳';
+            break;
+        case 'lunch':
+            mealIcon.textContent = '🍽️';
+            break;
+        case 'dinner':
+            mealIcon.textContent = '🍴';
+            break;
+        case 'snack':
+            mealIcon.textContent = '🍪';
+            break;
+        default:
+            mealIcon.textContent = '🍽️';
+    }
+    
+    // Show modal with animation
+    const modal = document.getElementById('removeMealModal');
+    modal.classList.remove('hidden');
+    
+    // Add entrance animation
+    requestAnimationFrame(() => {
+        const overlay = modal.querySelector('.bg-gray-500');
+        const panel = modal.querySelector('.bg-white');
+        
+        overlay.style.opacity = '0';
+        panel.style.transform = 'scale(0.95)';
+        panel.style.opacity = '0';
+        
+        overlay.style.transition = 'opacity 300ms ease-out';
+        panel.style.transition = 'all 300ms ease-out';
+        
+        requestAnimationFrame(() => {
+            overlay.style.opacity = '0.75';
+            panel.style.transform = 'scale(1)';
+            panel.style.opacity = '1';
+        });
+    });
+    
+    // Focus on cancel button for accessibility
+    setTimeout(() => {
+        modal.querySelector('button[onclick="hideRemoveMealModal()"]').focus();
+    }, 100);
+}
+
+function hideRemoveMealModal() {
+    const modal = document.getElementById('removeMealModal');
+    const overlay = modal.querySelector('.bg-gray-500');
+    const panel = modal.querySelector('.bg-white');
+    
+    // Add exit animation
+    overlay.style.transition = 'opacity 200ms ease-in';
+    panel.style.transition = 'all 200ms ease-in';
+    
+    overlay.style.opacity = '0';
+    panel.style.transform = 'scale(0.95)';
+    panel.style.opacity = '0';
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 200);
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('removeMealModal');
+        if (!modal.classList.contains('hidden')) {
+            hideRemoveMealModal();
+        }
+    }
+});
+
+// Loading state for form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('removeMealForm');
+    const LoadingUtils = window.LoadingUtils || null;
+    
+    form.addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('confirmRemoveBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        
+        // Show loading state
+        if (LoadingUtils) {
+            LoadingUtils.showOnButton(submitBtn, {
+                text: 'Removing...',
+                size: 'small'
+            });
+        } else {
+            // Fallback loading state
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Removing...
+            `;
+        }
+    });
+});
+</script>
+
 @endsection
 

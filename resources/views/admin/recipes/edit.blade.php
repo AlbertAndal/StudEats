@@ -6,6 +6,18 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <!-- Nutrition Calculator Script -->
 <script src="{{ asset('js/nutrition-calculator.js') }}" defer></script>
+<style>
+/* Remove spinner arrows from number inputs in readonly nutrition fields */
+input[type=number].no-spinners::-webkit-outer-spin-button,
+input[type=number].no-spinners::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number].no-spinners {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+</style>
 @endpush
 
 @section('content')
@@ -130,6 +142,17 @@
                                     </select>
                                 </div>
 
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-semibold text-gray-800 mb-2">Meal Type *</label>
+                                    <select name="meal_type" required class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white">
+                                        <option value="">Select</option>
+                                        <option value="breakfast" {{ old('meal_type', $recipe->meal_type) === 'breakfast' ? 'selected' : '' }}>Breakfast</option>
+                                        <option value="lunch" {{ old('meal_type', $recipe->meal_type) === 'lunch' ? 'selected' : '' }}>Lunch</option>
+                                        <option value="snack" {{ old('meal_type', $recipe->meal_type) === 'snack' ? 'selected' : '' }}>Snack</option>
+                                        <option value="dinner" {{ old('meal_type', $recipe->meal_type) === 'dinner' ? 'selected' : '' }}>Dinner</option>
+                                    </select>
+                                </div>
+
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-800 mb-2">Calories *</label>
                                     <input type="number" name="calories" value="{{ old('calories', $recipe->calories) }}" min="1" max="9999" required
@@ -200,6 +223,28 @@
                             <!-- Ingredients Grid Container -->
                             <div class="space-y-3">
                             
+                            <!-- Column Headers -->
+                            <div class="grid grid-cols-12 gap-3 pb-2 border-b border-gray-200">
+                                <div class="col-span-4">
+                                    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Ingredient Name</label>
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Quantity</label>
+                                </div>
+                                <div class="col-span-1">
+                                    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Unit</label>
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Unit Price</label>
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Total Price</label>
+                                </div>
+                                <div class="col-span-1">
+                                    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Action</label>
+                                </div>
+                            </div>
+                            
                             <!-- Ingredients List -->
                             <div id="recipe-ingredients" class="mb-3">
                                 @if($recipe->recipe->ingredients && count($recipe->recipe->ingredients) > 0)
@@ -223,7 +268,7 @@
                                             }
                                         @endphp
                                         <div class="grid grid-cols-12 gap-3 ingredient-item">
-                                            <div class="col-span-5">
+                                            <div class="col-span-4">
                                                 <input type="text" name="ingredient_names[]" 
                                                        value="{{ $name }}"
                                                        class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300 recipe-ing-name" 
@@ -233,24 +278,33 @@
                                                 <input type="number" name="ingredient_quantities[]" 
                                                        value="{{ $quantity }}"
                                                        class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-center transition-all duration-200 bg-white hover:border-gray-300 recipe-ing-qty" 
-                                                       placeholder="500" min="0.01" step="0.01">
+                                                       placeholder="500" min="0.01" step="0.01" onchange="calculateRowTotal(this)">
                                             </div>
-                                            <div class="col-span-2">
+                                            <div class="col-span-1">
                                                 <select name="ingredient_units[]" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300 recipe-ing-unit">
-                                                    <option value="g" {{ $unit == 'g' ? 'selected' : '' }}>g</option>
-                                                    <option value="kg" {{ $unit == 'kg' ? 'selected' : '' }}>kg</option>
-                                                    <option value="cup" {{ $unit == 'cup' ? 'selected' : '' }}>cup</option>
-                                                    <option value="tbsp" {{ $unit == 'tbsp' ? 'selected' : '' }}>tbsp</option>
-                                                    <option value="tsp" {{ $unit == 'tsp' ? 'selected' : '' }}>tsp</option>
-                                                    <option value="lb" {{ $unit == 'lb' ? 'selected' : '' }}>lb</option>
-                                                    <option value="oz" {{ $unit == 'oz' ? 'selected' : '' }}>oz</option>
+                                                    <option value="">Select unit...</option>
+                                                    <option value="kg" {{ $unit == 'kg' ? 'selected' : '' }}>Kilogram (kg)</option>
+                                                    <option value="g" {{ $unit == 'g' ? 'selected' : '' }}>Gram (g)</option>
+                                                    <option value="lb" {{ $unit == 'lb' ? 'selected' : '' }}>Pound (lb)</option>
+                                                    <option value="oz" {{ $unit == 'oz' ? 'selected' : '' }}>Ounce (oz)</option>
+                                                    <option value="cup" {{ $unit == 'cup' ? 'selected' : '' }}>Cup</option>
+                                                    <option value="tbsp" {{ $unit == 'tbsp' ? 'selected' : '' }}>Tablespoon (tbsp)</option>
+                                                    <option value="tsp" {{ $unit == 'tsp' ? 'selected' : '' }}>Teaspoon (tsp)</option>
+                                                    <option value="ml" {{ $unit == 'ml' ? 'selected' : '' }}>Milliliter (ml)</option>
+                                                    <option value="l" {{ $unit == 'l' ? 'selected' : '' }}>Liter (l)</option>
                                                 </select>
                                             </div>
                                             <div class="col-span-2">
                                                 <input type="number" name="ingredient_prices[]"
                                                        value="{{ $price }}"
                                                        class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-price" 
-                                                       placeholder="0.00" min="0" step="0.01">
+                                                       placeholder="0.00" min="0" step="0.01" onchange="calculateRowTotal(this)">
+                                            </div>
+                                            <div class="col-span-2">
+                                                <input type="number" name="ingredient_totals[]" 
+                                                       value="{{ $price && $quantity ? number_format($price * $quantity, 2, '.', '') : '' }}"
+                                                       class="w-full px-3 py-3 text-sm border border-gray-200 rounded-lg bg-gray-100 text-center text-gray-600 recipe-ing-total" 
+                                                       placeholder="0.00" readonly>
                                             </div>
                                             <div class="col-span-1 flex items-center justify-center">
                                                 <button type="button" onclick="this.parentElement.parentElement.remove(); updateIngredientCount();" 
@@ -266,7 +320,7 @@
                             </div>
                             
                             <!-- Add Ingredient Button -->
-                            <div class="pt-4">
+                            <div class="pt-4 flex items-center gap-3">
                                 <button type="button" onclick="addRecipeIngredient()" 
                                         class="inline-flex items-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-all duration-200">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -274,6 +328,21 @@
                                     </svg>
                                     Add Ingredient
                                 </button>
+                                
+                                <button type="button" 
+                                        onclick="document.getElementById('editBulkUploadFile').click()"
+                                        class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                                    </svg>
+                                    Bulk Upload
+                                </button>
+                                
+                                <input type="file" 
+                                       id="editBulkUploadFile" 
+                                       accept=".csv,.txt" 
+                                       style="display: none;" 
+                                       onchange="handleEditBulkUpload(event)">
                             </div>
                             
                             <!-- Nutrition Calculation Section -->
@@ -371,7 +440,7 @@
                         <summary class="px-6 py-4 border-b border-gray-100 cursor-pointer flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                             <div>
                                 <h3 class="text-base font-semibold text-gray-900">Nutritional Information</h3>
-                                <p class="text-sm text-gray-500 mt-0.5">Detailed nutrition facts and values</p>
+                                <p class="text-sm text-gray-500 mt-0.5">Auto-calculated from ingredients - Read only</p>
                             </div>
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -381,33 +450,33 @@
                             <div class="grid grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Protein (g)</label>
-                                    <input type="number" name="protein" value="{{ old('protein', $recipe->nutritionalInfo->protein ?? 0) }}" min="0" step="0.1"
-                                           class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300">
+                                    <input type="number" name="protein" value="{{ old('protein', $recipe->nutritionalInfo->protein ?? 0) }}" min="0" step="0.1" readonly
+                                           class="no-spinners w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Carbs (g)</label>
-                                    <input type="number" name="carbs" value="{{ old('carbs', $recipe->nutritionalInfo->carbs ?? 0) }}" min="0" step="0.1"
-                                           class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300">
+                                    <input type="number" name="carbs" value="{{ old('carbs', $recipe->nutritionalInfo->carbs ?? 0) }}" min="0" step="0.1" readonly
+                                           class="no-spinners w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Fats (g)</label>
-                                    <input type="number" name="fats" value="{{ old('fats', $recipe->nutritionalInfo->fats ?? 0) }}" min="0" step="0.1"
-                                           class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300">
+                                    <input type="number" name="fats" value="{{ old('fats', $recipe->nutritionalInfo->fats ?? 0) }}" min="0" step="0.1" readonly
+                                           class="no-spinners w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Fiber (g)</label>
-                                    <input type="number" name="fiber" value="{{ old('fiber', $recipe->nutritionalInfo->fiber ?? 0) }}" min="0" step="0.1"
-                                           class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300">
+                                    <input type="number" name="fiber" value="{{ old('fiber', $recipe->nutritionalInfo->fiber ?? 0) }}" min="0" step="0.1" readonly
+                                           class="no-spinners w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Sugar (g)</label>
-                                    <input type="number" name="sugar" value="{{ old('sugar', $recipe->nutritionalInfo->sugar ?? 0) }}" min="0" step="0.1"
-                                           class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300">
+                                    <input type="number" name="sugar" value="{{ old('sugar', $recipe->nutritionalInfo->sugar ?? 0) }}" min="0" step="0.1" readonly
+                                           class="no-spinners w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Sodium (mg)</label>
-                                    <input type="number" name="sodium" value="{{ old('sodium', $recipe->nutritionalInfo->sodium ?? 0) }}" min="0" step="0.1"
-                                           class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300">
+                                    <input type="number" name="sodium" value="{{ old('sodium', $recipe->nutritionalInfo->sodium ?? 0) }}" min="0" step="0.1" readonly
+                                           class="no-spinners w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
                                 </div>
                             </div>
                         </div>
@@ -416,9 +485,9 @@
                 </div>
 
                 <!-- Sidebar -->
-                <div class="lg:col-span-1 space-y-6">
-                    <!-- Recipe Image (Sticky) -->
-                    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden sticky top-24">
+                <div class="lg:col-span-1 space-y-4">
+                    <!-- Recipe Image -->
+                    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
                         <div class="px-5 py-3.5 border-b border-gray-100">
                             <h3 class="text-sm font-semibold text-gray-900">Recipe Image</h3>
                             <p class="text-xs text-gray-500 mt-0.5">Upload or update photo</p>
@@ -439,7 +508,7 @@
                         </div>
                     </div>
 
-                    <!-- Recipe Metadata -->
+                    <!-- Recipe Status -->
                     <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
                         <div class="px-5 py-3.5 border-b border-gray-100">
                             <h4 class="text-sm font-semibold text-gray-900">Recipe Status</h4>
@@ -493,7 +562,7 @@
                     </div>
 
                     <!-- Quick Stats -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden sticky top-96 z-10">
                         <div class="px-5 py-3 border-b border-gray-200 bg-gray-50">
                             <h4 class="text-base font-semibold text-gray-900">Quick Stats</h4>
                         </div>
@@ -522,7 +591,7 @@
                     </div>
 
                     <!-- Recipe Tags -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
                         <div class="px-5 py-3 border-b border-gray-200 bg-gray-50">
                             <h4 class="text-base font-semibold text-gray-900">Recipe Tags</h4>
                         </div>
@@ -628,7 +697,7 @@ function addRecipeIngredient() {
     const newRow = document.createElement('div');
     newRow.className = 'grid grid-cols-12 gap-3 ingredient-item';
     newRow.innerHTML = `
-        <div class="col-span-5">
+        <div class="col-span-4">
             <input type="text" name="ingredient_names[]" 
                    class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-name" 
                    placeholder="e.g., Chicken breast, Rice, Garlic">
@@ -636,23 +705,31 @@ function addRecipeIngredient() {
         <div class="col-span-2">
             <input type="number" name="ingredient_quantities[]" 
                    class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-qty" 
-                   placeholder="500" min="0.01" step="0.01">
+                   placeholder="500" min="0.01" step="0.01" onchange="calculateRowTotal(this)">
         </div>
-        <div class="col-span-2">
+        <div class="col-span-1">
             <select name="ingredient_units[]" class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-unit">
-                <option value="g">g</option>
-                <option value="kg">kg</option>
-                <option value="cup">cup</option>
-                <option value="tbsp">tbsp</option>
-                <option value="tsp">tsp</option>
-                <option value="lb">lb</option>
-                <option value="oz">oz</option>
+                <option value="">Select unit...</option>
+                <option value="kg">Kilogram (kg)</option>
+                <option value="g">Gram (g)</option>
+                <option value="lb">Pound (lb)</option>
+                <option value="oz">Ounce (oz)</option>
+                <option value="cup">Cup</option>
+                <option value="tbsp">Tablespoon (tbsp)</option>
+                <option value="tsp">Teaspoon (tsp)</option>
+                <option value="ml">Milliliter (ml)</option>
+                <option value="l">Liter (l)</option>
             </select>
         </div>
         <div class="col-span-2">
             <input type="number" name="ingredient_prices[]"
                    class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-price" 
-                   placeholder="0.00" min="0" step="0.01">
+                   placeholder="0.00" min="0" step="0.01" onchange="calculateRowTotal(this)">
+        </div>
+        <div class="col-span-2">
+            <input type="number" name="ingredient_totals[]" 
+                   class="w-full px-3 py-3 text-sm border border-gray-200 rounded-lg bg-gray-100 text-center text-gray-600 recipe-ing-total" 
+                   placeholder="0.00" readonly>
         </div>
         <div class="col-span-1 flex items-center justify-center">
             <button type="button" onclick="this.parentElement.parentElement.remove(); updateIngredientCount();" 
@@ -660,11 +737,149 @@ function addRecipeIngredient() {
                 ×
             </button>
         </div>
-        </button>
     `;
     container.appendChild(newRow);
     updateIngredientCount();
     console.log('New ingredient row added');
+}
+
+function handleEditBulkUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        parseEditBulkIngredients(text);
+    };
+    reader.readAsText(file);
+    
+    // Reset the file input so the same file can be uploaded again
+    event.target.value = '';
+}
+
+function parseEditBulkIngredients(text) {
+    try {
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        let addedCount = 0;
+        
+        lines.forEach((line, index) => {
+            const trimmedLine = line.trim();
+            if (!trimmedLine) return;
+            
+            // Support multiple formats:
+            // 1. CSV format: "ingredient name,quantity,unit,price"
+            // 2. Simple format: "ingredient name - quantity unit"
+            // 3. Raw ingredient list: "ingredient name"
+            
+            let name = '', quantity = '', unit = 'g', price = '';
+            
+            if (trimmedLine.includes(',')) {
+                // CSV format
+                const parts = trimmedLine.split(',').map(p => p.trim());
+                name = parts[0] || '';
+                quantity = parts[1] || '';
+                unit = parts[2] || 'g';
+                price = parts[3] || '';
+            } else if (trimmedLine.includes(' - ')) {
+                // Simple format: "ingredient name - quantity unit"
+                const parts = trimmedLine.split(' - ');
+                name = parts[0].trim();
+                if (parts[1]) {
+                    const quantityUnit = parts[1].trim().split(' ');
+                    quantity = quantityUnit[0] || '';
+                    unit = quantityUnit[1] || 'g';
+                }
+            } else {
+                // Raw ingredient list
+                name = trimmedLine;
+            }
+            
+            if (name) {
+                // Add the ingredient using the edit page structure
+                const container = document.getElementById('recipe-ingredients');
+                if (container) {
+                    const newRow = document.createElement('div');
+                    newRow.className = 'grid grid-cols-12 gap-3 ingredient-item';
+                    newRow.innerHTML = `
+                        <div class="col-span-4">
+                            <input type="text" name="ingredient_names[]" 
+                                   value="${name}"
+                                   class="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-name" 
+                                   placeholder="e.g., Chicken breast, Rice, Garlic">
+                        </div>
+                        <div class="col-span-2">
+                            <input type="number" name="ingredient_quantities[]" 
+                                   value="${quantity}"
+                                   class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-qty" 
+                                   placeholder="500" min="0.01" step="0.01" onchange="calculateRowTotal(this)">
+                        </div>
+                        <div class="col-span-1">
+                            <select name="ingredient_units[]" class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-unit">
+                                <option value="">Select unit...</option>
+                                <option value="kg" ${unit === 'kg' ? 'selected' : ''}>Kilogram (kg)</option>
+                                <option value="g" ${unit === 'g' ? 'selected' : ''}>Gram (g)</option>
+                                <option value="lb" ${unit === 'lb' ? 'selected' : ''}>Pound (lb)</option>
+                                <option value="oz" ${unit === 'oz' ? 'selected' : ''}>Ounce (oz)</option>
+                                <option value="cup" ${unit === 'cup' ? 'selected' : ''}>Cup</option>
+                                <option value="tbsp" ${unit === 'tbsp' ? 'selected' : ''}>Tablespoon (tbsp)</option>
+                                <option value="tsp" ${unit === 'tsp' ? 'selected' : ''}>Teaspoon (tsp)</option>
+                                <option value="ml" ${unit === 'ml' ? 'selected' : ''}>Milliliter (ml)</option>
+                                <option value="l" ${unit === 'l' ? 'selected' : ''}>Liter (l)</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <input type="number" name="ingredient_prices[]"
+                                   value="${price}"
+                                   class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-price" 
+                                   placeholder="0.00" min="0" step="0.01" onchange="calculateRowTotal(this)">
+                        </div>
+                        <div class="col-span-2">
+                            <input type="number" name="ingredient_totals[]" 
+                                   class="w-full px-3 py-3 text-sm border border-gray-200 rounded-lg bg-gray-100 text-center text-gray-600 recipe-ing-total" 
+                                   placeholder="0.00" readonly>
+                        </div>
+                        <div class="col-span-1 flex items-center justify-center">
+                            <button type="button" onclick="this.parentElement.parentElement.remove(); updateIngredientCount();" 
+                                    class="w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold">
+                                ×
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(newRow);
+                    addedCount++;
+                }
+            }
+        });
+        
+        updateIngredientCount();
+        
+        // Trigger calculations for all newly added rows
+        if (addedCount > 0) {
+            setTimeout(() => {
+                document.querySelectorAll('#recipe-ingredients .ingredient-item').forEach(row => {
+                    const qtyInput = row.querySelector('.recipe-ing-qty');
+                    const priceInput = row.querySelector('.recipe-ing-price');
+                    if (qtyInput && priceInput && (qtyInput.value || priceInput.value)) {
+                        calculateRowTotal(qtyInput);
+                    }
+                });
+                console.log('Bulk upload calculations triggered for all rows');
+            }, 100);
+        }
+        
+        if (addedCount > 0) {
+            // Show success message (you can customize this based on existing message system)
+            console.log(`Successfully added ${addedCount} ingredients from bulk upload.`);
+            alert(`Successfully added ${addedCount} ingredients from bulk upload.`);
+        } else {
+            alert('No valid ingredients found in the uploaded file.');
+        }
+        
+    } catch (error) {
+        console.error('Error parsing bulk ingredients:', error);
+        alert('Error parsing the uploaded file. Please check the format.');
+    }
 }
 
 function updateIngredientCount() {
@@ -675,6 +890,36 @@ function updateIngredientCount() {
     if (countElement) {
         countElement.textContent = `${count} items`;
     }
+}
+
+// Calculate total price for a single ingredient row
+function calculateRowTotal(element) {
+    const row = element.closest('.ingredient-item');
+    const quantityInput = row.querySelector('.recipe-ing-qty');
+    const priceInput = row.querySelector('.recipe-ing-price');
+    const totalInput = row.querySelector('.recipe-ing-total');
+    
+    if (!quantityInput || !priceInput || !totalInput) {
+        console.error('Missing input elements in row', row);
+        return;
+    }
+    
+    const quantity = parseFloat(quantityInput.value) || 0;
+    const price = parseFloat(priceInput.value) || 0;
+    const total = quantity * price;
+    
+    totalInput.value = total.toFixed(2);
+    
+    // Debug logging
+    console.log('Row total calculated:', {
+        quantity: quantity,
+        price: price,
+        total: total.toFixed(2),
+        element: element.className
+    });
+    
+    // Update the display immediately
+    totalInput.dispatchEvent(new Event('change'));
 }
 
 async function calculateRecipeNutrition() {
@@ -712,8 +957,8 @@ async function calculateRecipeNutrition() {
         const response = await fetch('/api/calculate-recipe-nutrition', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'Content-Type': 'application/json'
+                
             },
             body: JSON.stringify({ ingredients, servings })
         });
@@ -801,6 +1046,37 @@ function populateFormFields(data, servings, ingredients) {
 document.addEventListener('DOMContentLoaded', function() {
     updateIngredientCount();
     console.log('✅ Grid-based ingredient management initialized');
+    
+    // Calculate totals for existing ingredients on page load
+    document.querySelectorAll('#recipe-ingredients .ingredient-item').forEach(row => {
+        const qtyInput = row.querySelector('.recipe-ing-qty');
+        const priceInput = row.querySelector('.recipe-ing-price');
+        if (qtyInput && priceInput && (qtyInput.value || priceInput.value)) {
+            calculateRowTotal(qtyInput);
+        }
+    });
+    console.log('✅ Existing ingredient calculations initialized');
+    
+    // Add event delegation for ingredient calculations
+    const container = document.getElementById('recipe-ingredients');
+    if (container) {
+        // Use event delegation to handle dynamically added elements
+        container.addEventListener('input', function(e) {
+            if (e.target.classList.contains('recipe-ing-qty') || 
+                e.target.classList.contains('recipe-ing-price')) {
+                calculateRowTotal(e.target);
+            }
+        });
+        
+        container.addEventListener('change', function(e) {
+            if (e.target.classList.contains('recipe-ing-qty') || 
+                e.target.classList.contains('recipe-ing-price')) {
+                calculateRowTotal(e.target);
+            }
+        });
+        
+        console.log('✅ Event delegation for ingredient calculations added');
+    }
 });
 </script>
 
@@ -1103,8 +1379,8 @@ class IngredientManager {
             const response = await fetch('/api/calculate-recipe-nutrition', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'Content-Type': 'application/json'
+                    
                 },
                 body: JSON.stringify({
                     ingredients: this.ingredients,
@@ -1241,23 +1517,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.ingredientManager = new IngredientManager();
     console.log('Comprehensive Ingredient Management System initialized');
 });
-
-// Legacy functions for backward compatibility
-function addRecipeIngredient() {
-    if (window.ingredientManager) {
-        window.ingredientManager.addIngredient();
-    }
-}
-
-function updateIngredientCount() {
-    if (window.ingredientManager) {
-        window.ingredientManager.updateIngredientCount();
-    }
-}
-
-// Make functions globally accessible
-window.addRecipeIngredient = addRecipeIngredient;
-window.updateIngredientCount = updateIngredientCount;
 
 console.log('✅ Grid-based ingredient management functions loaded');
 </script>
@@ -1543,8 +1802,8 @@ console.log('✅ Grid-based ingredient management functions loaded');
             const response = await fetch('/api/calculate-recipe-nutrition', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'Content-Type': 'application/json'
+                    
                 },
                 body: JSON.stringify({ 
                     ingredients: this.ingredients,
@@ -1692,9 +1951,16 @@ function addIngredient() {
             </div>
             <div class="w-20">
                 <select name="ingredient_units[]" class="ingredient-unit w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center">
-                    <option value="g">g</option>
+                    <option value="">Unit</option>
                     <option value="kg">kg</option>
-                    <option value="Cup">Cup</option>
+                    <option value="g">g</option>
+                    <option value="lb">lb</option>
+                    <option value="oz">oz</option>
+                    <option value="cup">cup</option>
+                    <option value="tbsp">tbsp</option>
+                    <option value="tsp">tsp</option>
+                    <option value="ml">ml</option>
+                    <option value="l">l</option>
                 </select>
             </div>
             <button type="button" onclick="removeIngredient(this)" 
@@ -1769,15 +2035,37 @@ function createIngredientRow(name = '', quantity = '', unit = '', price = '') {
         updateTotalCost();
     });
 
-    const unitInput = document.createElement('input');
-    unitInput.type = 'text';
-    unitInput.name = 'ingredient_units[]';
-    unitInput.required = true;
-    unitInput.maxLength = 50;
-    unitInput.placeholder = 'kg';
-    unitInput.list = 'units-list';
-    unitInput.className = 'col-span-2 px-2 py-1.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-500 focus:border-transparent';
-    unitInput.value = unit;
+    // Unit select dropdown with standard USDA API units
+    const unitSelect = document.createElement('select');
+    unitSelect.name = 'ingredient_units[]';
+    unitSelect.required = true;
+    unitSelect.className = 'col-span-2 px-2 py-1.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-500 focus:border-transparent';
+    
+    // Standard units supported by USDA API
+    const unitOptions = [
+        { value: '', text: 'Select unit...' },
+        // Weight units
+        { value: 'kg', text: 'Kilogram (kg)' },
+        { value: 'g', text: 'Gram (g)' },
+        { value: 'lb', text: 'Pound (lb)' },
+        { value: 'oz', text: 'Ounce (oz)' },
+        // Volume units
+        { value: 'cup', text: 'Cup' },
+        { value: 'tbsp', text: 'Tablespoon (tbsp)' },
+        { value: 'tsp', text: 'Teaspoon (tsp)' },
+        { value: 'ml', text: 'Milliliter (ml)' },
+        { value: 'l', text: 'Liter (l)' },
+    ];
+    
+    unitOptions.forEach(unitOption => {
+        const option = document.createElement('option');
+        option.value = unitOption.value;
+        option.textContent = unitOption.text;
+        if (unit === unitOption.value) {
+            option.selected = true;
+        }
+        unitSelect.appendChild(option);
+    });
 
     // Enhanced price input with market price indicator
     const priceWrapper = document.createElement('div');
@@ -1819,14 +2107,14 @@ function createIngredientRow(name = '', quantity = '', unit = '', price = '') {
 
     wrapper.appendChild(nameInput);
     wrapper.appendChild(quantityInput);
-    wrapper.appendChild(unitInput);
+    wrapper.appendChild(unitSelect);
     wrapper.appendChild(priceWrapper);
     wrapper.appendChild(btnWrapper);
     
     // Store references for easy access
     wrapper.nameInput = nameInput;
     wrapper.quantityInput = quantityInput;
-    wrapper.unitInput = unitInput;
+    wrapper.unitInput = unitSelect;
     wrapper.priceInput = priceInput;
     wrapper.priceIndicator = priceIndicator;
     
@@ -1850,9 +2138,16 @@ function addIngredient() {
             </div>
             <div class="w-20">
                 <select name="ingredient_units[]" class="ingredient-unit w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center">
-                    <option value="g">g</option>
+                    <option value="">Unit</option>
                     <option value="kg">kg</option>
-                    <option value="Cup">Cup</option>
+                    <option value="g">g</option>
+                    <option value="lb">lb</option>
+                    <option value="oz">oz</option>
+                    <option value="cup">cup</option>
+                    <option value="tbsp">tbsp</option>
+                    <option value="tsp">tsp</option>
+                    <option value="ml">ml</option>
+                    <option value="l">l</option>
                 </select>
             </div>
             <button type="button" onclick="removeIngredient(this)" 
@@ -1874,11 +2169,15 @@ document.addEventListener('DOMContentLoaded', function () {
         calcBtn.addEventListener('click', async function () {
             console.log('Calculate nutrition button clicked');
             const rows = document.querySelectorAll('.ingredient-row');
+            console.log('Found ingredient rows:', rows.length);
+            
             let ingredients = [];
-            rows.forEach(row => {
+            rows.forEach((row, index) => {
                 const name = row.querySelector('.ingredient-name')?.value?.trim();
                 const qty = row.querySelector('.ingredient-quantity')?.value?.trim();
                 const unit = row.querySelector('.ingredient-unit')?.value?.trim();
+                console.log(`Row ${index}:`, { name, qty, unit });
+                
                 if (name && qty && unit) {
                     ingredients.push({ name, quantity: parseFloat(qty), unit });
                 }
@@ -1892,7 +2191,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Servings:', servings);
             
             if (ingredients.length === 0) {
-                document.getElementById('nutrition-results').innerHTML = '<span class="text-red-600">Please enter at least one valid ingredient.</span>';
+                document.getElementById('nutrition-results').innerHTML = '<span class="text-red-600">Please enter at least one valid ingredient with name, quantity, and unit.</span>';
                 return;
             }
             
@@ -1902,8 +2201,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const response = await fetch('/api/calculate-recipe-nutrition', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ ingredients, servings })
                 });
@@ -1922,7 +2220,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } catch (e) {
                 console.error('Nutrition calculation error:', e);
-                document.getElementById('nutrition-results').innerHTML = '<span class="text-red-600">❌ Error calculating nutrition: ' + e.message + '</span>';
+                console.error('Error stack:', e.stack);
+                document.getElementById('nutrition-results').innerHTML = '<span class="text-red-600">❌ Error calculating nutrition. Check browser console for details.</span>';
             }
         });
         
@@ -2241,7 +2540,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Create units datalist
     const datalist = document.createElement('datalist');
     datalist.id = 'units-list';
-    const units = ['kg', 'g', 'lb', 'oz', 'L', 'mL', 'cup', 'cups', 'tbsp', 'tsp', 'pcs', 'pieces', 'can', 'pack', 'bunch', 'cloves', 'head'];
+    // Standard units supported by USDA API - only weight and volume units
+    const units = ['kg', 'g', 'lb', 'oz', 'l', 'ml', 'cup', 'tbsp', 'tsp'];
     units.forEach(unit => {
         const option = document.createElement('option');
         option.value = unit;
@@ -2392,161 +2692,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize ingredient count on page load
     updateIngredientCount();
 });
-
-// Grid-based ingredient management functions (placed in global scope)
-function addRecipeIngredient() {
-    const container = document.getElementById('recipe-ingredients');
-    const newRow = document.createElement('div');
-    newRow.className = 'grid grid-cols-12 gap-2 ingredient-item';
-    newRow.innerHTML = `
-        <input type="text" name="ingredient_names[]" 
-               class="col-span-5 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 recipe-ing-name" 
-               placeholder="e.g., Chicken breast">
-        <input type="number" name="ingredient_quantities[]" 
-               class="col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 recipe-ing-qty" 
-               placeholder="500" min="0.01" step="0.01">
-        <select name="ingredient_units[]" class="col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 recipe-ing-unit">
-            <option value="g">g</option>
-            <option value="kg">kg</option>
-            <option value="cup">cup</option>
-            <option value="tbsp">tbsp</option>
-            <option value="tsp">tsp</option>
-            <option value="lb">lb</option>
-            <option value="oz">oz</option>
-        </select>
-        <input type="number" name="ingredient_prices[]"
-               class="col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 recipe-ing-price" 
-               placeholder="0.00" min="0" step="0.01">
-        <button type="button" onclick="this.parentElement.remove(); updateIngredientCount();" 
-                class="col-span-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center">
-            ×
-        </button>
-    `;
-    container.appendChild(newRow);
-    updateIngredientCount();
-}
-
-function updateIngredientCount() {
-    const count = document.querySelectorAll('#recipe-ingredients .ingredient-item').length;
-    // Update any ingredient count displays if they exist
-    const countElement = document.getElementById('ingredient-count');
-    if (countElement) {
-        countElement.textContent = `${count} items`;
-    }
-}
-
-async function calculateRecipeNutrition() {
-    const ingredients = [];
-    const rows = document.querySelectorAll('#recipe-ingredients .ingredient-item');
-    
-    // Collect ingredients from the grid
-    rows.forEach(row => {
-        const name = row.querySelector('.recipe-ing-name')?.value?.trim();
-        const qty = row.querySelector('.recipe-ing-qty')?.value?.trim();
-        const unit = row.querySelector('.recipe-ing-unit')?.value?.trim();
-        const price = row.querySelector('.recipe-ing-price')?.value?.trim();
-        
-        if (name && qty && unit) {
-            ingredients.push({ 
-                name, 
-                quantity: parseFloat(qty), 
-                unit,
-                price: price ? parseFloat(price) : 0 
-            });
-        }
-    });
-    
-    if (ingredients.length === 0) {
-        alert('Please add at least one ingredient.');
-        return;
-    }
-    
-    const servingsInput = document.getElementById('recipe-servings');
-    const servings = servingsInput ? parseInt(servingsInput.value) || 1 : 1;
-    
-    console.log('Calculating nutrition for:', ingredients, 'Servings:', servings);
-    
-    try {
-        const response = await fetch('/api/calculate-recipe-nutrition', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ ingredients, servings })
-        });
-        
-        const data = await response.json();
-        console.log('Nutrition API response:', data);
-        
-        if (data.success) {
-            displayRecipeResults(data, servings, ingredients);
-            // Auto-populate form fields
-            populateFormFields(data, servings, ingredients);
-        } else {
-            alert('Error calculating nutrition: ' + (data.message || 'Unknown error'));
-        }
-    } catch (error) {
-        console.error('Nutrition calculation error:', error);
-        alert('Failed to calculate nutrition. Please try again.');
-    }
-}
-
-function displayRecipeResults(data, servings, ingredients) {
-    const resultDiv = document.getElementById('recipe-result');
-    const perServing = data.per_serving || {};
-    const total = data.total || {};
-    
-    // Calculate total cost
-    const totalCost = ingredients.reduce((sum, ing) => sum + (ing.price || 0), 0);
-    const costPerServing = totalCost / servings;
-    
-    // Update nutrition display
-    document.getElementById('recipe-calories').textContent = Math.round(perServing.calories || 0);
-    document.getElementById('recipe-protein').textContent = (perServing.protein || 0).toFixed(1) + 'g';
-    document.getElementById('recipe-carbs').textContent = (perServing.carbs || 0).toFixed(1) + 'g';
-    document.getElementById('recipe-fats').textContent = (perServing.fats || 0).toFixed(1) + 'g';
-    document.getElementById('recipe-fiber').textContent = (perServing.fiber || 0).toFixed(1) + 'g';
-    document.getElementById('recipe-sugar').textContent = (perServing.sugar || 0).toFixed(1) + 'g';
-    document.getElementById('recipe-cost').textContent = '₱' + totalCost.toFixed(2);
-    document.getElementById('recipe-cost-per-serving').textContent = '₱' + costPerServing.toFixed(2);
-    
-    resultDiv.classList.remove('hidden');
-}
-
-function populateFormFields(data, servings, ingredients) {
-    const perServing = data.per_serving || {};
-    const totalCost = ingredients.reduce((sum, ing) => sum + (ing.price || 0), 0);
-    const costPerServing = totalCost / servings;
-    
-    // Auto-fill main form fields
-    const fields = {
-        'calories': Math.round(perServing.calories || 0),
-        'cost': costPerServing.toFixed(2),
-        'protein': (perServing.protein || 0).toFixed(1),
-        'carbs': (perServing.carbs || 0).toFixed(1),
-        'fats': (perServing.fats || 0).toFixed(1),
-        'fiber': (perServing.fiber || 0).toFixed(1),
-        'sugar': (perServing.sugar || 0).toFixed(1),
-        'sodium': Math.round(perServing.sodium || 0)
-    };
-    
-    Object.entries(fields).forEach(([field, value]) => {
-        const input = document.querySelector(`input[name="${field}"]`);
-        if (input) {
-            input.value = value;
-            // Visual feedback
-            input.style.background = '#f0f9ff';
-            input.style.borderColor = '#0ea5e9';
-            setTimeout(() => {
-                input.style.background = '';
-                input.style.borderColor = '';
-            }, 2000);
-        }
-    });
-    
-    console.log('✅ Form fields auto-populated with nutrition data');
-}
 </script>
 
 <style>

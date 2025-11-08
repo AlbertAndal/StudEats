@@ -2,13 +2,18 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <a href="{{ route('recipes.index') }}" 
-                   class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                   aria-label="Back to recipes">
+                <x-loading-button 
+                    href="{{ route('recipes.index') }}"
+                    variant="secondary"
+                    size="sm"
+                    square
+                    loadingType="spinner"
+                    class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    aria-label="Back to recipes">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                     </svg>
-                </a>
+                </x-loading-button>
                 <div>
                     <p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">Recipe Menu</p>
                     <h2 class="font-bold text-2xl text-gray-900 leading-tight">
@@ -25,13 +30,17 @@
                         ⭐ Featured
                     </span>
                 @endif
-                <a href="{{ route('meal-plans.create', ['meal_id' => $meal->id]) }}" 
-                   class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
+                <x-loading-button 
+                    href="{{ route('meal-plans.create', ['meal_id' => $meal->id]) }}"
+                    variant="success"
+                    size="sm"
+                    loadingText="Loading..."
+                    loadingType="spinner">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                     </svg>
                     Add to Plan
-                </a>
+                </x-loading-button>
             </div>
         </div>
     </x-slot>
@@ -101,24 +110,57 @@
                                 </div>
                             </div>
                             <div class="p-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="space-y-3">
+                                    @php
+                                        $totalCost = 0;
+                                    @endphp
                                     @foreach($meal->recipe->ingredients ?? [] as $ingredient)
-                                        <div class="flex items-start p-3 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors">
-                                            <div class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
-                                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                                </svg>
+                                        @php
+                                            $price = 0;
+                                            if(is_array($ingredient)) {
+                                                $quantity = floatval($ingredient['quantity'] ?? $ingredient['amount'] ?? 0);
+                                                $unitPrice = floatval($ingredient['price'] ?? 0);
+                                                $price = $quantity * $unitPrice;
+                                                $totalCost += $price;
+                                            }
+                                        @endphp
+                                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors">
+                                            <div class="flex items-start flex-1">
+                                                <div class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                                                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <span class="text-sm text-gray-700">
+                                                        @if(is_array($ingredient))
+                                                            <strong class="text-gray-900">{{ $ingredient['quantity'] ?? $ingredient['amount'] ?? '' }} {{ $ingredient['unit'] ?? '' }}</strong> {{ $ingredient['name'] ?? '' }}
+                                                        @else
+                                                            {{ $ingredient }}
+                                                        @endif
+                                                    </span>
+                                                    @if(is_array($ingredient) && isset($ingredient['price']) && $ingredient['price'] > 0)
+                                                        <div class="text-xs text-gray-500 mt-1">
+                                                            ₱{{ number_format($ingredient['price'], 2) }} per {{ $ingredient['unit'] ?? 'unit' }}
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             </div>
-                                            <span class="text-sm text-gray-700">
-                                                @if(is_array($ingredient))
-                                                    <strong class="text-gray-900">{{ $ingredient['quantity'] ?? '' }} {{ $ingredient['unit'] ?? '' }}</strong> {{ $ingredient['name'] ?? '' }}
-                                                @else
-                                                    {{ $ingredient }}
-                                                @endif
-                                            </span>
+                                            @if($price > 0)
+                                                <span class="text-sm font-semibold text-green-600 ml-3">₱{{ number_format($price, 2) }}</span>
+                                            @endif
                                         </div>
                                     @endforeach
                                 </div>
+                                
+                                @if($totalCost > 0)
+                                    <div class="mt-4 pt-4 border-t border-gray-200">
+                                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                            <span class="text-sm font-medium text-gray-700">Total Ingredients Cost:</span>
+                                            <span class="text-lg font-bold text-green-600">₱{{ number_format($totalCost, 2) }}</span>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @endif
@@ -199,6 +241,20 @@
                                     </div>
                                 @endif
 
+                                <!-- Cost Display -->
+                                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-10 w-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                                            <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <span class="text-lg font-bold text-green-600">₱</span>
+                                        </div>
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</dt>
+                                            <dd class="text-sm font-semibold text-green-700">{{ number_format($meal->cost, 2) }}</dd>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 @if($meal->recipe && ($meal->recipe->prep_time || $meal->recipe->cook_time))
                                     <div class="grid grid-cols-2 gap-3">
                                         @if($meal->recipe->prep_time)
@@ -252,20 +308,42 @@
                                             <dd class="text-xl font-bold text-blue-700 mt-1">{{ number_format($meal->nutritionalInfo->protein, 1) }}<span class="text-sm">g</span></dd>
                                         </div>
                                         <div class="bg-orange-50 rounded-lg p-3 text-center">
-                                            <dt class="text-xs font-medium text-orange-600 uppercase tracking-wider">Carbs</dt>
-                                            <dd class="text-xl font-bold text-orange-700 mt-1">{{ number_format($meal->nutritionalInfo->carbohydrates, 1) }}<span class="text-sm">g</span></dd>
+                                            <dt class="text-xs font-medium text-orange-600 uppercase tracking-wider">Carbohydrates</dt>
+                                            <dd class="text-xl font-bold text-orange-700 mt-1">{{ number_format($meal->nutritionalInfo->carbs, 1) }}<span class="text-sm">g</span></dd>
                                         </div>
                                         <div class="bg-yellow-50 rounded-lg p-3 text-center">
-                                            <dt class="text-xs font-medium text-yellow-600 uppercase tracking-wider">Fat</dt>
-                                            <dd class="text-xl font-bold text-yellow-700 mt-1">{{ number_format($meal->nutritionalInfo->fat, 1) }}<span class="text-sm">g</span></dd>
+                                            <dt class="text-xs font-medium text-yellow-600 uppercase tracking-wider">Fats</dt>
+                                            <dd class="text-xl font-bold text-yellow-700 mt-1">{{ number_format($meal->nutritionalInfo->fats, 1) }}<span class="text-sm">g</span></dd>
                                         </div>
-                                        @if($meal->nutritionalInfo->fiber)
-                                            <div class="bg-purple-50 rounded-lg p-3 text-center">
-                                                <dt class="text-xs font-medium text-purple-600 uppercase tracking-wider">Fiber</dt>
-                                                <dd class="text-xl font-bold text-purple-700 mt-1">{{ number_format($meal->nutritionalInfo->fiber, 1) }}<span class="text-sm">g</span></dd>
-                                            </div>
-                                        @endif
+                                        <div class="bg-purple-50 rounded-lg p-3 text-center">
+                                            <dt class="text-xs font-medium text-purple-600 uppercase tracking-wider">Fiber</dt>
+                                            <dd class="text-xl font-bold text-purple-700 mt-1">{{ number_format($meal->nutritionalInfo->fiber, 1) }}<span class="text-sm">g</span></dd>
+                                        </div>
+                                        <div class="bg-pink-50 rounded-lg p-3 text-center">
+                                            <dt class="text-xs font-medium text-pink-600 uppercase tracking-wider">Sugar</dt>
+                                            <dd class="text-xl font-bold text-pink-700 mt-1">{{ number_format($meal->nutritionalInfo->sugar, 1) }}<span class="text-sm">g</span></dd>
+                                        </div>
+                                        <div class="bg-indigo-50 rounded-lg p-3 text-center">
+                                            <dt class="text-xs font-medium text-indigo-600 uppercase tracking-wider">Sodium</dt>
+                                            <dd class="text-xl font-bold text-indigo-700 mt-1">{{ number_format($meal->nutritionalInfo->sodium, 0) }}<span class="text-sm">mg</span></dd>
+                                        </div>
                                     </div>
+
+                                    @if(auth()->check() && !empty($nutrientWarnings))
+                                        <div class="mt-4 space-y-2">
+                                            <p class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Health Indicators</p>
+                                            @foreach($nutrientWarnings as $warning)
+                                                <div class="flex items-center gap-2 px-3 py-2 rounded-lg {{ $warning['type'] === 'danger' ? 'bg-red-50 border border-red-200' : 'bg-yellow-50 border border-yellow-200' }}">
+                                                    <svg class="w-4 h-4 {{ $warning['type'] === 'danger' ? 'text-red-600' : 'text-yellow-600' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <span class="text-sm font-medium {{ $warning['type'] === 'danger' ? 'text-red-800' : 'text-yellow-800' }}">
+                                                        {{ $warning['message'] }}
+                                                    </span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </dl>
                             </div>
                         </div>

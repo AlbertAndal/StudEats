@@ -52,6 +52,26 @@
                 </div>
             @endif
 
+            <!-- Authentication Errors -->
+            @if ($errors->any())
+                <div class="mb-6 rounded-md border border-red-200 bg-red-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <div class="text-sm font-medium text-red-600">
+                                @foreach ($errors->all() as $error)
+                                    <p class="mb-1 last:mb-0 text-red-600">{{ $error }}</p>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Login Form -->
             <form action="{{ route('login') }}" method="POST" class="space-y-5">
                 @csrf
@@ -61,8 +81,7 @@
                     <div class="space-y-1">
                         <label for="email" class="text-sm font-medium">Email Address</label>
                         <input id="email" name="email" type="email" autocomplete="email" required value="{{ old('email') }}" placeholder="you@example.com"
-                               class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 @error('email') border-destructive @enderror">
-                        @error('email')<p class="text-xs text-destructive mt-1">{{ $message }}</p>@enderror
+                               class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                     </div>
 
                     <!-- Password Field -->

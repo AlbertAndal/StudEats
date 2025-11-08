@@ -232,7 +232,13 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getRecommendedDailyCalories(): int
     {
-        // Base calorie calculation using Mifflin-St Jeor Equation
+        // Use PDRI data if available
+        $pdri = PdriReference::getRecommendationsForUser($this);
+        if ($pdri) {
+            return $pdri->energy_kcal;
+        }
+
+        // Fallback to BMR calculation using Mifflin-St Jeor Equation
         $age = (int) $this->age;
         $weightInKg = $this->weight_unit === 'lbs' ? $this->weight * 0.453592 : $this->weight;
         $heightInCm = $this->height_unit === 'ft' ? $this->height * 30.48 : $this->height;
@@ -246,10 +252,9 @@ class User extends Authenticatable implements MustVerifyEmail
         // Activity level multipliers
         $activityMultiplier = match ($this->activity_level) {
             'sedentary' => 1.2,
-            'lightly_active' => 1.375,
-            'moderately_active' => 1.55,
+            'low_active' => 1.375,
+            'active' => 1.55,
             'very_active' => 1.725,
-            'extra_active' => 1.9,
             default => 1.375
         };
 
@@ -259,6 +264,14 @@ class User extends Authenticatable implements MustVerifyEmail
         $bmiMultiplier = $this->getCalorieMultiplier();
 
         return round($dailyCalories * $bmiMultiplier);
+    }
+
+    /**
+     * Get PDRI-based macronutrient recommendations
+     */
+    public function getPdriRecommendations(): ?PdriReference
+    {
+        return PdriReference::getRecommendationsForUser($this);
     }
 
     /**

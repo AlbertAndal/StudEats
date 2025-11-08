@@ -154,14 +154,13 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
 // Protected routes (requires authentication and email verification)
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'no.super.admin'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Meal Plans
     Route::get('/meal-plans', [MealPlanController::class, 'index'])->name('meal-plans.index');
     Route::get('/meal-plans/create', [MealPlanController::class, 'create'])->name('meal-plans.create');
-    Route::get('/meal-plans/select', [MealPlanController::class, 'selectMealType'])->name('meal-plans.select');
     Route::get('/meal-plans/weekly', [MealPlanController::class, 'weekly'])->name('meal-plans.weekly');
     Route::post('/meal-plans', [MealPlanController::class, 'store'])->name('meal-plans.store');
     Route::get('/meal-plans/{mealPlan}', [MealPlanController::class, 'show'])->name('meal-plans.show');
@@ -215,15 +214,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/market-prices/stats', [AdminMarketPriceController::class, 'stats'])->name('market-prices.stats');
     Route::get('/market-prices/ingredients', [AdminMarketPriceController::class, 'ingredients'])->name('market-prices.ingredients');
     Route::get('/market-prices/{ingredient}/history', [AdminMarketPriceController::class, 'history'])->name('market-prices.history');
-
-    // Security Monitor
-    Route::get('/security-monitor', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'index'])->name('security-monitor.index');
-    Route::get('/security-monitor/stats', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'getStats'])->name('security-monitor.stats');
-    Route::get('/security-monitor/csrf-errors', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'getCsrfErrors'])->name('security-monitor.csrf-errors');
-    Route::get('/security-monitor/session-stats', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'getSessionStats'])->name('security-monitor.session-stats');
-    Route::post('/security-monitor/clear-sessions', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'clearOldSessions'])->name('security-monitor.clear-sessions');
-    Route::get('/security-monitor/export', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'exportReport'])->name('security-monitor.export');
-    Route::post('/security-monitor/test', [App\Http\Controllers\Admin\SecurityMonitorController::class, 'testSecurity'])->name('security-monitor.test');
 });
 
 // API Routes for Dynamic Pricing System
@@ -238,10 +228,16 @@ Route::prefix('api')->group(function () {
         Route::get('/market-prices/search', [AdminMarketPriceController::class, 'search']);
         Route::post('/ingredient-price/{ingredient}/refresh', [AdminMarketPriceController::class, 'refreshSingle']);
         
-        // Nutrition API endpoints (admin only)
-        Route::post('/calculate-ingredient-nutrition', [App\Http\Controllers\Api\NutritionApiController::class, 'calculateIngredient']);
-        Route::post('/calculate-recipe-nutrition', [App\Http\Controllers\Api\NutritionApiController::class, 'calculateRecipe']);
-        Route::get('/search-food', [App\Http\Controllers\Api\NutritionApiController::class, 'searchFood']);
+        // Nutrition API endpoints removed - using public API routes instead
+    });
+    
+    // Admin-only API routes without CSRF protection (for seamless admin experience)
+    Route::middleware(['auth', 'admin'])->withoutMiddleware([
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+        \App\Http\Middleware\VerifyCsrfToken::class
+    ])->prefix('admin-api')->group(function () {
+        Route::post('/ingredient-price', [App\Http\Controllers\Api\IngredientPriceController::class, 'getPrice']);
+        // Nutrition API endpoints removed - using public API routes instead
     });
 });
 
@@ -265,6 +261,26 @@ Route::get('/health', function () {
         ], 503);
     }
 });
+
+// Loading Examples (for development)
+Route::get('/loading-examples', function () {
+    return view('loading-examples');
+})->name('loading-examples');
+
+// FlyonUI Loading Buttons Demo
+Route::get('/loading-buttons-demo', function () {
+    return view('components.loading-button-demo');
+})->name('loading-buttons.demo');
+
+// FlyonUI Loading Spinners Demo
+Route::get('/loading-spinners-demo', function () {
+    return view('components.loading-spinner-demo');
+})->name('loading-spinners.demo');
+
+// Spinner Animation Test
+Route::get('/spinner-test', function () {
+    return view('spinner-test');
+})->name('spinner.test');
 
 // Laravel Cloud Debug Route (remove after use)
 Route::get('/debug-deployment', function () {

@@ -6,13 +6,26 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Welcome back, {{ $user->name }}! 👋</h1>
-        <p class="mt-2 text-gray-600">Here's your personalized meal planning dashboard</p>
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Welcome back, {{ $user->name }}! 👋</h1>
+                <p class="mt-2 text-gray-600">Here's your personalized meal planning dashboard</p>
+            </div>
+            <button onclick="startDashboardTour()" 
+                    class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Take a Tour
+            </button>
+        </div>
     </div>
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+        <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200" 
+             data-intro="This shows how many meals you have planned for today. Click to view meal details."
+             data-step="1">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Today's Meals</p>
@@ -24,12 +37,34 @@
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+        <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
+             data-intro="Your personalized daily calorie target based on PDRI (Philippine Dietary Reference Intake) standards, age, gender, and activity level."
+             data-step="2">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Daily Calorie Target</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ number_format($user->getRecommendedDailyCalories()) }} cal</p>
+                    @php
+                        $pdri = $user->getPdriRecommendations();
+                    @endphp
+                    @if($pdri)
+                        <p class="text-xs text-gray-500 mt-1">Based on PDRI for {{ ucfirst($user->activity_level ?? 'moderate') }} activity</p>
+                    @endif
+                </div>
+                <div class="text-green-600 bg-green-100 p-2 rounded-lg">
+                    <x-icon name="bolt" class="w-8 h-8" variant="outline" aria-label="Daily calorie target icon" />
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
+             data-intro="Set your daily budget to get meal recommendations that fit your finances. StudEats will suggest affordable recipes."
+             data-step="3">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Daily Budget</p>
                     <p class="text-2xl font-bold text-gray-900">
-                        {{ $user->daily_budget ? '₱' . number_format($user->daily_budget, 2) : 'Not set' }}
+                        {{ $user->daily_budget ? number_format($user->daily_budget, 2) : 'Not set' }}
                     </p>
                 </div>
                 <div class="text-blue-600 bg-blue-100 p-2 rounded-lg">
@@ -42,7 +77,9 @@
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+        <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
+             data-intro="Track your total calories consumed this week. Stay on track with your health goals!"
+             data-step="4">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Weekly Calories</p>
@@ -50,18 +87,6 @@
                 </div>
                 <div class="text-purple-600 bg-purple-100 p-2 rounded-lg">
                     <x-icon name="bolt" class="w-8 h-8" variant="outline" aria-label="Weekly calories icon" />
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Weekly Meals</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $weeklySummary['mealCount'] }}</p>
-                </div>
-                <div class="text-orange-600 bg-orange-100 p-2 rounded-lg">
-                    <x-icon name="clipboard-document-list" class="w-8 h-8" variant="outline" aria-label="Weekly meals icon" />
                 </div>
             </div>
         </div>
@@ -131,7 +156,9 @@
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <!-- Featured Meal -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2"
+             data-intro="Discover our featured meal of the day! This is a specially selected recipe with great nutrition and affordable cost."
+             data-step="6">
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900">Featured Meal of the Day</h2>
@@ -164,19 +191,29 @@
                                     </div>
                                     <div class="bg-blue-50 p-3 rounded-lg">
                                         <div class="text-sm text-blue-600 font-medium">Cost</div>
-                                        <div class="text-lg font-bold text-blue-700">₱{{ $featuredMeal->cost ?? 'N/A' }}</div>
+                                        <div class="text-lg font-bold text-blue-700">{{ $featuredMeal->cost ?? 'N/A' }}</div>
                                     </div>
                                 </div>
                                 
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('recipes.show', $featuredMeal) }}" 
-                                       class="flex-1 text-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100">
+                                    <x-loading-button 
+                                        href="{{ route('recipes.show', $featuredMeal) }}"
+                                        variant="secondary"
+                                        size="sm"
+                                        class="flex-1"
+                                        loadingText="Loading..."
+                                        loadingType="spinner">
                                         View Recipe
-                                    </a>
-                                    <a href="{{ route('meal-plans.create') }}?meal_id={{ $featuredMeal->id }}" 
-                                       class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
+                                    </x-loading-button>
+                                    <x-loading-button 
+                                        href="{{ route('meal-plans.create') }}?meal_id={{ $featuredMeal->id }}"
+                                        variant="success"
+                                        size="sm"
+                                        class="flex-1"
+                                        loadingText="Adding..."
+                                        loadingType="spinner">
                                         Add to Plan
-                                    </a>
+                                    </x-loading-button>
                                 </div>
                             </div>
                         </div>
@@ -185,11 +222,15 @@
                             <span class="text-6xl mb-4 block">🍽️</span>
                             <h3 class="text-lg font-medium text-gray-900 mb-2">No featured meal available</h3>
                             <p class="text-gray-500 mb-6">Check back later for today's featured meal</p>
-                            <a href="{{ route('recipes.index') }}" 
-                               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                            <x-loading-button 
+                                href="{{ route('recipes.index') }}"
+                                variant="success"
+                                size="sm"
+                                loadingText="Loading..."
+                                loadingType="spinner">
                                 <x-icon name="book-open" class="w-4 h-4 mr-2" variant="outline" />
                                 Browse All Recipes
-                            </a>
+                            </x-loading-button>
                         </div>
                     @endif
                 </div>
@@ -198,7 +239,9 @@
 
         <!-- Today's Meals -->
         <div>
-            <div class="bg-white shadow rounded-lg">
+            <div class="bg-white shadow rounded-lg"
+                 data-intro="View and manage your meals for today. You can mark meals as completed, edit them, or remove them from your plan."
+                 data-step="5">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -229,10 +272,10 @@
                                                 {{ $mealPlan->meal_type === 'snack' ? 'bg-green-100' : '' }}
                                             ">
                                                 <span class="text-xl">
-                                                    @if($mealPlan->meal_type === 'breakfast') 🌅
-                                                    @elseif($mealPlan->meal_type === 'lunch') ☀️
-                                                    @elseif($mealPlan->meal_type === 'dinner') 🌙
-                                                    @elseif($mealPlan->meal_type === 'snack') 🍎
+                                                    @if($mealPlan->meal_type === 'breakfast') 🍳
+                                                    @elseif($mealPlan->meal_type === 'lunch') 🍽️
+                                                    @elseif($mealPlan->meal_type === 'dinner') 🍴
+                                                    @elseif($mealPlan->meal_type === 'snack') 🍪
                                                     @else 🍽️
                                                     @endif
                                                 </span>
@@ -266,37 +309,39 @@
                                                             <form method="POST" action="{{ route('meal-plans.toggle', $mealPlan) }}" class="inline">
                                                                 @csrf
                                                                 @method('PATCH')
-                                                                <button type="submit" 
-                                                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700 border border-gray-200 hover:border-green-200 transition-all duration-200 cursor-pointer"
-                                                                        aria-label="Mark {{ $mealPlan->meal->name }} as completed">
+                                                                <x-loading-button 
+                                                                    type="submit"
+                                                                    variant="secondary"
+                                                                    size="xs"
+                                                                    loadingText="Updating..."
+                                                                    loadingType="spinner"
+                                                                    class="border border-gray-200 hover:border-green-200"
+                                                                    aria-label="Mark {{ $mealPlan->meal->name }} as completed">
                                                                     <x-icon name="clock" class="w-3 h-3 mr-1" variant="outline" />
                                                                     Pending
-                                                                </button>
+                                                                </x-loading-button>
                                                             </form>
                                                         @endif
                                                     </div>
                                                 </div>
                                                 
                                                 <!-- Nutritional Info -->
-                                                <div class="flex items-center space-x-4 mt-3 text-xs">
-                                                    <div class="flex items-center text-gray-500">
-                                                        <x-icon name="bolt" class="w-3 h-3 mr-1" variant="outline" />
-                                                        <span class="font-medium">{{ $mealPlan->meal->nutritionalInfo->calories ?? 'N/A' }}</span>
-                                                        <span class="ml-0.5">cal</span>
-                                                    </div>
-                                                    <div class="flex items-center text-gray-500">
-                                                        <x-icon name="currency-dollar" class="w-3 h-3 mr-1" variant="outline" />
-                                                        <span class="font-medium">₱{{ $mealPlan->meal->cost }}</span>
-                                                    </div>
-                                                    @if($mealPlan->scheduled_time)
-                                                        <div class="flex items-center text-gray-500">
-                                                            <x-icon name="clock" class="w-3 h-3 mr-1" variant="outline" />
-                                                            <span class="font-medium">{{ Carbon\Carbon::parse($mealPlan->scheduled_time)->format('g:i A') }}</span>
-                                                        </div>
-                                                    @endif
+                                            <div class="flex items-center space-x-4 mt-3 text-xs">
+                                                <div class="flex items-center text-gray-500">
+                                                    <x-icon name="bolt" class="w-3 h-3 mr-1" variant="outline" />
+                                                    <span class="font-medium">{{ $mealPlan->meal->nutritionalInfo->calories ?? 'N/A' }}</span>
+                                                    <span class="ml-0.5">cal</span>
                                                 </div>
-                                                
-                                                <!-- Quick Actions -->
+                                                <div class="flex items-center text-gray-500">
+                                                    <span class="font-medium">₱{{ $mealPlan->meal->cost }}</span>
+                                                </div>
+                                                @if($mealPlan->scheduled_time)
+                                                    <div class="flex items-center text-gray-500">
+                                                        <x-icon name="clock" class="w-3 h-3 mr-1" variant="outline" />
+                                                        <span class="font-medium">{{ Carbon\Carbon::parse($mealPlan->scheduled_time)->format('g:i A') }}</span>
+                                                    </div>
+                                                @endif
+                                            </div>                                                <!-- Quick Actions -->
                                                 <div class="flex items-center space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                     <a href="{{ route('recipes.show', $mealPlan->meal) }}" 
                                                        class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors duration-200"
@@ -310,10 +355,23 @@
                                                         <x-icon name="pencil" class="w-3 h-3 mr-1" variant="outline" />
                                                         Edit
                                                     </a>
+                                                    <button type="button" 
+                                                            onclick="showRemoveMealModal('{{ $mealPlan->id }}', '{{ $mealPlan->meal->name }}', '{{ $mealPlan->meal_type }}')" 
+                                                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors duration-200"
+                                                            aria-label="Remove {{ $mealPlan->meal->name }} from today's plan">
+                                                        <x-icon name="trash" class="w-3 h-3 mr-1" variant="outline" />
+                                                        Remove
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Hidden form for meal removal -->
+                                    <form id="removeMealForm_{{ $mealPlan->id }}" method="POST" action="{{ route('meal-plans.destroy', $mealPlan) }}" class="hidden">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
                                 </div>
                             @endforeach
                         </div>
@@ -322,23 +380,16 @@
                         @if($todayMeals->count() > 0)
                             <div class="mt-6 pt-4 border-t border-gray-200">
                                 <div class="bg-gray-50 rounded-lg p-4">
-                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
-                                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-                                            <div class="flex items-center">
-                                                <span class="font-medium text-gray-700">Daily Total:</span>
-                                            </div>
-                                            <div class="flex items-center gap-4">
-                                                <div class="flex items-center text-green-700">
-                                                    <x-icon name="bolt" class="w-4 h-4 mr-1" variant="outline" />
-                                                    <span class="font-semibold">{{ $todayMeals->sum('meal.nutritionalInfo.calories') ?? 0 }} cal</span>
-                                                </div>
-                                                <div class="flex items-center text-blue-700">
-                                                    <x-icon name="currency-dollar" class="w-4 h-4 mr-1" variant="outline" />
-                                                    <span class="font-semibold">₱{{ $todayMeals->sum('meal.cost') ?? 0 }}</span>
-                                                </div>
-                                            </div>
+                                    <div class="flex flex-wrap items-center gap-4 text-sm">
+                                        <span class="font-medium text-gray-700">Daily Total:</span>
+                                        <div class="flex items-center text-green-700">
+                                            <x-icon name="bolt" class="w-4 h-4 mr-1" variant="outline" />
+                                            <span class="font-semibold">{{ $todayMeals->sum('meal.nutritionalInfo.calories') ?? 0 }} cal</span>
                                         </div>
-                                        <div class="text-gray-500 text-sm">
+                                            <div class="flex items-center text-blue-700">
+                                                <span class="font-semibold">₱{{ $todayMeals->sum('meal.cost') ?? 0 }}</span>
+                                            </div>
+                                        <div class="text-gray-500">
                                             {{ $todayMeals->where('is_completed', true)->count() }}/{{ $todayMeals->count() }} completed
                                         </div>
                                     </div>
@@ -347,11 +398,16 @@
                         @endif
                         
                         <div class="mt-4 pt-4 border-t border-gray-200">
-                            <a href="{{ route('meal-plans.index') }}" 
-                               class="w-full text-center block px-4 py-2 text-sm font-medium text-green-600 bg-green-50 hover:bg-green-100 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                               aria-label="View all meal plans">
+                            <x-loading-button 
+                                href="{{ route('meal-plans.index') }}"
+                                variant="success"
+                                size="sm"
+                                class="w-full"
+                                loadingText="Loading..."
+                                loadingType="spinner"
+                                aria-label="View all meal plans">
                                 View All Meal Plans
-                            </a>
+                            </x-loading-button>
                         </div>
                     @else
                         <div class="text-center py-12">
@@ -380,17 +436,27 @@
                                     </p>
                                     
                                     <div class="space-y-3">
-                                        <a href="{{ route('meal-plans.create') }}" 
-                                           class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+                                        <x-loading-button 
+                                            href="{{ route('meal-plans.create') }}"
+                                            variant="success"
+                                            size="lg"
+                                            loadingText="Loading..."
+                                            loadingType="spinner"
+                                            class="shadow-lg hover:shadow-xl transform hover:scale-105">
                                             <x-icon name="plus" class="w-5 h-5 mr-2" variant="outline" />
                                             Plan Your First Meal
-                                        </a>
+                                        </x-loading-button>
                                         <div class="text-sm text-gray-400">or</div>
-                                        <a href="{{ route('recipes.index') }}" 
-                                           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200">
+                                        <x-loading-button 
+                                            href="{{ route('recipes.index') }}"
+                                            variant="secondary"
+                                            size="sm"
+                                            loadingText="Loading..."
+                                            loadingType="spinner"
+                                            class="border border-gray-300">
                                             <x-icon name="magnifying-glass" class="w-4 h-4 mr-2" variant="outline" />
                                             Explore Recipes First
-                                        </a>
+                                        </x-loading-button>
                                     </div>
                                 </div>
                             </div>
@@ -426,7 +492,7 @@
                             <div class="p-4">
                                 <div class="flex items-start justify-between mb-2">
                                     <h4 class="font-medium text-gray-900">{{ $meal->name }}</h4>
-                                    <span class="text-sm font-medium text-green-600">₱{{ $meal->cost }}</span>
+                                    <span class="text-sm font-medium text-green-600">{{ $meal->cost }}</span>
                                 </div>
                                 
                                 <p class="text-sm text-gray-600 mb-3">{{ Str::limit($meal->description, 60) }}</p>
@@ -438,28 +504,299 @@
                                 </div>
 
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('recipes.show', $meal) }}" 
-                                       class="flex-1 text-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100">
+                                    <x-loading-button 
+                                        href="{{ route('recipes.show', $meal) }}"
+                                        variant="secondary"
+                                        size="sm"
+                                        class="flex-1"
+                                        loadingText="Loading..."
+                                        loadingType="spinner">
                                         View Recipe
-                                    </a>
-                                    <a href="{{ route('meal-plans.create') }}?meal_id={{ $meal->id }}" 
-                                       class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
+                                    </x-loading-button>
+                                    <x-loading-button 
+                                        href="{{ route('meal-plans.create') }}?meal_id={{ $meal->id }}"
+                                        variant="success"
+                                        size="sm"
+                                        class="flex-1"
+                                        loadingText="Adding..."
+                                        loadingType="spinner">
                                         Add to Plan
-                                    </a>
+                                    </x-loading-button>
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
                 <div class="mt-6 pt-6 border-t border-gray-200 text-center">
-                    <a href="{{ route('recipes.index') }}" 
-                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <x-loading-button 
+                        href="{{ route('recipes.index') }}"
+                        variant="secondary"
+                        size="sm"
+                        loadingText="Loading..."
+                        loadingType="spinner"
+                        class="border border-gray-300">
                         Browse All Recipes
                         <x-icon name="chevron-right" class="w-4 h-4 ml-2" variant="outline" />
-                    </a>
+                    </x-loading-button>
                 </div>
             </div>
         </div>
     @endif
 </div>
+
+<!-- Meal Removal Confirmation Modal -->
+<div id="removeMealModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="hideRemoveMealModal()"></div>
+
+        <!-- Center the modal contents -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <!-- Modal panel -->
+        <div class="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div class="sm:flex sm:items-start">
+                <!-- Warning Icon -->
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                </div>
+                
+                <!-- Modal Content -->
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                        Remove Meal from Plan?
+                    </h3>
+                    <div class="mt-3">
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    <span id="modalMealIcon" class="text-2xl">🍽️</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900" id="modalMealName">Meal Name</p>
+                                    <p class="text-sm text-gray-500">
+                                        <span class="capitalize" id="modalMealType">meal type</span> • Today
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500">
+                            This action cannot be undone. The meal will be permanently removed from your meal plan for today.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Actions -->
+            <div class="mt-6 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <form id="removeMealForm" method="POST" action="" class="inline-flex w-full sm:w-auto">
+                    @csrf
+                    @method('DELETE')
+                    <x-loading-button 
+                        type="submit"
+                        variant="error"
+                        size="sm"
+                        loadingText="Removing..."
+                        loadingType="spinner"
+                        class="w-full sm:w-auto sm:ml-3">
+                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Yes, Remove Meal
+                    </x-loading-button>
+                </form>
+                <button type="button" 
+                        onclick="hideRemoveMealModal()" 
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors duration-200">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Modal Functionality -->
+<script>
+// Modal functionality
+function showRemoveMealModal(mealPlanId, mealName, mealType) {
+    // Update modal content
+    document.getElementById('modalMealName').textContent = mealName;
+    document.getElementById('modalMealType').textContent = mealType;
+    document.getElementById('removeMealForm').action = `/meal-plans/${mealPlanId}`;
+    
+    // Update meal type icon
+    const mealIcon = document.getElementById('modalMealIcon');
+    switch(mealType) {
+        case 'breakfast':
+            mealIcon.textContent = '🍳';
+            break;
+        case 'lunch':
+            mealIcon.textContent = '🍽️';
+            break;
+        case 'dinner':
+            mealIcon.textContent = '🍴';
+            break;
+        case 'snack':
+            mealIcon.textContent = '🍪';
+            break;
+        default:
+            mealIcon.textContent = '🍽️';
+    }
+    
+    // Show modal with animation
+    const modal = document.getElementById('removeMealModal');
+    modal.classList.remove('hidden');
+    
+    // Add entrance animation
+    requestAnimationFrame(() => {
+        const overlay = modal.querySelector('.bg-gray-500');
+        const panel = modal.querySelector('.bg-white');
+        
+        overlay.style.opacity = '0';
+        panel.style.transform = 'scale(0.95)';
+        panel.style.opacity = '0';
+        
+        overlay.style.transition = 'opacity 300ms ease-out';
+        panel.style.transition = 'all 300ms ease-out';
+        
+        requestAnimationFrame(() => {
+            overlay.style.opacity = '0.75';
+            panel.style.transform = 'scale(1)';
+            panel.style.opacity = '1';
+        });
+    });
+    
+    // Focus on cancel button for accessibility
+    setTimeout(() => {
+        modal.querySelector('button[onclick="hideRemoveMealModal()"]').focus();
+    }, 100);
+}
+
+function hideRemoveMealModal() {
+    const modal = document.getElementById('removeMealModal');
+    const overlay = modal.querySelector('.bg-gray-500');
+    const panel = modal.querySelector('.bg-white');
+    
+    // Add exit animation
+    overlay.style.transition = 'opacity 200ms ease-in';
+    panel.style.transition = 'all 200ms ease-in';
+    
+    overlay.style.opacity = '0';
+    panel.style.transform = 'scale(0.95)';
+    panel.style.opacity = '0';
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 200);
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('removeMealModal');
+        if (!modal.classList.contains('hidden')) {
+            hideRemoveMealModal();
+        }
+    }
+});
+
+// Loading state for form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('removeMealForm');
+    const LoadingUtils = window.LoadingUtils || null;
+    
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        // Show loading state
+        if (LoadingUtils) {
+            LoadingUtils.showOnButton(submitBtn, {
+                text: 'Removing...',
+                size: 'small'
+            });
+        } else {
+            // Fallback loading state
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Removing...
+            `;
+        }
+    });
+});
+
+// Intro.js Tour Configuration
+function startDashboardTour() {
+    introJs().setOptions({
+        steps: [
+            {
+                title: 'Welcome to StudEats! 🎉',
+                intro: 'Let me show you around your personalized meal planning dashboard. Click "Next" to continue!'
+            },
+            {
+                element: document.querySelector('[data-step="1"]'),
+                intro: 'This shows how many meals you have planned for today. Stay organized with your daily meal schedule!',
+                position: 'bottom'
+            },
+            {
+                element: document.querySelector('[data-step="2"]'),
+                intro: 'Your personalized daily calorie target based on PDRI (Philippine Dietary Reference Intake) standards, considering your age, gender, and activity level.',
+                position: 'bottom'
+            },
+            {
+                element: document.querySelector('[data-step="3"]'),
+                intro: 'Set your daily budget here to get meal recommendations that fit your finances. StudEats suggests affordable Filipino recipes!',
+                position: 'bottom'
+            },
+            {
+                element: document.querySelector('[data-step="4"]'),
+                intro: 'Track your total calories consumed this week. Monitor your progress and stay on track with your health goals.',
+                position: 'bottom'
+            },
+            {
+                element: document.querySelector('[data-step="5"]'),
+                intro: 'View and manage all your meals for today. Mark them as completed, edit details, or remove them from your plan.',
+                position: 'top'
+            },
+            {
+                element: document.querySelector('[data-step="6"]'),
+                intro: 'Check out our featured meal of the day! Carefully selected for great nutrition, taste, and affordability.',
+                position: 'top'
+            }
+        ],
+        showProgress: true,
+        showBullets: true,
+        exitOnOverlayClick: false,
+        disableInteraction: true,
+        scrollToElement: true,
+        scrollPadding: 30,
+        tooltipClass: 'customTooltip',
+        highlightClass: 'customHighlight',
+        doneLabel: 'Got it!',
+        nextLabel: 'Next →',
+        prevLabel: '← Back',
+        hidePrev: true,
+        hideNext: false,
+        showStepNumbers: true
+    }).start();
+}
+
+// Auto-start tour for first-time visitors
+document.addEventListener('DOMContentLoaded', function() {
+    const hasSeenTour = localStorage.getItem('dashboardTourCompleted');
+    if (!hasSeenTour) {
+        setTimeout(() => {
+            startDashboardTour();
+            localStorage.setItem('dashboardTourCompleted', 'true');
+        }, 1000); // Wait 1 second for page to fully load
+    }
+});
+</script>
+
 @endsection

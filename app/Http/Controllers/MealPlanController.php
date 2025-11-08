@@ -47,39 +47,6 @@ class MealPlanController extends Controller
     }
 
     /**
-     * Show the meal type selection interface.
-     */
-    public function selectMealType(Request $request)
-    {
-        $user = Auth::user();
-        $userTz = $user->timezone ?? config('app.timezone');
-        $date = $request->get('date');
-        if (! $date) {
-            $date = now($userTz)->toDateString();
-        }
-        $selectedDate = Carbon::createFromFormat('Y-m-d', $date, $userTz)->startOfDay();
-
-        // Get existing meal plans for the selected date
-        $existingMealPlans = $user->mealPlansForDate($date)
-            ->pluck('meal_type')
-            ->toArray();
-
-        // Get available meal counts for each type
-        $availableMeals = Meal::with(['nutritionalInfo'])
-            ->withinBudget($user->daily_budget ?? 500)
-            ->get();
-
-        $mealCounts = [
-            'breakfast' => $availableMeals->count(),
-            'lunch' => $availableMeals->count(),
-            'dinner' => $availableMeals->count(),
-            'snack' => $availableMeals->count(),
-        ];
-
-        return view('meal-plans.select', compact('selectedDate', 'existingMealPlans', 'mealCounts'));
-    }
-
-    /**
      * Show the form for creating a new meal plan.
      */
     public function create()
@@ -87,10 +54,16 @@ class MealPlanController extends Controller
         $user = Auth::user();
         $userBMICategory = $user->getBMICategory();
 
-        $meals = Meal::with(['nutritionalInfo', 'recipe'])
+        $mealsQuery = Meal::with(['nutritionalInfo', 'recipe'])
             ->withinBudget($user->daily_budget ?? 500)
-            ->forBMICategory($userBMICategory)
-            ->get();
+            ->forBMICategory($userBMICategory);
+
+        // Filter by meal type if specified
+        if (request('meal_type')) {
+            $mealsQuery->byMealType(request('meal_type'));
+        }
+
+        $meals = $mealsQuery->get();
 
         // Get user's BMI status for display
         $bmiStatus = $user->getBMIStatus();

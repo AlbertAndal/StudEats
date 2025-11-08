@@ -232,6 +232,15 @@
                                                     </svg>
                                                 </button>
                                             @endif
+                                            
+                                            @if($user->role !== 'super_admin')
+                                                <button onclick="showDeleteModal('{{ $user->id }}', '{{ $user->name }}')" 
+                                                        class="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50" title="Delete User">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                                                    </svg>
+                                                </button>
+                                            @endif
                                         @endif
                                     </div>
                                 </td>
@@ -345,6 +354,51 @@
     </div>
 </div>
 
+<!-- Delete User Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="deleteModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Delete User</h3>
+                    <p class="text-sm text-gray-600">
+                        Are you sure you want to permanently delete <span id="deleteUserName" class="font-semibold"></span>? This action cannot be undone.
+                    </p>
+                    <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-xs text-red-700">
+                            <strong>Warning:</strong> This will permanently delete the user account and all associated data including meal plans and activity history.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeDeleteModal()" 
+                        class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+                <form id="deleteForm" method="POST" class="flex-1">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" 
+                            class="w-full px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 shadow-lg">
+                        Delete User
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function showSuspendModal(userId) {
     document.getElementById('suspendForm').action = `/admin/users/${userId}/suspend`;
@@ -400,6 +454,34 @@ function closeActivateModal() {
     }, 300);
 }
 
+function showDeleteModal(userId, userName) {
+    document.getElementById('deleteForm').action = `/admin/users/${userId}`;
+    document.getElementById('deleteUserName').textContent = userName;
+    const modal = document.getElementById('deleteModal');
+    const modalContent = document.getElementById('deleteModalContent');
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    const modalContent = document.getElementById('deleteModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }, 300);
+}
+
 function exportUsers() {
     // Get current filters
     const params = new URLSearchParams(window.location.search);
@@ -413,6 +495,7 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeSuspendModal();
         closeActivateModal();
+        closeDeleteModal();
     }
 });
 </script>

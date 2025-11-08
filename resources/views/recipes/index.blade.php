@@ -175,6 +175,12 @@
                                                 {{ ucfirst($recipe->cuisine_type) }}
                                             </span>
                                         @endif
+                                        @if($recipe->cost)
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">
+                                                <span class="text-sm">💰</span>
+                                                ₱{{ number_format($recipe->cost, 2) }}
+                                            </span>
+                                        @endif
                                     </div>
                                     @if($recipe->nutritionalInfo)
                                         <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-green-100">

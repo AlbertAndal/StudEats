@@ -97,39 +97,93 @@
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 @php
                                     $mealTypes = [
-                                        'breakfast' => ['icon' => '🌅', 'label' => 'Breakfast', 'color' => 'yellow', 'time' => '08:00'],
-                                        'lunch' => ['icon' => '☀️', 'label' => 'Lunch', 'color' => 'orange', 'time' => '12:00'],
-                                        'dinner' => ['icon' => '🌙', 'label' => 'Dinner', 'color' => 'purple', 'time' => '18:00'],
-                                        'snack' => ['icon' => '🍎', 'label' => 'Snack', 'color' => 'green', 'time' => '15:00']
+                                        'breakfast' => ['icon' => '🍳', 'label' => 'Breakfast', 'color' => 'yellow', 'time' => '08:00'],
+                                        'lunch' => ['icon' => '🍽️', 'label' => 'Lunch', 'color' => 'orange', 'time' => '12:00'],
+                                        'dinner' => ['icon' => '🍴', 'label' => 'Dinner', 'color' => 'purple', 'time' => '18:00'],
+                                        'snack' => ['icon' => '🍪', 'label' => 'Snack', 'color' => 'green', 'time' => '15:00']
                                     ];
                                 @endphp
                                 @foreach($mealTypes as $type => $details)
                                     @php
                                         $isExisting = in_array($type, $existingMealTypes ?? []);
                                     @endphp
-                                    <label class="relative {{ $isExisting ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} group">
+                                    <label class="relative block {{ $isExisting ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} group">
                                         <input type="radio" name="meal_type" value="{{ $type }}" 
                                                class="sr-only peer" 
                                                data-suggested-time="{{ $details['time'] }}"
                                                {{ request('meal_type') == $type ? 'checked' : '' }}
                                                {{ $isExisting ? 'disabled' : '' }} required>
-                                        <div class="border-2 {{ $isExisting ? 'border-red-300 bg-red-50' : 'border-gray-200' }} rounded-lg p-4 text-center {{ $isExisting ? '' : 'hover:border-'.$details['color'].'-300 hover:shadow-md' }} peer-checked:border-{{ $details['color'] }}-500 peer-checked:bg-{{ $details['color'] }}-50 peer-checked:shadow-sm transition-all duration-200 peer-disabled:opacity-60">
+                                        
+                                        <!-- Meal type card -->
+                                        <!-- Meal type card -->
+                                        <div class="meal-type-card relative border-2 rounded-lg p-4 text-center transition-all duration-200 peer-disabled:opacity-60
+                                                    {{ $isExisting ? 'border-red-300 bg-red-50 opacity-60' : 'border-gray-200 hover:shadow-md' }}
+                                                    @if(!$isExisting)
+                                                        @if($type === 'breakfast')
+                                                            hover:border-yellow-300
+                                                            {{ request('meal_type') == $type ? 'border-yellow-500 bg-yellow-50 ring-2 ring-yellow-200 shadow-lg' : '' }}
+                                                        @elseif($type === 'lunch')
+                                                            hover:border-orange-300
+                                                            {{ request('meal_type') == $type ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-200 shadow-lg' : '' }}
+                                                        @elseif($type === 'dinner')
+                                                            hover:border-purple-300
+                                                            {{ request('meal_type') == $type ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200 shadow-lg' : '' }}
+                                                        @elseif($type === 'snack')
+                                                            hover:border-green-300
+                                                            {{ request('meal_type') == $type ? 'border-green-500 bg-green-50 ring-2 ring-green-200 shadow-lg' : '' }}
+                                                        @endif
+                                                    @endif" 
+                                             data-meal-type="{{ $type }}">
                                             <div class="text-3xl mb-2">{{ $details['icon'] }}</div>
-                                            <div class="text-sm font-semibold {{ $isExisting ? 'text-red-700' : 'text-gray-700' }} peer-checked:text-{{ $details['color'] }}-700">{{ $details['label'] }}</div>
-                                            <div class="text-xs {{ $isExisting ? 'text-red-600' : 'text-gray-500' }} mt-1 peer-checked:text-{{ $details['color'] }}-600">
+                                            <div class="meal-type-label text-sm font-semibold
+                                                        {{ $isExisting ? 'text-red-700' : 'text-gray-700' }}
+                                                        @if(!$isExisting && request('meal_type') == $type)
+                                                            @if($type === 'breakfast')
+                                                                text-yellow-700
+                                                            @elseif($type === 'lunch')
+                                                                text-orange-700
+                                                            @elseif($type === 'dinner')
+                                                                text-purple-700
+                                                            @elseif($type === 'snack')
+                                                                text-green-700
+                                                            @endif
+                                                        @endif">{{ $details['label'] }}</div>
+                                            <div class="meal-type-time text-xs mt-1
+                                                        {{ $isExisting ? 'text-red-600' : 'text-gray-500' }}
+                                                        @if(!$isExisting && request('meal_type') == $type)
+                                                            @if($type === 'breakfast')
+                                                                text-yellow-600
+                                                            @elseif($type === 'lunch')
+                                                                text-orange-600
+                                                            @elseif($type === 'dinner')
+                                                                text-purple-600
+                                                            @elseif($type === 'snack')
+                                                                text-green-600
+                                                            @endif
+                                                        @endif">
                                                 {{ $isExisting ? 'Already scheduled' : $details['time'] }}
                                             </div>
                                         </div>
+                                        
                                         @if($isExisting)
                                             <!-- Already scheduled indicator -->
-                                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-sm">
+                                            <div class="absolute -top-2 -right-2 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white z-10">
                                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/>
                                                 </svg>
                                             </div>
                                         @else
                                             <!-- Selection checkmark -->
-                                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-{{ $details['color'] }}-500 rounded-full hidden peer-checked:flex items-center justify-center shadow-sm">
+                                            @php
+                                                $checkmarkBg = match($type) {
+                                                    'breakfast' => 'bg-yellow-500',
+                                                    'lunch' => 'bg-orange-500',
+                                                    'dinner' => 'bg-purple-500',
+                                                    'snack' => 'bg-green-500',
+                                                    default => 'bg-gray-500'
+                                                };
+                                            @endphp
+                                            <div class="absolute -top-2 -right-2 w-7 h-7 {{ $checkmarkBg }} rounded-full shadow-lg border-2 border-white z-10 hidden peer-checked:flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity duration-200">
                                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                                 </svg>
@@ -156,19 +210,25 @@
                 <!-- Action Buttons -->
                 <div class="bg-white shadow rounded-lg p-6">
                     <div class="flex justify-between items-center">
-                        <a href="{{ route('meal-plans.index') }}" 
-                           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200">
+                        <x-loading-button 
+                            href="{{ route('meal-plans.index') }}"
+                            variant="secondary"
+                            size="sm"
+                            loadingText="Loading..."
+                            loadingType="spinner"
+                            class="border border-gray-300">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                             Cancel
-                        </a>
+                        </x-loading-button>
                         <button type="submit" id="submit-btn" disabled
-                                class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gray-400 cursor-not-allowed transition-all duration-200 disabled:opacity-50">
+                                class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gray-400 cursor-not-allowed transition-all duration-200">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                             </svg>
-                            Add to Plan
+                            <span id="submit-btn-text">Add to Plan</span>
+                            <span id="submit-btn-spinner" class="hidden loading loading-spinner loading-sm ml-2"></span>
                         </button>
                     </div>
                     <div id="form-validation" class="mt-4 text-sm text-gray-500">
@@ -181,74 +241,239 @@
                     </div>
                 </div>
             </form>
+            
+            <!-- Available Meals Grid -->
+            <div class="mt-8">
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                                    <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                    Available Meals
+                                    @if(request('meal_type'))
+                                        @php
+                                            $filterTypes = [
+                                                'breakfast' => ['icon' => '🍳', 'color' => 'bg-yellow-100 text-yellow-700'],
+                                                'lunch' => ['icon' => '🍽️', 'color' => 'bg-orange-100 text-orange-700'],
+                                                'dinner' => ['icon' => '🍴', 'color' => 'bg-purple-100 text-purple-700'],
+                                                'snack' => ['icon' => '🍪', 'color' => 'bg-green-100 text-green-700']
+                                            ];
+                                            $selectedType = request('meal_type');
+                                            $filterInfo = $filterTypes[$selectedType] ?? ['icon' => '🍽️', 'color' => 'bg-gray-100 text-gray-700'];
+                                        @endphp
+                                        <span class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $filterInfo['color'] }}">
+                                            <span class="mr-1">{{ $filterInfo['icon'] }}</span>
+                                            <span class="capitalize">{{ $selectedType }} only</span>
+                                        </span>
+                                    @endif
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    @if(request('meal_type'))
+                                        Showing meals suitable for {{ request('meal_type') }}. Select a different meal type above to see other options.
+                                    @else
+                                        Click on a meal to select it for your plan
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                {{ $meals->count() }} meals available
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        @if($meals->count() > 0)
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                @foreach($meals as $meal)
+                                    @php
+                                        $displayCost = $meal->getDisplayCost('NCR');
+                                        $hasRealTimePricing = $meal->hasRealTimePricing('NCR');
+                                    @endphp
+                                    <div class="group border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-green-400 hover:shadow-lg transition-all duration-300 meal-option bg-white hover:bg-gradient-to-br hover:from-green-50 hover:to-white"
+                                         data-meal-id="{{ $meal->id }}"
+                                         data-meal-name="{{ $meal->name }}"
+                                         data-meal-description="{{ $meal->description }}"
+                                         data-meal-calories="{{ $meal->nutritionalInfo->calories ?? 'N/A' }}"
+                                         data-meal-cost="₱{{ number_format($displayCost, 2) }}"
+                                         aria-label="Select {{ $meal->name }} for your meal plan">
+                                        
+                                        <!-- Meal Image/Icon -->
+                                        <div class="relative mb-3">
+                                            @if($meal->image_path)
+                                                <div class="w-full h-32 bg-gray-100 rounded-md overflow-hidden group-hover:shadow-md transition-shadow duration-300">
+                                                    <img src="{{ asset('storage/' . $meal->image_path) }}" 
+                                                         alt="{{ $meal->name }}" 
+                                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                         loading="lazy">
+                                                </div>
+                                            @else
+                                                <div class="w-full h-32 bg-gradient-to-br from-green-100 to-blue-100 rounded-md flex items-center justify-center group-hover:shadow-md transition-shadow duration-300">
+                                                    <span class="text-4xl opacity-70">🍽️</span>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <!-- Meal Info -->
+                                        <div class="space-y-2">
+                                            <!-- Meal Title -->
+                                            <div class="text-center">
+                                                <h3 class="text-lg font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-300 mb-1 line-clamp-2">
+                                                    {{ $meal->name }}
+                                                </h3>
+                                                <div class="flex items-center justify-center gap-2 mb-1">
+                                                    <div class="inline-flex items-center px-2 py-0.5 bg-gray-100 group-hover:bg-green-100 rounded-full text-xs font-medium text-gray-600 group-hover:text-green-700 transition-colors duration-300">
+                                                        <span class="capitalize">{{ $meal->cuisine_type }}</span>
+                                                    </div>
+                                                    @php
+                                                        $mealTypeColors = [
+                                                            'breakfast' => 'bg-yellow-100 text-yellow-700 group-hover:bg-yellow-200',
+                                                            'lunch' => 'bg-orange-100 text-orange-700 group-hover:bg-orange-200',
+                                                            'dinner' => 'bg-purple-100 text-purple-700 group-hover:bg-purple-200',
+                                                            'snack' => 'bg-green-100 text-green-700 group-hover:bg-green-200'
+                                                        ];
+                                                        $mealTypeIcons = [
+                                                            'breakfast' => '🍳',
+                                                            'lunch' => '🍽️',
+                                                            'dinner' => '🍴',
+                                                            'snack' => '🍪'
+                                                        ];
+                                                        $colorClass = $mealTypeColors[$meal->meal_type] ?? 'bg-gray-100 text-gray-700';
+                                                        $icon = $mealTypeIcons[$meal->meal_type] ?? '🍽️';
+                                                    @endphp
+                                                    <div class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium transition-colors duration-300 {{ $colorClass }}">
+                                                        <span class="mr-1">{{ $icon }}</span>
+                                                        <span class="capitalize">{{ $meal->meal_type }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Description -->
+                                            <p class="text-xs text-gray-600 text-center line-clamp-2 leading-relaxed px-1">
+                                                {{ Str::limit($meal->description, 80) }}
+                                            </p>
+
+                                            <!-- Meal Stats -->
+                                            <div class="bg-gray-50 group-hover:bg-green-50/50 rounded-md p-3 transition-colors duration-300">
+                                                <div class="grid grid-cols-2 gap-4 text-center">
+                                                    <!-- Calories -->
+                                                    <div class="space-y-0.5">
+                                                        <div class="w-6 h-6 bg-orange-100 group-hover:bg-orange-200 rounded-full flex items-center justify-center mx-auto transition-colors duration-300">
+                                                            <span class="text-sm">🔥</span>
+                                                        </div>
+                                                        @if(isset($bmiStatus) && $bmiStatus['calorie_multiplier'] != 1)
+                                                            @php
+                                                                $originalCalories = $meal->nutritionalInfo->calories ?? 0;
+                                                                $adjustedCalories = round($originalCalories * $bmiStatus['calorie_multiplier']);
+                                                            @endphp
+                                                            <div class="text-xs font-bold text-orange-600">{{ $adjustedCalories > 0 ? $adjustedCalories : '300' }}</div>
+                                                            <div class="text-xs text-orange-500">cal</div>
+                                                        @else
+                                                            <div class="text-xs font-bold text-orange-600">{{ $meal->nutritionalInfo->calories ?? '300' }}</div>
+                                                            <div class="text-xs text-orange-500">cal</div>
+                                                        @endif
+                                                    </div>
+                                                    
+                                                    <!-- Prep Time -->
+                                                    <div class="space-y-0.5">
+                                                        <div class="w-6 h-6 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mx-auto transition-colors duration-300">
+                                                            <span class="text-sm">⏱️</span>
+                                                        </div>
+                                                        <div class="text-xs font-bold text-blue-600">{{ $meal->prep_time ?? '30' }}</div>
+                                                        <div class="text-xs text-blue-500">min</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Selection Indicator -->
+                                            <div class="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                <button type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-3 rounded-md transition-colors duration-200 flex items-center justify-center space-x-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                                    </svg>
+                                                    <span class="text-sm">Select Meal</span>
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- Selected State -->
+                                            <div class="selected-indicator hidden absolute inset-0">
+                                                <!-- Green border outline -->
+                                                <div class="absolute inset-0 bg-transparent border-2 border-green-500 rounded-lg shadow-lg"></div>
+                                                <!-- Check circle -->
+                                                <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white z-10">
+                                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-12">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No meals available</h3>
+                                <p class="text-gray-500 mb-6">There are no meals in the system yet.</p>
+                                <x-loading-button 
+                                    href="{{ route('recipes.index') }}"
+                                    variant="success"
+                                    size="sm"
+                                    loadingText="Loading..."
+                                    loadingType="spinner">
+                                    Browse Recipes
+                                </x-loading-button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Meal Preview Sidebar -->
         <div class="lg:col-span-1">
-            <div class="sticky top-8">
-                <!-- Selected Meal Preview -->
-                <div id="meal-preview" class="bg-white shadow rounded-lg mb-6 hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                            <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Selected Meal
-                        </h3>
-                    </div>
-                    <div class="p-6">
-                        <div class="text-center mb-4">
-                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <span class="text-2xl">🍽️</span>
-                            </div>
-                            <h4 class="font-semibold text-gray-900 text-lg" id="preview-name"></h4>
-                            <p class="text-sm text-gray-600 mt-2" id="preview-description"></p>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 gap-3 mb-4">
-                            <div class="bg-green-50 p-3 rounded-lg text-center">
-                                <div class="text-xs text-green-600 font-medium uppercase tracking-wide">Calories</div>
-                                <div class="text-lg font-bold text-green-700" id="preview-calories"></div>
-                            </div>
-                            <div class="bg-blue-50 p-3 rounded-lg text-center">
-                                <div class="text-xs text-blue-600 font-medium uppercase tracking-wide">Cost</div>
-                                <div class="text-lg font-bold text-blue-700" id="preview-cost"></div>
-                            </div>
-                        </div>
-                        
-                        <button type="button" onclick="clearSelection()" 
-                                class="w-full px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
-                            Change Selection
-                        </button>
-                    </div>
-                </div>
-
+            <div class="sticky top-8 space-y-6">
                 <!-- Quick Actions -->
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
                     </div>
                     <div class="p-6 space-y-3">
-                        <a href="{{ route('recipes.index') }}" 
-                           class="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                        <x-loading-button 
+                            href="{{ route('recipes.index') }}"
+                            variant="secondary"
+                            size="sm"
+                            loadingText="Loading..."
+                            loadingType="spinner"
+                            class="w-full bg-gray-50 hover:bg-gray-100">
                             <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                             Browse All Recipes
-                        </a>
-                        <a href="{{ route('meal-plans.index') }}" 
-                           class="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                        </x-loading-button>
+                        <x-loading-button 
+                            href="{{ route('meal-plans.index') }}"
+                            variant="secondary"
+                            size="sm"
+                            loadingText="Loading..."
+                            loadingType="spinner"
+                            class="w-full bg-gray-50 hover:bg-gray-100">
                             <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                             View Meal Plans
-                        </a>
+                        </x-loading-button>
                     </div>
                 </div>
                 
-                <!-- BMI Status -->
+                <!-- BMI Status / Health Profile -->
                 @if(isset($bmiStatus) && $bmiStatus['bmi'])
-                <div class="bg-white shadow rounded-lg mt-6">
+                <div class="bg-white shadow rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900 flex items-center">
                             <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,9 +511,7 @@
                                         <p class="text-xs text-gray-600">{{ $bmiStatus['recommendation'] }}</p>
                                         @if($bmiStatus['calorie_multiplier'] != 1)
                                             <p class="text-xs text-blue-600 mt-1">
-                                                Meals are adjusted 
-                                                {{ $bmiStatus['calorie_multiplier'] > 1 ? '+' : '' }}{{ round(($bmiStatus['calorie_multiplier'] - 1) * 100) }}% 
-                                                for your health goals.
+                                                Meal calories are {{ $bmiStatus['calorie_multiplier'] > 1 ? 'increased' : 'reduced' }} by {{ round(abs(($bmiStatus['calorie_multiplier'] - 1) * 100)) }}% for your health goals.
                                             </p>
                                         @endif
                                     </div>
@@ -298,154 +521,62 @@
                     </div>
                 </div>
                 @endif
-            </div>
-        </div>
-    </div>
 
-    <!-- Available Meals Grid -->
-    <div class="mt-8">
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <!-- Selected Meal Preview -->
+                <div id="meal-preview" class="bg-white shadow rounded-lg min-h-0">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
                             <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            Available Meals
-                        </h2>
-                        <p class="text-sm text-gray-600 mt-1">Click on a meal to select it for your plan</p>
+                            <span id="preview-title">Selected Meal</span>
+                        </h3>
                     </div>
-                    <div class="text-sm text-gray-500">
-                        {{ $meals->count() }} meals available
+                    <div class="p-6">
+                        <!-- Default state (no meal selected) -->
+                        <div id="no-meal-selected" class="text-center py-8">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-medium text-gray-900 mb-2">No meal selected</h4>
+                            <p class="text-sm text-gray-600">Click on a meal from the Available Meals section to see its details here.</p>
+                        </div>
+
+                        <!-- Selected meal content -->
+                        <div id="meal-selected-content" class="hidden">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <span class="text-2xl">🍽️</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 text-lg" id="preview-name"></h4>
+                                <p class="text-sm text-gray-600 mt-2" id="preview-description"></p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 gap-3 mb-4">
+                                <div class="bg-green-50 p-3 rounded-lg text-center">
+                                    <div class="text-xs text-green-600 font-medium uppercase tracking-wide">Calories</div>
+                                    <div class="text-lg font-bold text-green-700" id="preview-calories"></div>
+                                </div>
+                                <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                    <div class="text-xs text-blue-600 font-medium uppercase tracking-wide">Cost</div>
+                                    <div class="text-lg font-bold text-blue-700" id="preview-cost"></div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" onclick="clearSelection()" 
+                                    class="w-full px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
+                                Change Selection
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="p-6">
-                @if($meals->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        @foreach($meals as $meal)
-                            @php
-                                $displayCost = $meal->getDisplayCost('NCR');
-                                $hasRealTimePricing = $meal->hasRealTimePricing('NCR');
-                            @endphp
-                            <div class="group border-2 border-gray-200 rounded-lg p-6 cursor-pointer hover:border-green-400 hover:shadow-lg transition-all duration-300 meal-option transform hover:-translate-y-1"
-                                 data-meal-id="{{ $meal->id }}"
-                                 data-meal-name="{{ $meal->name }}"
-                                 data-meal-description="{{ $meal->description }}"
-                                 data-meal-calories="{{ $meal->nutritionalInfo->calories ?? 'N/A' }}"
-                                 data-meal-cost="₱{{ number_format($displayCost, 2) }}"
-                                 aria-label="Select {{ $meal->name }} for your meal plan">
-                                
-                                <!-- Meal Image/Icon -->
-                                <div class="flex items-center justify-center w-16 h-16 bg-gray-100 group-hover:bg-green-100 rounded-full mx-auto mb-4 transition-colors duration-300">
-                                    @if($meal->image_url)
-                                        <img src="{{ $meal->image_url }}" 
-                                             alt="{{ $meal->name }}" 
-                                             class="w-full h-full object-cover rounded-full"
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                        <span class="text-2xl hidden">🍽️</span>
-                                    @else
-                                        <span class="text-2xl">🍽️</span>
-                                    @endif
-                                </div>
-
-                                <!-- Meal Info -->
-                                <div class="text-center">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <h3 class="font-semibold text-gray-900 group-hover:text-green-700 transition-colors duration-300 text-left flex-1">
-                                            {{ $meal->name }}
-                                        </h3>
-                                        <div class="flex flex-col items-end ml-2">
-                                            <span class="text-lg font-bold text-green-600">₱{{ number_format($displayCost, 2) }}</span>
-                                            @if($hasRealTimePricing)
-                                                <span class="text-xs text-blue-600 flex items-center mt-0.5">
-                                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                                    </svg>
-                                                    Live
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    
-                                    <p class="text-sm text-gray-600 mb-4 text-left line-clamp-2">
-                                        {{ Str::limit($meal->description, 100) }}
-                                    </p>
-                                    
-                                    <!-- Meal Stats -->
-                                    <div class="grid grid-cols-2 gap-3 mb-4">
-                                        <div class="bg-gray-50 group-hover:bg-green-50 rounded-lg p-3 transition-colors duration-300">
-                                            <div class="flex flex-col items-center justify-center text-gray-500 group-hover:text-green-600">
-                                                <div class="flex items-center">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                                    </svg>
-                                                    @if(isset($bmiStatus) && $bmiStatus['calorie_multiplier'] != 1)
-                                                        @php
-                                                            $originalCalories = $meal->nutritionalInfo->calories ?? 0;
-                                                            $adjustedCalories = round($originalCalories * $bmiStatus['calorie_multiplier']);
-                                                        @endphp
-                                                        <span class="text-xs font-medium">{{ $adjustedCalories }} cal</span>
-                                                    @else
-                                                        <span class="text-xs font-medium">{{ $meal->nutritionalInfo->calories ?? 'N/A' }} cal</span>
-                                                    @endif
-                                                </div>
-                                                @if(isset($bmiStatus) && $bmiStatus['calorie_multiplier'] != 1)
-                                                    <span class="text-xs text-gray-400 line-through">{{ $meal->nutritionalInfo->calories ?? 'N/A' }}</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="bg-gray-50 group-hover:bg-green-50 rounded-lg p-3 transition-colors duration-300">
-                                            <div class="flex items-center justify-center text-gray-500 group-hover:text-green-600">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                                </svg>
-                                                <span class="text-xs font-medium capitalize">{{ $meal->cuisine_type }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Selection Indicator -->
-                                    <div class="flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <div class="flex items-center text-green-600">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                            </svg>
-                                            <span class="text-sm font-medium">Select This Meal</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Selected State -->
-                                    <div class="selected-indicator hidden">
-                                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-12">
-                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">No meals available</h3>
-                        <p class="text-gray-500 mb-6">There are no meals in the system yet.</p>
-                        <a href="{{ route('recipes.index') }}" 
-                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700">
-                            Browse Recipes
-                        </a>
-                    </div>
-                @endif
-            </div>
         </div>
     </div>
+
+
 </div>
 
 <script>
@@ -455,24 +586,111 @@ document.addEventListener('DOMContentLoaded', function() {
     const mealOptions = document.querySelectorAll('.meal-option');
     const submitBtn = document.getElementById('submit-btn');
     const formValidation = document.getElementById('form-validation');
-    const mealTypeInputs = document.querySelectorAll('input[name="meal_type"]');
+    const mealTypeInputs = document.querySelectorAll('input[name=\"meal_type\"]');
     const dateInput = document.getElementById('scheduled_date');
     
     let selectedMealId = mealIdInput.value;
+    
+    // Function to filter meals by type
+    function filterMealsByType(mealType) {
+        // Build URL with current parameters
+        const url = new URL(window.location.href);
+        url.searchParams.set('meal_type', mealType);
+        
+        // Preserve existing date parameter if present
+        const currentDate = dateInput.value;
+        if (currentDate) {
+            url.searchParams.set('date', currentDate);
+        }
+        
+        // Show loading indicator
+        const mealsGrid = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.xl\\:grid-cols-3');
+        if (mealsGrid) {
+            mealsGrid.innerHTML = '<div class="col-span-full text-center py-8"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div><p class="mt-2 text-gray-600">Loading meals for ' + mealType + '...</p></div>';
+        }
+        
+        // Navigate to filtered URL
+        window.location.href = url.toString();
+    }
+    
+    // Initialize pre-selected meal type from URL
+    const preSelectedMealType = document.querySelector('input[name=\"meal_type\"]:checked');
+    if (preSelectedMealType && !preSelectedMealType.disabled) {
+        // Force visual selection by manually applying styles
+        const mealTypeContainer = preSelectedMealType.closest('label').querySelector('div');
+        const mealTypeValue = preSelectedMealType.value;
+        
+        // Remove default border and add selected styling based on meal type
+        mealTypeContainer.classList.remove('border-gray-200');
+        if (mealTypeValue === 'breakfast') {
+            mealTypeContainer.classList.add('border-yellow-500', 'bg-yellow-50');
+        } else if (mealTypeValue === 'lunch') {
+            mealTypeContainer.classList.add('border-orange-500', 'bg-orange-50');
+        } else if (mealTypeValue === 'dinner') {
+            mealTypeContainer.classList.add('border-purple-500', 'bg-purple-50');
+        } else if (mealTypeValue === 'snack') {
+            mealTypeContainer.classList.add('border-green-500', 'bg-green-50');
+        }
+        
+        // Show the checkmark indicator
+        const checkmark = preSelectedMealType.closest('label').querySelector('.absolute.-top-2.-right-2');
+        if (checkmark && !checkmark.classList.contains('bg-red-500')) {
+            checkmark.classList.remove('hidden');
+        }
+        
+        // Auto-fill suggested time to match the meal type
+        const timeInput = document.getElementById('scheduled_time');
+        const suggestedTime = preSelectedMealType.dataset.suggestedTime;
+        
+        // Always set the time to match the meal type, even if time input has a value
+        if (suggestedTime) {
+            timeInput.value = suggestedTime;
+            // Add visual feedback to show time was auto-filled
+            timeInput.classList.add('border-green-300', 'bg-green-50');
+            setTimeout(() => {
+                timeInput.classList.remove('border-green-300', 'bg-green-50');
+            }, 2000);
+        }
+    }
+
+    // Add form submission handler with loading indicator
+    const form = document.getElementById('meal-plan-form');
+    form.addEventListener('submit', function(e) {
+        // Validate form before showing loading
+        if (!selectedMealId) {
+            e.preventDefault();
+            alert('Please select a meal first.');
+            return;
+        }
+        
+        if (!document.querySelector('input[name=\"meal_type\"]:checked')) {
+            e.preventDefault();
+            alert('Please select a meal type.');
+            return;
+        }
+        
+        // Form is valid, show loading state on button
+        const btnText = document.getElementById('submit-btn-text');
+        const btnSpinner = document.getElementById('submit-btn-spinner');
+        const btnIcon = submitBtn.querySelector('svg');
+        
+        if (btnText && btnSpinner && btnIcon) {
+            btnIcon.classList.add('hidden');
+            btnText.textContent = 'Adding to Plan...';
+            btnSpinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+        }
+    });
 
     // Handle meal option clicks
     mealOptions.forEach(option => {
         option.addEventListener('click', function() {
-            // Remove selected class from all options
+            // Remove selected indicator from all options
             mealOptions.forEach(opt => {
-                opt.classList.remove('border-green-500', 'bg-green-50', 'ring-2', 'ring-green-200');
-                opt.classList.add('border-gray-200');
                 opt.querySelector('.selected-indicator')?.classList.add('hidden');
             });
             
-            // Add selected class to clicked option
-            this.classList.remove('border-gray-200');
-            this.classList.add('border-green-500', 'bg-green-50', 'ring-2', 'ring-green-200');
+            // Show selected indicator on clicked option
             this.querySelector('.selected-indicator')?.classList.remove('hidden');
             
             // Update form
@@ -481,11 +699,6 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedMealId = mealId;
             updateMealPreview();
             validateForm();
-            
-            // Scroll to preview on mobile
-            if (window.innerWidth < 1024) {
-                mealPreview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
         });
     });
 
@@ -493,13 +706,73 @@ document.addEventListener('DOMContentLoaded', function() {
     mealTypeInputs.forEach(input => {
         input.addEventListener('change', function() {
             if (!this.disabled) {
+                const mealType = this.value;
+                
+                // Remove selected styling from all meal type cards
+                mealTypeInputs.forEach(inp => {
+                    const card = inp.parentElement.querySelector('.meal-type-card');
+                    const label = inp.parentElement.querySelector('.meal-type-label');
+                    const time = inp.parentElement.querySelector('.meal-type-time');
+                    
+                    if (inp !== this) {
+                        inp.checked = false;
+                        // Remove all selected styling
+                        card.classList.remove(
+                            'border-yellow-500', 'bg-yellow-50', 'ring-2', 'ring-yellow-200', 'shadow-lg',
+                            'border-orange-500', 'bg-orange-50', 'ring-orange-200',
+                            'border-purple-500', 'bg-purple-50', 'ring-purple-200',
+                            'border-green-500', 'bg-green-50', 'ring-green-200'
+                        );
+                        label.classList.remove('text-yellow-700', 'text-orange-700', 'text-purple-700', 'text-green-700');
+                        time.classList.remove('text-yellow-600', 'text-orange-600', 'text-purple-600', 'text-green-600');
+                        
+                        // Reset to default
+                        card.classList.add('border-gray-200');
+                        label.classList.add('text-gray-700');
+                        time.classList.add('text-gray-500');
+                    }
+                });
+                
+                // Apply selected styling to current meal type
+                const selectedCard = this.parentElement.querySelector('.meal-type-card');
+                const selectedLabel = this.parentElement.querySelector('.meal-type-label');
+                const selectedTime = this.parentElement.querySelector('.meal-type-time');
+                
+                selectedCard.classList.remove('border-gray-200');
+                selectedLabel.classList.remove('text-gray-700');
+                selectedTime.classList.remove('text-gray-500');
+                
+                switch(mealType) {
+                    case 'breakfast':
+                        selectedCard.classList.add('border-yellow-500', 'bg-yellow-50', 'ring-2', 'ring-yellow-200', 'shadow-lg');
+                        selectedLabel.classList.add('text-yellow-700');
+                        selectedTime.classList.add('text-yellow-600');
+                        break;
+                    case 'lunch':
+                        selectedCard.classList.add('border-orange-500', 'bg-orange-50', 'ring-2', 'ring-orange-200', 'shadow-lg');
+                        selectedLabel.classList.add('text-orange-700');
+                        selectedTime.classList.add('text-orange-600');
+                        break;
+                    case 'dinner':
+                        selectedCard.classList.add('border-purple-500', 'bg-purple-50', 'ring-2', 'ring-purple-200', 'shadow-lg');
+                        selectedLabel.classList.add('text-purple-700');
+                        selectedTime.classList.add('text-purple-600');
+                        break;
+                    case 'snack':
+                        selectedCard.classList.add('border-green-500', 'bg-green-50', 'ring-2', 'ring-green-200', 'shadow-lg');
+                        selectedLabel.classList.add('text-green-700');
+                        selectedTime.classList.add('text-green-600');
+                        break;
+                }
+                
+                this.checked = true;
                 validateForm();
                 
-                // Auto-fill suggested time if time input is empty
+                // Always update time to match the selected meal type
                 const timeInput = document.getElementById('scheduled_time');
                 const suggestedTime = this.dataset.suggestedTime;
                 
-                if (!timeInput.value && suggestedTime) {
+                if (suggestedTime) {
                     timeInput.value = suggestedTime;
                     // Add visual feedback
                     timeInput.classList.add('border-green-300', 'bg-green-50');
@@ -507,6 +780,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         timeInput.classList.remove('border-green-300', 'bg-green-50');
                     }, 1000);
                 }
+                
+                // Filter meals based on selected meal type
+                filterMealsByType(mealType);
             }
         });
         
@@ -555,6 +831,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function updateMealPreview() {
+        const noMealSelected = document.getElementById('no-meal-selected');
+        const mealSelectedContent = document.getElementById('meal-selected-content');
+        const previewTitle = document.getElementById('preview-title');
+        
         if (selectedMealId) {
             const selectedMeal = Array.from(mealOptions).find(option => 
                 option.dataset.mealId === selectedMealId
@@ -565,16 +845,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('preview-description').textContent = selectedMeal.dataset.mealDescription;
                 document.getElementById('preview-calories').textContent = selectedMeal.dataset.mealCalories;
                 document.getElementById('preview-cost').textContent = selectedMeal.dataset.mealCost;
-                mealPreview.classList.remove('hidden');
                 
-                // Add smooth reveal animation
-                setTimeout(() => {
-                    mealPreview.style.opacity = '1';
-                    mealPreview.style.transform = 'translateY(0)';
-                }, 100);
+                // Update title and show selected content
+                previewTitle.textContent = 'Selected Meal';
+                noMealSelected.classList.add('hidden');
+                mealSelectedContent.classList.remove('hidden');
             }
         } else {
-            mealPreview.classList.add('hidden');
+            // Show default state
+            previewTitle.textContent = 'Meal Preview';
+            mealSelectedContent.classList.add('hidden');
+            noMealSelected.classList.remove('hidden');
         }
     }
 
@@ -622,12 +903,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear visual selection
         mealOptions.forEach(option => {
-            option.classList.remove('border-green-500', 'bg-green-50', 'ring-2', 'ring-green-200');
-            option.classList.add('border-gray-200');
             option.querySelector('.selected-indicator')?.classList.add('hidden');
         });
         
-        mealPreview.classList.add('hidden');
+        // Update preview to show default state
+        updateMealPreview();
         validateForm();
     }
     
@@ -643,8 +923,6 @@ document.addEventListener('DOMContentLoaded', function() {
             option.dataset.mealId === selectedMealId
         );
         if (preSelectedMeal) {
-            preSelectedMeal.classList.remove('border-gray-200');
-            preSelectedMeal.classList.add('border-green-500', 'bg-green-50', 'ring-2', 'ring-green-200');
             preSelectedMeal.querySelector('.selected-indicator')?.classList.remove('hidden');
         }
     }
@@ -666,10 +944,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize form validation
     validateForm();
     
-    // Add smooth transitions for preview
-    mealPreview.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-    mealPreview.style.opacity = '0';
-    mealPreview.style.transform = 'translateY(-10px)';
+    // Initialize meal preview (always show the preview container)
+    updateMealPreview();
 });
 
 // Add some CSS for smooth transitions

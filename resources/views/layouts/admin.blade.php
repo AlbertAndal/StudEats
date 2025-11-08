@@ -24,8 +24,52 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    <!-- CSRF Manager for session handling and 419 error prevention -->
-    <script src="{{ asset('js/csrf-manager.js') }}"></script>
+    <!-- Session Management Script for improved admin UX -->
+    <script>
+        // Extended session management for admin users
+        function keepAdminSessionAlive() {
+            fetch('/api/csrf-token', {
+                method: 'GET',
+                credentials: 'same-origin'
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+            }).then(data => {
+                if (data && data.csrf_token) {
+                    // Update CSRF token in meta tag
+                    const metaTag = document.querySelector('meta[name="csrf-token"]');
+                    if (metaTag) {
+                        metaTag.setAttribute('content', data.csrf_token);
+                    }
+                    // Update CSRF tokens in forms
+                    document.querySelectorAll('input[name="_token"]').forEach(input => {
+                        input.value = data.csrf_token;
+                    });
+                }
+            }).catch(error => {
+                console.log('Admin session renewal skipped:', error.message);
+            });
+        }
+        
+        // Keep admin session alive every 20 minutes (more frequent for admin)
+        setInterval(keepAdminSessionAlive, 20 * 60 * 1000);
+        
+        // Refresh session on admin activity
+        let adminActivityTimer;
+        function resetAdminActivityTimer() {
+            clearTimeout(adminActivityTimer);
+            adminActivityTimer = setTimeout(keepAdminSessionAlive, 10 * 60 * 1000); // 10 minutes of inactivity
+        }
+        
+        // Listen for admin activity
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+            document.addEventListener(event, resetAdminActivityTimer, true);
+        });
+        
+        // Initial timer
+        resetAdminActivityTimer();
+    </script>
     
     <!-- Fallback CSS for production if Vite assets fail to load -->
     @if(app()->environment('production'))
