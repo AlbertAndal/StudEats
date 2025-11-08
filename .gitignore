@@ -23,3 +23,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Emergency scripts (remove after use for security)
+emergency-admin-create.php
+emergency-admin-reset.php

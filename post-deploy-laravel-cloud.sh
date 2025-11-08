@@ -60,6 +60,11 @@ echo "🌱 Seeding essential data..."
 run_command "php artisan db:seed --class=AdminSeeder --force"
 run_command "php artisan db:seed --class=PdriReferenceSeeder --force"
 
+# Ensure admin account exists and is accessible
+echo ""
+echo "👤 Ensuring admin account is ready..."
+run_command "php artisan admin:create --reset"
+
 # Optimize for production
 echo ""
 echo "⚡ Optimizing for production..."
