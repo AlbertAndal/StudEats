@@ -25,19 +25,5 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // Completely suppress TokenMismatchException to prevent 419 errors
-        $exceptions->dontReport([
-            \Illuminate\Session\TokenMismatchException::class,
-        ]);
-        
-        // Render custom response for token mismatch - just continue the request
-        $exceptions->renderable(function (\Illuminate\Session\TokenMismatchException $e, $request) {
-            // Never show 419 page - redirect to login or back
-            if ($request->expectsJson()) {
-                return response()->json(['message' => 'Request processed'], 200);
-            }
-            
-            // For web requests, redirect to intended destination or back
-            return redirect()->back()->withInput()->with('info', 'Request processed');
-        });
+        // No special exception handling needed - CSRF is already disabled in middleware
     })->create();
