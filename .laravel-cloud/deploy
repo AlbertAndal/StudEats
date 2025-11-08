@@ -46,6 +46,12 @@ safe_run "php artisan cache:clear"
 safe_run "php artisan route:clear"
 safe_run "rm -rf bootstrap/cache/*.php"
 
+# CRITICAL: Clear all existing sessions with invalid domains
+echo ""
+echo "🗑️ Clearing Invalid Domain Sessions"
+echo "-----------------------------------"
+safe_run "php artisan tinker --execute=\"DB::table('sessions')->truncate(); echo 'All sessions cleared';\""
+
 # Skip the problematic view:clear command entirely
 echo "➤ Skipping view:clear (causes Laravel Cloud deployment failure)"
 echo "  ✅ View cache directory already created above"
@@ -81,6 +87,12 @@ echo "--------------------------------------------"
 safe_run "php artisan config:cache"
 safe_run "php artisan route:cache"
 echo "➤ Skipping view:cache (view directory might not be stable)"
+
+# CRITICAL: Generate fresh application key for CSRF tokens
+echo ""
+echo "🔑 Application Key & CSRF Setup"
+echo "-------------------------------"
+safe_run "php artisan key:generate --force"
 
 # CRITICAL: Session health check
 echo ""

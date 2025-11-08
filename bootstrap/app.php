@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust all proxies for Laravel Cloud
+        $middleware->trustProxies(at: '*');
+        
         // Replace the default CSRF middleware with our more lenient version
         $middleware->replace(
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
