@@ -4,6 +4,11 @@ echo "Running post-deployment migrations..."
 php artisan migrate --force --no-interaction
 echo "Migrations complete!"
 
+# Seed PDRI reference data
+echo "Seeding PDRI reference data..."
+php artisan db:seed --class=PdriReferenceSeeder --force --no-interaction
+echo "PDRI data seeded!"
+
 # Create storage symlink
 echo "Creating storage symlink..."
 php artisan storage:link --force

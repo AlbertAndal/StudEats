@@ -22,7 +22,10 @@ if [ -z "$APP_KEY" ]; then
 fi
 
 # Run migrations (be careful with this in production)
-# php artisan migrate --force
+php artisan migrate --force
+
+# Seed PDRI reference data
+php artisan db:seed --class=PdriReferenceSeeder --force
 
 # Cache for production
 php artisan config:cache

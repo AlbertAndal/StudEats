@@ -6,6 +6,10 @@ echo "=== Laravel Cloud Deployment ==="
 echo "Running migrations..."
 php artisan migrate --force
 
+# Seed PDRI reference data
+echo "Seeding PDRI reference data..."
+php artisan db:seed --class=PdriReferenceSeeder --force
+
 # Create storage symlink
 echo "Creating storage symlink..."
 php artisan storage:link --force
