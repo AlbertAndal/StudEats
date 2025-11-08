@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# Laravel Cloud Deployment Hook - StudEats
+# Laravel Cloud Deployment Hook - StudEats CSRF Session Fix
 # This script runs automatically during Laravel Cloud deployment
+# FOCUS: Resolving 419 CSRF Session Expired errors
 
 set -e  # Exit on error, but we'll handle errors gracefully
 
-echo "🚀 StudEats Laravel Cloud Deployment Started"
-echo "============================================"
+echo "🚀 StudEats Laravel Cloud Deployment - CSRF Session Fix"
+echo "========================================================"
 echo "Timestamp: $(date)"
 
 # Function to run commands safely
@@ -36,17 +37,24 @@ echo "---------------------"
 safe_run "chmod -R 755 storage/"
 safe_run "chmod -R 755 bootstrap/cache/"
 
-# Clear caches (skip view:clear to avoid the error)
+# CRITICAL: Complete cache clearing for fresh session configuration
 echo ""
-echo "🧹 Clearing Caches"
-echo "------------------"
+echo "🧹 Complete Cache Clearing (CSRF Fix)"
+echo "------------------------------------"
 safe_run "php artisan config:clear"
 safe_run "php artisan cache:clear"
 safe_run "php artisan route:clear"
+safe_run "rm -rf bootstrap/cache/*.php"
 
 # Skip the problematic view:clear command entirely
 echo "➤ Skipping view:clear (causes Laravel Cloud deployment failure)"
 echo "  ✅ View cache directory already created above"
+
+# CRITICAL: Ensure session table exists and is properly configured
+echo ""
+echo "🔐 Session Configuration (CSRF Fix)"
+echo "-----------------------------------"
+safe_run "php artisan session:table --no-interaction"
 
 # Database operations
 echo ""
@@ -66,28 +74,32 @@ echo "🔗 Storage Link"
 echo "---------------"
 safe_run "php artisan storage:link --force"
 
-# Cache for production (skip view:cache too since view:clear failed)
+# CRITICAL: Cache production configuration with session fixes
 echo ""
-echo "⚡ Production Caching"
-echo "--------------------"
+echo "⚡ Production Caching (Session Configuration)"
+echo "--------------------------------------------"
 safe_run "php artisan config:cache"
 safe_run "php artisan route:cache"
 echo "➤ Skipping view:cache (view directory might not be stable)"
 
-# Final health check
+# CRITICAL: Session health check
 echo ""
-echo "🏥 Health Check"
-echo "---------------"
-echo "➤ Testing database connection..."
-if php artisan tinker --execute="try { DB::connection()->getPdo(); echo 'Database: OK'; } catch(Exception \$e) { echo 'Database: ERROR - ' . \$e->getMessage(); }" 2>/dev/null; then
-    echo "  ✅ Database connection healthy"
-else
-    echo "  ⚠️ Database connection might have issues"
-fi
+echo "🔐 Session Health Check"
+echo "----------------------"
+echo "➤ Testing session configuration..."
+php artisan tinker --execute="
+try { 
+    echo 'Session Driver: ' . config('session.driver');
+    echo 'Session Domain: ' . config('session.domain');
+    echo 'Session Secure: ' . (config('session.secure') ? 'true' : 'false');
+    echo 'Session Lifetime: ' . config('session.lifetime') . ' minutes';
+} catch(Exception \$e) { 
+    echo 'Session Config Error: ' . \$e->getMessage(); 
+}"
 
 echo ""
-echo "✅ StudEats Deployment Complete!"
-echo "================================"
+echo "✅ StudEats Deployment Complete - CSRF Session Fix Applied!"
+echo "==========================================================="
 echo "🌐 Application URL: https://studeats.laravel.cloud"
 echo "🔧 Admin Login: https://studeats.laravel.cloud/admin/login"
 echo ""
@@ -95,5 +107,13 @@ echo "📧 Default Admin Credentials:"
 echo "   Email: admin@studeats.com"
 echo "   Password: admin123"
 echo ""
-echo "⚠️ IMPORTANT: Change admin password after first login!"
+echo "🔐 CSRF SESSION FIXES APPLIED:"
+echo "   ✅ Laravel Cloud compatible session domain (.laravel.cloud)"
+echo "   ✅ HTTPS secure cookies enabled for production"
+echo "   ✅ Session lifetime optimized (4 hours for production)"
+echo "   ✅ Same-site cookie policy set to 'lax'"
+echo "   ✅ Database session driver configured"
+echo "   ✅ Fresh configuration cache without old settings"
+echo ""
+echo "⚠️ IMPORTANT: Test login immediately after deployment!"
 echo ""

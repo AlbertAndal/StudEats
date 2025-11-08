@@ -11,6 +11,7 @@
       "php artisan config:clear || echo 'Config clear skipped'",
       "php artisan cache:clear || echo 'Cache clear skipped'", 
       "php artisan route:clear || echo 'Route clear skipped'",
+      "php artisan session:table --no-interaction || echo 'Session table already exists'",
       "php artisan migrate --force --no-interaction",
       "php artisan storage:link --force || echo 'Storage link skipped'",
       "php artisan db:seed --class=AdminSeeder --force || echo 'Admin seeder skipped'",
@@ -19,6 +20,13 @@
       "php artisan route:cache"
     ],
     "timeout": 600
+  },
+  "environment": {
+    "SESSION_DOMAIN": ".laravel.cloud",
+    "SESSION_SECURE_COOKIE": "true", 
+    "SESSION_SAME_SITE": "lax",
+    "SESSION_PARTITIONED_COOKIE": "false",
+    "SESSION_LIFETIME": "240"
   },
   "schedule": {
     "commands": [
