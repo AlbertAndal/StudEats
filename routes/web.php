@@ -319,3 +319,29 @@ Route::post('/csrf-test', function (Request $request) {
         'csrf_token' => $request->input('_token')
     ]);
 })->name('csrf.test.submit');
+
+// TEMPORARY DEBUG ROUTE - REMOVE AFTER TESTING
+Route::get('/debug-cookies', function () {
+    $cookies = request()->cookies->all();
+    $sessionConfig = [
+        'cookie_name' => config('session.cookie'),
+        'domain' => config('session.domain'),
+        'secure' => config('session.secure'),
+        'same_site' => config('session.same_site'),
+        'partitioned' => config('session.partitioned'),
+        'app_env' => config('app.env'),
+        'app_url' => config('app.url'),
+    ];
+    
+    return response()->json([
+        'session_config' => $sessionConfig,
+        'received_cookies' => array_keys($cookies),
+        'cookie_details' => $cookies,
+        'session_id' => session()->getId(),
+        'csrf_token' => csrf_token(),
+        'current_domain' => request()->getHost(),
+        'is_secure' => request()->isSecure(),
+        'user_agent' => request()->userAgent(),
+        'headers' => request()->headers->all(),
+    ]);
+})->middleware('web');
