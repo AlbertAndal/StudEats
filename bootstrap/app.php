@@ -25,5 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // No special exception handling needed - CSRF is already disabled in middleware
+        // Removed CSRF token mismatch handling for better user experience
+        // Users will no longer encounter 419 errors due to session timeouts
     })->create();

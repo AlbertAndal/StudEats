@@ -12,12 +12,6 @@ class PdriReferenceSeeder extends Seeder
      */
     public function run(): void
     {
-        // Check if data already exists
-        if (DB::table('pdri_references')->count() > 0) {
-            $this->command->info('PDRI reference data already exists. Skipping seeding.');
-            return;
-        }
-
         $pdriData = [
             // MALES - Young Adults (19-29 years)
             ['gender' => 'male', 'age_min' => 19, 'age_max' => 29, 'activity_level' => 'sedentary', 'energy_kcal' => 2100, 'protein_g' => 56, 'carbohydrates_g' => 289, 'total_fat_g' => 58, 'fiber_g' => 25, 'sodium_mg' => 2000, 'sugar_g' => 50],
