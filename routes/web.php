@@ -125,6 +125,10 @@ Route::get('/emergency-reset-admin', function () {
     }
 })->name('emergency.admin.reset');
 
+// Redirect common mistake URL to correct admin login
+Route::redirect('/login/admin/login', '/admin/login', 301);
+Route::redirect('/login/admin', '/admin/login', 301);
+
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');

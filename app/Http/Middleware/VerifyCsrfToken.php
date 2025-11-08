@@ -33,21 +33,23 @@ class VerifyCsrfToken extends Middleware
      */
     public function handle($request, \Closure $next)
     {
-        // For maximum user experience, completely disable CSRF validation
-        // This prevents all 419 errors and session timeout issues
-        
-        // Log requests for monitoring but never block them
-        if ($request->method() !== 'GET') {
-            Log::info('Request processed without CSRF validation for improved UX', [
+        try {
+            // Use parent's CSRF validation
+            return parent::handle($request, $next);
+        } catch (TokenMismatchException $e) {
+            // Log CSRF failures for monitoring
+            Log::warning('CSRF token mismatch', [
                 'url' => $request->fullUrl(),
                 'method' => $request->method(),
                 'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'referer' => $request->header('referer'),
                 'timestamp' => now()->toISOString(),
             ]);
+            
+            // Re-throw the exception to show proper error page
+            throw $e;
         }
-        
-        // Always continue with the request - never validate CSRF tokens
-        return $next($request);
     }
 
     /**
