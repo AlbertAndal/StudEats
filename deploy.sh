@@ -24,8 +24,8 @@ fi
 # Run migrations (be careful with this in production)
 php artisan migrate --force
 
-# Seed PDRI reference data
-php artisan db:seed --class=PdriReferenceSeeder --force
+# Seed PDRI reference data (ignore if already exists)
+php artisan db:seed --class=PdriReferenceSeeder --force || echo "PDRI data already exists"
 
 # Cache for production
 php artisan config:cache
