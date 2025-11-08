@@ -195,9 +195,18 @@ Comprehensive documentation is available in the `/docs` directory:
 - **[Setup Guide](docs/email-configuration-fix.md)** - Detailed setup instructions
 - **[Admin Guide](docs/admin-dashboard-guide.md)** - Administrative features
 - **[API Documentation](docs/analytics-implementation-summary.md)** - API integration guides
-- **[Deployment Guide](docs/RENDER-ENV-FIX.md)** - Cloud deployment instructions
+
+### 🚨 Deployment & Troubleshooting
+
+#### Laravel Cloud
+- **[500 Error Analysis](LARAVEL-CLOUD-500-ERROR-ANALYSIS.md)** - Root cause & resolution
+- **[Troubleshooting Guide](LARAVEL-CLOUD-500-ERROR-FIX.md)** - Detailed fix instructions
+- **[Deployment Checklist](LARAVEL-CLOUD-DEPLOYMENT-CHECKLIST.md)** - Step-by-step deployment
+
+#### Render.com
 - **[500 Error Fix](RENDER-500-ERROR-SOLUTION.md)** - Immediate solution: APP_KEY issue
 - **[Troubleshooting Guide](RENDER-DEPLOYMENT-TROUBLESHOOTING.md)** - Complete deployment guide
+- **[Environment Guide](docs/RENDER-ENV-FIX.md)** - Environment configuration
 
 ### Key Documentation Files:
 - 📧 [Email System](docs/email-confirmation-system.md)
