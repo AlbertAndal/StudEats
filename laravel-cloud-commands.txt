@@ -1,0 +1,22 @@
+# Laravel Cloud Deploy Commands
+# These are the individual commands to run in Laravel Cloud dashboard
+
+# 1. Run migrations
+php artisan migrate --force
+
+# 2. Seed PDRI reference data
+php artisan db:seed --class=PdriReferenceSeeder --force
+
+# 3. Create storage symlink
+php artisan storage:link --force
+
+# 4. Set up admin account
+php artisan db:seed --class=AdminSeeder --force
+
+# 5. Clear and cache config
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# All in one line (for copy-paste):
+# php artisan migrate --force && php artisan db:seed --class=PdriReferenceSeeder --force && php artisan storage:link --force && php artisan db:seed --class=AdminSeeder --force && php artisan config:cache && php artisan route:cache && php artisan view:cache
