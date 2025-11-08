@@ -130,6 +130,10 @@ Route::get('/emergency-reset-admin', function () {
 Route::redirect('/login/admin/login', '/admin/login', 301);
 Route::redirect('/login/admin', '/admin/login', 301);
 
+// Standalone Admin Registration (accessible without auth)
+Route::get('/admin/register-new', [\App\Http\Controllers\Admin\AdminRegistrationController::class, 'showStandaloneRegistrationForm'])->name('admin.register.standalone');
+Route::post('/admin/register-new', [\App\Http\Controllers\Admin\AdminRegistrationController::class, 'standaloneRegister'])->name('admin.register.standalone.submit');
+
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
