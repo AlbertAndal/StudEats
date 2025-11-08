@@ -80,13 +80,13 @@
             fetch('/api/csrf-token', {
                 method: 'GET',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 credentials: 'same-origin'
             })
             .then(response => {
+                console.log('Response status:', response.status);
                 if (response.ok) {
                     return response.json();
                 } else {
@@ -94,11 +94,18 @@
                 }
             })
             .then(data => {
+                console.log('Received data:', data);
+                
+                if (!data || !data.csrf_token) {
+                    throw new Error('CSRF token not found in response');
+                }
+                
                 result.innerHTML = `<span class="text-green-600">✅ Success! Token: ${data.csrf_token.substring(0, 10)}...</span>`;
                 button.textContent = 'Test AJAX with CSRF';
                 button.disabled = false;
             })
             .catch(error => {
+                console.error('AJAX Error:', error);
                 result.innerHTML = `<span class="text-red-600">❌ Error: ${error.message}</span>`;
                 button.textContent = 'Test AJAX with CSRF';
                 button.disabled = false;
@@ -114,10 +121,25 @@
             
             fetch('/api/csrf-token', {
                 method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
                 credentials: 'same-origin'
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Token refresh data:', data);
+                
+                if (!data || !data.csrf_token) {
+                    throw new Error('CSRF token not found');
+                }
+                
                 // Update meta tag
                 document.querySelector('meta[name="csrf-token"]').setAttribute('content', data.csrf_token);
                 
@@ -140,8 +162,13 @@
             })
             .catch(error => {
                 console.error('Failed to refresh token:', error);
-                button.textContent = 'Refresh CSRF Token';
-                button.disabled = false;
+                button.textContent = 'Failed - Try Again';
+                button.className = button.className.replace('bg-purple-600 hover:bg-purple-700', 'bg-red-600 hover:bg-red-700');
+                setTimeout(() => {
+                    button.textContent = 'Refresh CSRF Token';
+                    button.className = button.className.replace('bg-red-600 hover:bg-red-700', 'bg-purple-600 hover:bg-purple-700');
+                    button.disabled = false;
+                }, 2000);
             });
         }
     </script>

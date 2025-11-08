@@ -12,6 +12,7 @@ use App\Http\Controllers\MealPlanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Controllers\RecipeController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Welcome page
@@ -308,3 +309,13 @@ Route::get('/debug-deployment', function () {
 Route::get('/csrf-test', function () {
     return view('csrf-test');
 })->name('csrf.test');
+
+// CSRF Test Form Submission
+Route::post('/csrf-test', function (Request $request) {
+    return view('csrf-test-success', [
+        'name' => $request->input('name'),
+        'email' => $request->input('email'),
+        'message' => $request->input('message'),
+        'csrf_token' => $request->input('_token')
+    ]);
+})->name('csrf.test.submit');
