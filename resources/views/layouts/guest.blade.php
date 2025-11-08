@@ -21,8 +21,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    <!-- Fallback CSS for production if Vite assets fail to load -->
-    @if(app()->environment('production'))
+    <!-- Fallback CSS if Vite assets fail to load -->
     <script>
         // Check if Vite CSS loaded, if not load Tailwind from CDN
         window.addEventListener('DOMContentLoaded', function() {
@@ -39,10 +38,30 @@
                 const fallback = document.createElement('script');
                 fallback.src = 'https://cdn.tailwindcss.com';
                 document.head.appendChild(fallback);
+                
+                // Add basic styling for immediate visual feedback
+                const style = document.createElement('style');
+                style.textContent = `
+                    body { font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; }
+                    .min-h-screen { min-height: 100vh; }
+                    .grid { display: grid; }
+                    .md\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                    .flex { display: flex; }
+                    .items-center { align-items: center; }
+                    .justify-center { justify-content: center; }
+                    .bg-green-600 { background-color: #059669; }
+                    .text-white { color: #ffffff; }
+                    .rounded-md { border-radius: 0.375rem; }
+                    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+                    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+                    .w-full { width: 100%; }
+                    .max-w-md { max-width: 28rem; }
+                    .mx-auto { margin-left: auto; margin-right: auto; }
+                `;
+                document.head.appendChild(style);
             }
         });
     </script>
-    @endif
 </head>
 <body class="font-sans antialiased bg-background text-foreground">
     <div class="min-h-screen flex flex-col">

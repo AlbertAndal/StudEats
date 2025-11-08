@@ -206,6 +206,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Include CSRF Manager -->
 <script src="<?php echo e(asset('js/csrf-manager.js')); ?>"></script>
 
+<!-- Include Cache Manager -->
+<script src="<?php echo e(asset('js/cache-manager.js')); ?>"></script>
+
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.guest', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\StudEats\resources\views/auth/admin-login.blade.php ENDPATH**/ ?>

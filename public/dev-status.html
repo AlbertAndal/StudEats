@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudEats Asset Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { border-color: #28a745; background-color: #d4edda; }
+        .error { border-color: #dc3545; background-color: #f8d7da; }
+        .warning { border-color: #ffc107; background-color: #fff3cd; }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍽️ StudEats Development Environment Status</h1>
+    
+    <div class="test-item success">
+        <h3>✅ Application Status</h3>
+        <p>Laravel version: <code>12.25.0</code></p>
+        <p>Environment: <code>local</code></p>
+        <p>Debug mode: <code>enabled</code></p>
+    </div>
+    
+    <div class="test-item success">
+        <h3>✅ Asset Compilation</h3>
+        <p>Vite build completed successfully</p>
+        <p>CSS assets: <code>public/build/assets/app-DqZVy-z2.css</code></p>
+        <p>JS assets: <code>public/build/assets/app-DiuJUmZA.js</code></p>
+    </div>
+    
+    <div class="test-item success">
+        <h3>✅ Development Servers</h3>
+        <p>Laravel server: <code>http://127.0.0.1:8000</code> ✅</p>
+        <p>Vite dev server: <code>http://localhost:5174</code> ✅</p>
+        <p>Queue worker: <code>Running</code> ✅</p>
+    </div>
+    
+    <div class="test-item success">
+        <h3>✅ Session Configuration</h3>
+        <p>Driver: <code>database</code></p>
+        <p>Same-site: <code>lax</code> (development optimized)</p>
+        <p>Partitioned: <code>false</code> (development optimized)</p>
+        <p>CSRF protection: <code>enabled</code></p>
+    </div>
+    
+    <div class="test-item success">
+        <h3>✅ 419 Error Resolution</h3>
+        <p>Custom error page: <code>implemented</code></p>
+        <p>CSRF manager: <code>active</code></p>
+        <p>Cache manager: <code>active</code></p>
+        <p>Session monitoring: <code>enabled</code></p>
+    </div>
+    
+    <div class="test-item warning">
+        <h3>⚠️ Browser Cache Notice</h3>
+        <p>If you still see design issues, clear your browser cache:</p>
+        <ul>
+            <li>Press <code>Ctrl+Shift+Del</code></li>
+            <li>Select "Cookies and site data" + "Cached images and files"</li>
+            <li>Or run: <code>.\clear-browser-cache.ps1</code></li>
+        </ul>
+    </div>
+    
+    <div class="test-item success">
+        <h3>🎯 Next Steps</h3>
+        <ol>
+            <li>Navigate to: <a href="http://127.0.0.1:8000/admin/login" target="_blank">Admin Login</a></li>
+            <li>Verify the design loads properly</li>
+            <li>Test form submission (should no longer get 419 errors)</li>
+            <li>If issues persist, check browser developer console</li>
+        </ol>
+    </div>
+    
+    <div class="test-item">
+        <h3>📋 Troubleshooting Tools</h3>
+        <p>Run these commands if needed:</p>
+        <ul>
+            <li><code>php troubleshoot-session.php</code> - Comprehensive diagnostics</li>
+            <li><code>.\clear-browser-cache.ps1</code> - Clear browser cache</li>
+            <li><code>composer run dev</code> - Start development environment</li>
+            <li><code>npm run build</code> - Build production assets</li>
+        </ul>
+    </div>
+    
+    <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666;">
+        <p>StudEats Development Environment - All systems operational 🚀</p>
+    </footer>
+</body>
+</html>

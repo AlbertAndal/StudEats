@@ -180,4 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Include CSRF Manager -->
 <script src="{{ asset('js/csrf-manager.js') }}"></script>
 
+<!-- Include Cache Manager -->
+<script src="{{ asset('js/cache-manager.js') }}"></script>
+
 @endsection

@@ -22,7 +22,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             'no.super.admin' => \App\Http\Middleware\RestrictSuperAdminToUserInterface::class,
+            'session.monitor' => \App\Http\Middleware\SessionMonitorMiddleware::class,
         ]);
+        
+        // Add session monitoring to web routes in development
+        if (env('APP_ENV', 'production') === 'local') {
+            $middleware->appendToGroup('web', \App\Http\Middleware\SessionMonitorMiddleware::class);
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Removed CSRF token mismatch handling for better user experience
