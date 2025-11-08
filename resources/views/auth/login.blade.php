@@ -36,6 +36,9 @@
                 <span class="text-xl font-semibold">StudEats</span>
             </div>
 
+            <!-- CSRF Error Alert -->
+            @include('components.csrf-error-alert')
+
             <!-- Session Status -->
             @if (session('status'))
                 <div class="mb-6 rounded-md border border-green-200 bg-green-50 p-4">

@@ -303,3 +303,8 @@ Route::get('/debug-deployment', function () {
         'timestamp' => now()->toISOString()
     ]);
 });
+
+// CSRF Test Page (for development and testing)
+Route::get('/csrf-test', function () {
+    return view('csrf-test');
+})->name('csrf.test');

@@ -50,6 +50,9 @@
                 <p class="mt-1 text-sm text-muted-foreground">Access the administrative dashboard</p>
             </div>
 
+            <!-- CSRF Error Alert -->
+            @include('components.csrf-error-alert')
+
             <!-- Alert Message -->
             @if (session('error'))
                 <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-3">

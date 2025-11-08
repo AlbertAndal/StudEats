@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -34,6 +35,15 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // Removed CSRF token mismatch handling for better user experience
-        // Users will no longer encounter 419 errors due to session timeouts
+        // Handle CSRF token mismatch exceptions with a user-friendly response
+        $exceptions->respond(function (Response $response) {
+            if ($response->getStatusCode() === 419) {
+                return back()->with([
+                    'error' => 'The page expired due to inactivity. Please try again.',
+                    'csrf_error' => true
+                ])->withInput();
+            }
+
+            return $response;
+        });
     })->create();

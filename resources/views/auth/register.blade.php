@@ -42,6 +42,9 @@
                 <p class="mt-1 text-sm text-muted-foreground">Join StudEats and start planning balanced meals.</p>
             </div>
 
+            <!-- CSRF Error Alert -->
+            @include('components.csrf-error-alert')
+
                     <!-- Registration Form -->
                 <form action="{{ route('register') }}" method="POST" class="space-y-5">
                     @csrf
