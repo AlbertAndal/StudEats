@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geist Font Implementation Test - StudEats</title>
     
-    <!-- Geist Font - Comprehensive weights -->
+    <!-- Geist Font - Comprehensive weights with npm fallback -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -140,7 +140,7 @@
     </div>
 
     <script>
-        // Check if Geist font is loaded
+        // Enhanced font loading detection
         document.fonts.ready.then(() => {
             const testElement = document.createElement('span');
             testElement.style.fontFamily = 'Geist, sans-serif';
@@ -150,14 +150,55 @@
             const computedFont = window.getComputedStyle(testElement).fontFamily;
             console.log('Computed font family:', computedFont);
             
-            if (computedFont.includes('Geist')) {
-                console.log('✅ Geist font successfully loaded');
+            // Test font loading from different sources
+            const googleFontsLoaded = computedFont.includes('Geist');
+            const fallbackActive = computedFont.includes('system-ui') || computedFont.includes('sans-serif');
+            
+            // Create status indicator
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50';
+            
+            if (googleFontsLoaded) {
+                statusDiv.className += ' bg-green-100 border border-green-300 text-green-800';
+                statusDiv.innerHTML = '✅ Google Fonts Geist loaded successfully';
+                console.log('✅ Geist font successfully loaded from Google Fonts');
+            } else if (fallbackActive) {
+                statusDiv.className += ' bg-yellow-100 border border-yellow-300 text-yellow-800';
+                statusDiv.innerHTML = '⚠️ Using fallback fonts (Google Fonts failed)';
+                console.log('⚠️ Using fallback fonts - Google Fonts may be blocked');
             } else {
-                console.log('❌ Geist font not loaded, using fallback');
+                statusDiv.className += ' bg-red-100 border border-red-300 text-red-800';
+                statusDiv.innerHTML = '❌ Font loading failed';
+                console.log('❌ Geist font not loaded, using default system fonts');
             }
             
+            document.body.appendChild(statusDiv);
+            
+            // Test npm package availability
+            fetch('/build/assets/geist.css').then(response => {
+                if (response.ok) {
+                    console.log('✅ Local Geist npm package available as fallback');
+                } else {
+                    console.log('⚠️ Local Geist npm package not found in build');
+                }
+            }).catch(() => {
+                console.log('ℹ️ Local Geist check skipped (expected for Google Fonts primary)');
+            });
+            
             document.body.removeChild(testElement);
+            
+            // Remove status after 5 seconds
+            setTimeout(() => {
+                if (statusDiv.parentNode) {
+                    statusDiv.parentNode.removeChild(statusDiv);
+                }
+            }, 5000);
         });
+        
+        // Test network connectivity to Google Fonts
+        fetch('https://fonts.googleapis.com/css2?family=Geist:wght@400&display=swap', { mode: 'no-cors' })
+            .then(() => console.log('✅ Google Fonts API accessible'))
+            .catch(() => console.log('❌ Google Fonts API not accessible'));
     </script>
 </body>
 </html>

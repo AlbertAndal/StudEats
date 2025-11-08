@@ -287,6 +287,11 @@ Route::get('/spinner-test', function () {
     return view('spinner-test');
 })->name('spinner.test');
 
+// Font Loading Test
+Route::get('/font-test', function () {
+    return view('font-test');
+})->name('font.test');
+
 // Laravel Cloud Debug Route (remove after use)
 Route::get('/debug-deployment', function () {
     return response()->json([

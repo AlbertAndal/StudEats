@@ -66,6 +66,12 @@ echo "⚡ Optimizing for production..."
 run_command "php artisan config:cache"
 run_command "php artisan route:cache"
 
+# Clear caches one more time to ensure session config is fresh
+echo ""
+echo "🔄 Final cache refresh for session configuration..."
+run_command "php artisan config:clear"
+run_command "php artisan config:cache"
+
 # Only cache views if we can clear them successfully
 if php artisan view:clear > /dev/null 2>&1; then
     run_command "php artisan view:cache"

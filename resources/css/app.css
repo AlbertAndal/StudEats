@@ -3,10 +3,43 @@
 @import "./loading-indicator.css";
 @import "./loading-buttons.css";
 
+/* Local Geist font fallback - will be loaded by layouts */
+@font-face {
+  font-family: 'Geist Local';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Geist'), local('Geist-Regular');
+}
+
+@font-face {
+  font-family: 'Geist Local';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Geist Medium'), local('Geist-Medium');
+}
+
+@font-face {
+  font-family: 'Geist Local';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Geist SemiBold'), local('Geist-SemiBold');
+}
+
+@font-face {
+  font-family: 'Geist Local';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Geist Bold'), local('Geist-Bold');
+}
+
 /* Migrated variables from deprecated @theme at-rules into :root */
 
 :root {
-    --font-sans: 'Geist', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Geist', 'Geist Local', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
@@ -119,7 +152,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: 'Geist', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif !important;
+    font-family: 'Geist', 'Geist Local', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif !important;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -130,6 +163,6 @@
   /* Ensure font consistency across all elements */
   h1, h2, h3, h4, h5, h6,
   .font-sans {
-    font-family: 'Geist', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif !important;
+    font-family: 'Geist', 'Geist Local', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif !important;
   }
 }

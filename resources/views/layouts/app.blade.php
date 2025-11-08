@@ -11,12 +11,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Geist Font - Comprehensive weights for consistent typography -->
+    <!-- Geist Font - Optimized loading with display swap -->
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Preload critical font weights for faster rendering -->
-    <link rel="preload" href="https://fonts.gstatic.com/s/geist/v1/gyB-hkdavoI.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://fonts.gstatic.com/s/geist/v1/gyB4hkdavoI.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Local Geist fallback via npm package -->
+    <style>
+        @font-face {
+            font-family: 'Geist Fallback';
+            src: local('Geist'), local('system-ui'), local('-apple-system');
+            font-display: swap;
+        }
+    </style>
 
     <!-- Intro.js CSS -->
     <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
