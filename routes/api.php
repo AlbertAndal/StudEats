@@ -23,6 +23,7 @@ ned to the "api" middleware group. Make something great!
 Route::get('/csrf-token', [SessionController::class, 'getCsrfToken'])->name('api.csrf-token');
 Route::get('/session-check', [SessionController::class, 'checkSession'])->name('api.session-check');
 Route::post('/session-refresh', [SessionController::class, 'refreshSession'])->name('api.session-refresh');
+Route::post('/csrf-validate', [SessionController::class, 'validateToken'])->name('api.csrf-validate');
 
 // Nutrition calculation API (no auth required for better UX)
 Route::post('/nutrition/calculate', [NutritionController::class, 'calculate'])->name('api.nutrition.calculate');
