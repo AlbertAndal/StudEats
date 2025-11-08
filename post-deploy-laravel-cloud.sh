@@ -1,0 +1,94 @@
+#!/bin/bash
+# Laravel Cloud Deployment Hook
+# This script runs during Laravel Cloud deployment to ensure proper setup
+
+set -e  # Exit on any error, but with proper error handling
+
+echo "🚀 Laravel Cloud Post-Deploy Hook Starting..."
+echo "Timestamp: $(date)"
+
+# Function to run commands with error handling
+run_command() {
+    echo "Running: $1"
+    if eval $1; then
+        echo "✅ Success: $1"
+    else
+        echo "⚠️ Warning: $1 failed, continuing..."
+    fi
+}
+
+# Clear caches individually with error handling
+echo ""
+echo "📦 Clearing application caches..."
+run_command "php artisan config:clear"
+run_command "php artisan cache:clear"
+run_command "php artisan route:clear"
+
+# Handle view:clear separately since it can fail on fresh deployments
+echo ""
+echo "🗂️ Clearing view cache..."
+if [ -d "storage/framework/views" ]; then
+    run_command "php artisan view:clear"
+else
+    echo "⚠️ Views directory doesn't exist, creating it..."
+    mkdir -p storage/framework/views
+    chmod 755 storage/framework/views
+fi
+
+# Ensure critical directories exist
+echo ""
+echo "📁 Ensuring critical directories exist..."
+mkdir -p storage/framework/cache
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/logs
+chmod -R 755 storage/
+
+# Run migrations
+echo ""
+echo "🗄️ Running migrations..."
+run_command "php artisan migrate --force --no-interaction"
+
+# Create storage link
+echo ""
+echo "🔗 Creating storage symlink..."
+run_command "php artisan storage:link --force"
+
+# Seed essential data
+echo ""
+echo "🌱 Seeding essential data..."
+run_command "php artisan db:seed --class=AdminSeeder --force"
+run_command "php artisan db:seed --class=PdriReferenceSeeder --force"
+
+# Optimize for production
+echo ""
+echo "⚡ Optimizing for production..."
+run_command "php artisan config:cache"
+run_command "php artisan route:cache"
+
+# Only cache views if we can clear them successfully
+if php artisan view:clear > /dev/null 2>&1; then
+    run_command "php artisan view:cache"
+else
+    echo "⚠️ Skipping view cache due to clearing issues"
+fi
+
+# Final health check
+echo ""
+echo "🏥 Health check..."
+if php artisan tinker --execute="echo 'Database connection: '; try { DB::connection()->getPdo(); echo 'OK'; } catch(Exception \$e) { echo 'FAILED'; }" 2>/dev/null; then
+    echo "✅ Database connection healthy"
+else
+    echo "❌ Database connection issues detected"
+fi
+
+echo ""
+echo "✅ Laravel Cloud deployment completed successfully!"
+echo "🌐 Application ready at: https://studeats.laravel.cloud"
+echo ""
+echo "📧 Admin Login:"
+echo "   URL: https://studeats.laravel.cloud/admin/login"
+echo "   Email: admin@studeats.com"
+echo "   Password: admin123"
+echo ""
+echo "⚠️ IMPORTANT: Change admin password after first login!"
