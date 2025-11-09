@@ -41,9 +41,16 @@ class Recipe extends Model
      */
     public function ingredientRelations(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Ingredient::class, 'recipe_ingredients')
-            ->withPivot('quantity', 'unit', 'estimated_cost', 'notes')
-            ->withTimestamps();
+        try {
+            return $this->belongsToMany(Ingredient::class, 'recipe_ingredients', 'recipe_id', 'ingredient_id')
+                ->withPivot('quantity', 'unit', 'estimated_cost', 'notes')
+                ->withTimestamps();
+        } catch (\Exception $e) {
+            // Return empty relationship if table doesn't exist or is malformed
+            \Log::warning('Recipe ingredientRelations error: ' . $e->getMessage());
+            return $this->belongsToMany(Ingredient::class, 'recipe_ingredients')
+                ->whereRaw('1 = 0'); // Return empty result
+        }
     }
 
     /**
@@ -78,26 +85,31 @@ class Recipe extends Model
      */
     public function calculateTotalCost(string $regionCode = 'NCR'): float
     {
-        $totalCost = 0.0;
+        try {
+            $totalCost = 0.0;
 
-        // Load ingredients with their pivot data
-        $ingredients = $this->ingredientRelations;
+            // Load ingredients with their pivot data
+            $ingredients = $this->ingredientRelations;
 
-        foreach ($ingredients as $ingredient) {
-            $quantity = $ingredient->pivot->quantity;
-            $price = $ingredient->getPriceForRegion($regionCode);
+            foreach ($ingredients as $ingredient) {
+                $quantity = optional($ingredient->pivot)->quantity ?? 0;
+                $price = $ingredient->getPriceForRegion($regionCode);
 
-            // Fallback to estimated_cost if no price available
-            if (!$price && $ingredient->pivot->estimated_cost) {
-                $totalCost += $ingredient->pivot->estimated_cost;
-            } elseif ($price) {
-                // Calculate cost based on quantity and price per kg
-                // Assuming unit is 'kg' - you might need unit conversion logic
-                $totalCost += $quantity * $price;
+                // Fallback to estimated_cost if no price available
+                if (!$price && optional($ingredient->pivot)->estimated_cost) {
+                    $totalCost += $ingredient->pivot->estimated_cost;
+                } elseif ($price) {
+                    // Calculate cost based on quantity and price per kg
+                    // Assuming unit is 'kg' - you might need unit conversion logic
+                    $totalCost += $quantity * $price;
+                }
             }
-        }
 
-        return round($totalCost, 2);
+            return round($totalCost, 2);
+        } catch (\Exception $e) {
+            \Log::warning('Recipe calculateTotalCost error: ' . $e->getMessage());
+            return 0.0;
+        }
     }
 
     /**

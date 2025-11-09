@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('recipe_ingredients', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('recipe_id')->constrained('recipes')->onDelete('cascade');
+            $table->foreignId('ingredient_id')->constrained('ingredients')->onDelete('cascade');
+            $table->decimal('quantity', 10, 2)->default(0);
+            $table->string('unit', 50)->default('g');
+            $table->decimal('estimated_cost', 10, 2)->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
+            
+            // Prevent duplicate entries
+            $table->unique(['recipe_id', 'ingredient_id']);
         });
     }
 
