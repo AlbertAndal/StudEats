@@ -45,9 +45,18 @@ class Meal extends Model
             return $this->image_path;
         }
 
-        // For production (Laravel Cloud) and local environments
-        // Simply use asset() helper which works everywhere
-        return asset('storage/' . $this->image_path);
+        // Use Storage facade for production compatibility (Laravel Cloud)
+        try {
+            return Storage::disk('public')->url($this->image_path);
+        } catch (\Exception $e) {
+            \Log::warning('Failed to generate storage URL for meal image', [
+                'meal_id' => $this->id,
+                'image_path' => $this->image_path,
+                'error' => $e->getMessage()
+            ]);
+            // Fallback to asset helper
+            return asset('storage/' . $this->image_path);
+        }
     }
 
     /**
