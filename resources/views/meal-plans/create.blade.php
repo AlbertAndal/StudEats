@@ -303,10 +303,11 @@
                                         <div class="relative mb-3">
                                             @if($meal->image_path)
                                                 <div class="w-full h-32 bg-gray-100 rounded-md overflow-hidden group-hover:shadow-md transition-shadow duration-300">
-                                                    <img src="{{ asset('storage/' . $meal->image_path) }}" 
+                                                    <img src="{{ $meal->image_url }}" 
                                                          alt="{{ $meal->name }}" 
                                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                         loading="lazy">
+                                                         loading="lazy"
+                                                         onerror="this.src='{{ asset('images/placeholder-meal.jpg') }}'">
                                                 </div>
                                             @else
                                                 <div class="w-full h-32 bg-gradient-to-br from-green-100 to-blue-100 rounded-md flex items-center justify-center group-hover:shadow-md transition-shadow duration-300">

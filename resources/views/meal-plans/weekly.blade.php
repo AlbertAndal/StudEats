@@ -127,7 +127,7 @@
                                     <!-- Meal Image -->
                                     @if($mealImage)
                                         <div class="mb-1.5 rounded overflow-hidden">
-                                            <img src="{{ asset('storage/' . $mealImage) }}" 
+                                            <img src="{{ $mealPlan->meal->image_url }}" 
                                                  alt="{{ $mealPlan->meal->name }}"
                                                  class="w-full h-24 object-cover"
                                                  loading="lazy">

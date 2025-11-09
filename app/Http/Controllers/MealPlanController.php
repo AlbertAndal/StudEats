@@ -51,31 +51,70 @@ class MealPlanController extends Controller
      */
     public function create()
     {
-        $user = Auth::user();
-        $userBMICategory = $user->getBMICategory();
+        try {
+            $user = Auth::user();
+                    
+            // Safely get BMI category with fallback
+            $userBMICategory = 'normal'; // Default fallback
+            try {
+                if ($user->height && $user->weight && $user->height > 0 && $user->weight > 0) {
+                    $userBMICategory = $user->getBMICategory();
+                }
+            } catch (\Exception $e) {
+                \Log::warning('BMI calculation failed for user: ' . $user->id, [
+                    'error' => $e->getMessage()
+                ]);
+            }
 
-        $mealsQuery = Meal::with(['nutritionalInfo', 'recipe'])
-            ->withinBudget($user->daily_budget ?? 500)
-            ->forBMICategory($userBMICategory);
+            $mealsQuery = Meal::with(['nutritionalInfo', 'recipe'])
+                ->withinBudget($user->daily_budget ?? 500);
 
-        // Filter by meal type if specified
-        if (request('meal_type')) {
-            $mealsQuery->byMealType(request('meal_type'));
+            // Safely apply BMI filtering
+            try {
+                $mealsQuery->forBMICategory($userBMICategory);
+            } catch (\Exception $e) {
+                \Log::warning('BMI category filtering failed: ' . $e->getMessage());
+                // Continue without BMI filtering
+            }
+
+            // Filter by meal type if specified
+            if (request('meal_type')) {
+                $mealsQuery->byMealType(request('meal_type'));
+            }
+
+            $meals = $mealsQuery->get();
+
+            // Safely get BMI status
+            $bmiStatus = null;
+            try {
+                if ($user->height && $user->weight && $user->height > 0 && $user->weight > 0) {
+                    $bmiStatus = $user->getBMIStatus();
+                }
+            } catch (\Exception $e) {
+                \Log::warning('BMI status calculation failed for user: ' . $user->id, [
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            // Get existing meal plans for the selected date
+            $selectedDate = request('date', now()->format('Y-m-d'));
+            $existingMealTypes = $user->mealPlans()
+                ->where('scheduled_date', $selectedDate)
+                ->pluck('meal_type')
+                ->toArray();
+
+            return view('meal-plans.create', compact('meals', 'bmiStatus', 'existingMealTypes'));
+                
+        } catch (\Exception $e) {
+            \Log::error('Meal plan create error: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'url' => request()->fullUrl(),
+                'trace' => $e->getTraceAsString()
+            ]);
+                    
+            return redirect()->route('meal-plans.index')
+                ->with('error', 'Unable to load meal selection. Please try again.');
         }
-
-        $meals = $mealsQuery->get();
-
-        // Get user's BMI status for display
-        $bmiStatus = $user->getBMIStatus();
-
-        // Get existing meal plans for the selected date
-        $selectedDate = request('date', now()->format('Y-m-d'));
-        $existingMealTypes = $user->mealPlans()
-            ->where('scheduled_date', $selectedDate)
-            ->pluck('meal_type')
-            ->toArray();
-
-        return view('meal-plans.create', compact('meals', 'bmiStatus', 'existingMealTypes'));
     }
 
     /**
