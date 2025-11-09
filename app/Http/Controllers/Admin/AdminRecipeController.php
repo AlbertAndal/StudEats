@@ -219,11 +219,11 @@ class AdminRecipeController extends Controller
             
             // Recipe fields - new structured format
             'ingredient_names' => 'nullable|array',
-            'ingredient_names.*' => 'required|string|max:100',
+            'ingredient_names.*' => 'nullable|string|max:100',
             'ingredient_quantities' => 'nullable|array',
-            'ingredient_quantities.*' => 'required|numeric|min:0',
+            'ingredient_quantities.*' => 'nullable|numeric|min:0',
             'ingredient_units' => 'nullable|array',
-            'ingredient_units.*' => 'required|string|max:50',
+            'ingredient_units.*' => 'nullable|string|max:50',
             'ingredient_prices' => 'nullable|array',
             'ingredient_prices.*' => 'nullable|numeric|min:0',
             'instructions' => 'nullable|string',
@@ -250,12 +250,15 @@ class AdminRecipeController extends Controller
             $prices = $validated['ingredient_prices'] ?? [];
 
             for ($i = 0; $i < count($names); $i++) {
-                $ingredients[] = [
-                    'name' => $names[$i],
-                    'amount' => $quantities[$i] ?? 0,
-                    'unit' => $units[$i] ?? '',
-                    'price' => $prices[$i] ?? null,
-                ];
+                // Only add ingredient if name is not empty
+                if (!empty($names[$i]) && !empty($units[$i]) && isset($quantities[$i])) {
+                    $ingredients[] = [
+                        'name' => $names[$i],
+                        'amount' => $quantities[$i],
+                        'unit' => $units[$i],
+                        'price' => $prices[$i] ?? null,
+                    ];
+                }
             }
         }
 
