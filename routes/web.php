@@ -177,6 +177,37 @@ Route::get('/storage/{path}', function ($path) {
     ]);
 })->where('path', '.*')->name('storage.serve');
 
+// Debug route for file system analysis
+Route::get('/debug/storage', function () {
+    $data = [
+        'storage_directory_exists' => is_dir(storage_path('app/public')),
+        'meals_directory_exists' => is_dir(storage_path('app/public/meals')),
+        'files_in_meals' => [],
+        'meals_with_images' => [],
+        'storage_permissions' => substr(sprintf('%o', fileperms(storage_path('app/public'))), -4),
+    ];
+    
+    // Get files in meals directory
+    if (is_dir(storage_path('app/public/meals'))) {
+        $files = array_diff(scandir(storage_path('app/public/meals')), ['.', '..']);
+        $data['files_in_meals'] = array_values($files);
+    }
+    
+    // Get meals from database with image paths
+    $meals = \App\Models\Meal::whereNotNull('image_path')->get(['id', 'name', 'image_path']);
+    foreach ($meals as $meal) {
+        $data['meals_with_images'][] = [
+            'id' => $meal->id,
+            'name' => $meal->name,
+            'image_path' => $meal->image_path,
+            'file_exists' => file_exists(storage_path('app/public/' . $meal->image_path)),
+            'generated_url' => $meal->image_url,
+        ];
+    }
+    
+    return response()->json($data, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.storage');
+
 // Logout route
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
