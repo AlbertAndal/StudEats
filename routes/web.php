@@ -130,10 +130,6 @@ Route::get('/emergency-reset-admin', function () {
 Route::redirect('/login/admin/login', '/admin/login', 301);
 Route::redirect('/login/admin', '/admin/login', 301);
 
-// Standalone Admin Registration (accessible without auth)
-Route::get('/admin/register-new', [\App\Http\Controllers\Admin\AdminRegistrationController::class, 'showStandaloneRegistrationForm'])->name('admin.register.standalone');
-Route::post('/admin/register-new', [\App\Http\Controllers\Admin\AdminRegistrationController::class, 'standaloneRegister'])->name('admin.register.standalone.submit');
-
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -197,6 +193,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Dashboard
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/system-health', [AdminDashboardController::class, 'systemHealth'])->name('system-health');
+
+    // Admin Registration (super_admin only)
+    Route::middleware(function ($request, $next) {
+        if (!Auth::user()->isSuperAdmin()) {
+            abort(403, 'Only super admins can create new admin accounts.');
+        }
+        return $next($request);
+    })->group(function () {
+        Route::get('/register-new', [\App\Http\Controllers\Admin\AdminRegistrationController::class, 'showStandaloneRegistrationForm'])->name('register.standalone');
+        Route::post('/register-new', [\App\Http\Controllers\Admin\AdminRegistrationController::class, 'standaloneRegister'])->name('register.standalone.submit');
+    });
 
     // User Management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
