@@ -195,12 +195,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/system-health', [AdminDashboardController::class, 'systemHealth'])->name('system-health');
 
     // Admin Registration (super_admin only)
-    Route::middleware(function ($request, $next) {
-        if (!Auth::user()->isSuperAdmin()) {
-            abort(403, 'Only super admins can create new admin accounts.');
-        }
-        return $next($request);
-    })->group(function () {
+    Route::middleware('super.admin')->group(function () {
         Route::get('/register-new', [\App\Http\Controllers\Admin\AdminRegistrationController::class, 'showStandaloneRegistrationForm'])->name('register.standalone');
         Route::post('/register-new', [\App\Http\Controllers\Admin\AdminRegistrationController::class, 'standaloneRegister'])->name('register.standalone.submit');
     });

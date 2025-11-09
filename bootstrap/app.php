@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             'no.super.admin' => \App\Http\Middleware\RestrictSuperAdminToUserInterface::class,
             'session.monitor' => \App\Http\Middleware\SessionMonitorMiddleware::class,
+            'super.admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
         ]);
         
         // Add session monitoring to web routes in development
