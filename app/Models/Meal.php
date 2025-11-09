@@ -281,17 +281,40 @@ class Meal extends Model
     public function scopeForBMICategory($query, string $bmiCategory)
     {
         // Adjust meal selection based on BMI category
-        return match($bmiCategory) {
-            'underweight' => $query->whereHas('nutritionalInfo', function($q) {
-                $q->where('calories', '>=', 400); // Higher calorie meals
-            }),
-            'obese' => $query->whereHas('nutritionalInfo', function($q) {
-                $q->where('calories', '<=', 350); // Lower calorie meals
-            }),
-            'overweight' => $query->whereHas('nutritionalInfo', function($q) {
-                $q->where('calories', '<=', 400); // Moderate calorie meals
-            }),
-            default => $query // Normal weight - all meals
-        };
+        try {
+            switch($bmiCategory) {
+                case 'underweight':
+                    // Higher calorie meals for weight gain
+                    return $query->whereHas('nutritionalInfo', function($q) {
+                        $q->where('calories', '>=', 400);
+                    });
+                    
+                case 'obese':
+                    // Lower calorie meals for weight management
+                    return $query->whereHas('nutritionalInfo', function($q) {
+                        $q->where('calories', '<=', 350);
+                    });
+                    
+                case 'overweight':
+                    // Moderate calorie meals for gradual weight loss
+                    return $query->whereHas('nutritionalInfo', function($q) {
+                        $q->where('calories', '<=', 400);
+                    });
+                    
+                default:
+                    // Normal weight or unknown - return all meals (no filtering)
+                    return $query;
+            }
+        } catch (\Exception $e) {
+            // If there's any error with the query, log it and return query unchanged
+            // This prevents the scope from breaking the entire query builder
+            \Log::warning('BMI category scope error: ' . $e->getMessage(), [
+                'bmi_category' => $bmiCategory,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return $query;
+        }
     }
 }

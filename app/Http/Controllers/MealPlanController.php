@@ -54,6 +54,10 @@ class MealPlanController extends Controller
     {
         try {
             $user = Auth::user();
+            
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'Please login to add meals to your plan.');
+            }
                     
             // Safely get BMI category with fallback
             $userBMICategory = 'normal'; // Default fallback
@@ -67,23 +71,57 @@ class MealPlanController extends Controller
                 ]);
             }
 
-            $mealsQuery = Meal::query()->withinBudget($user->daily_budget ?? 500);
-
-            // Safely apply BMI filtering
+            // Build meals query with error handling
             try {
-                $mealsQuery->forBMICategory($userBMICategory);
+                $mealsQuery = Meal::query();
+                
+                // Apply budget filter
+                $budget = $user->daily_budget ?? 500;
+                if ($budget && is_numeric($budget)) {
+                    $mealsQuery->withinBudget((float)$budget);
+                }
+
+                // Safely apply BMI filtering - only if not 'normal' or 'unknown'
+                if (!in_array($userBMICategory, ['normal', 'unknown'])) {
+                    try {
+                        $mealsQuery->forBMICategory($userBMICategory);
+                    } catch (\Exception $e) {
+                        Log::warning('BMI category filtering failed: ' . $e->getMessage(), [
+                            'bmi_category' => $userBMICategory,
+                            'error' => $e->getMessage()
+                        ]);
+                        // Continue without BMI filtering - don't break the query
+                    }
+                }
+
+                // Filter by meal type if specified
+                if (request('meal_type')) {
+                    $mealType = request('meal_type');
+                    if (in_array($mealType, ['breakfast', 'lunch', 'dinner', 'snack'])) {
+                        $mealsQuery->byMealType($mealType);
+                    }
+                }
+
+                // Eager load relationships with error handling
+                try {
+                    $meals = $mealsQuery->with(['nutritionalInfo', 'recipe'])->get();
+                } catch (\Exception $e) {
+                    Log::error('Failed to load meals with relationships: ' . $e->getMessage());
+                    // Fallback: load meals without relationships
+                    $meals = $mealsQuery->get();
+                }
             } catch (\Exception $e) {
-                Log::warning('BMI category filtering failed: ' . $e->getMessage());
-                // Continue without BMI filtering
+                Log::error('Failed to build meals query: ' . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString()
+                ]);
+                // Fallback: get all meals within budget
+                $meals = Meal::where('cost', '<=', $user->daily_budget ?? 500)->get();
             }
 
-            // Filter by meal type if specified
-            if (request('meal_type')) {
-                $mealsQuery->byMealType(request('meal_type'));
+            // Ensure $meals is a collection
+            if (!$meals) {
+                $meals = collect();
             }
-
-            // CRITICAL: Eager load relationships AFTER all scopes are applied
-            $meals = $mealsQuery->with(['nutritionalInfo', 'recipe'])->get();
 
             // Safely get BMI status
             $bmiStatus = null;
@@ -99,10 +137,15 @@ class MealPlanController extends Controller
 
             // Get existing meal plans for the selected date
             $selectedDate = request('date', now()->format('Y-m-d'));
-            $existingMealTypes = $user->mealPlans()
-                ->where('scheduled_date', $selectedDate)
-                ->pluck('meal_type')
-                ->toArray();
+            try {
+                $existingMealTypes = $user->mealPlans()
+                    ->where('scheduled_date', $selectedDate)
+                    ->pluck('meal_type')
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::warning('Failed to get existing meal types: ' . $e->getMessage());
+                $existingMealTypes = [];
+            }
 
             return view('meal-plans.create', compact('meals', 'bmiStatus', 'existingMealTypes'));
                 
@@ -110,11 +153,17 @@ class MealPlanController extends Controller
             Log::error('Meal plan create error: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
                 'url' => request()->fullUrl(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
             ]);
                     
+            $errorMessage = config('app.debug') 
+                ? 'Unable to load meal selection. Please try again. Error: ' . $e->getMessage()
+                : 'Unable to load meal selection. Please try again.';
+                    
             return redirect()->route('meal-plans.index')
-                ->with('error', 'Unable to load meal selection. Please try again.');
+                ->with('error', $errorMessage);
         }
     }
 
