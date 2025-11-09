@@ -153,6 +153,22 @@ Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index'
 Route::get('/recipes/search', [RecipeController::class, 'search'])->name('recipes.search');
 Route::get('/recipes/{meal}', [RecipeController::class, 'show'])->name('recipes.show');
 
+// Custom storage file serving for Laravel Cloud compatibility
+Route::get('/storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    
+    if (!file_exists($filePath)) {
+        abort(404, 'File not found');
+    }
+    
+    $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+    
+    return response()->file($filePath, [
+        'Content-Type' => $mimeType,
+        'Cache-Control' => 'public, max-age=31536000, immutable',
+    ]);
+})->where('path', '.*')->name('storage.serve');
+
 // Logout route
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
