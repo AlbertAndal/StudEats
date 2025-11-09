@@ -40,35 +40,14 @@ class Meal extends Model
             return null;
         }
 
-        // If already a full URL (external or storage symlink resolved), return as-is
+        // If already a full URL (external), return as-is
         if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
             return $this->image_path;
         }
 
-        // Check if file exists before generating URL
-        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->image_path)) {
-            // Use current request host to ensure correct URL generation
-            $currentHost = request()->getHost();
-            $currentPort = request()->getPort();
-            $scheme = request()->getScheme();
-            
-            if ($currentHost && ($currentHost === '127.0.0.1' || $currentHost === 'localhost')) {
-                $baseUrl = $scheme . '://' . $currentHost;
-                if ($currentPort && $currentPort != 80 && $currentPort != 443) {
-                    $baseUrl .= ':' . $currentPort;
-                }
-                return $baseUrl . '/storage/' . $this->image_path;
-            }
-            
-            // Fallback to config URL
-            $baseUrl = config('app.url');
-            if ($baseUrl === 'http://localhost') {
-                $baseUrl = 'http://localhost:8000';
-            }
-            return $baseUrl . '/storage/' . $this->image_path;
-        }
-
-        return null;
+        // For production (Laravel Cloud) and local environments
+        // Simply use asset() helper which works everywhere
+        return asset('storage/' . $this->image_path);
     }
 
     /**
