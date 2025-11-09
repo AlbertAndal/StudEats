@@ -67,8 +67,7 @@ class MealPlanController extends Controller
                 ]);
             }
 
-            $mealsQuery = Meal::with(['nutritionalInfo', 'recipe'])
-                ->withinBudget($user->daily_budget ?? 500);
+            $mealsQuery = Meal::query()->withinBudget($user->daily_budget ?? 500);
 
             // Safely apply BMI filtering
             try {
@@ -83,7 +82,8 @@ class MealPlanController extends Controller
                 $mealsQuery->byMealType(request('meal_type'));
             }
 
-            $meals = $mealsQuery->get();
+            // CRITICAL: Eager load relationships AFTER all scopes are applied
+            $meals = $mealsQuery->with(['nutritionalInfo', 'recipe'])->get();
 
             // Safely get BMI status
             $bmiStatus = null;

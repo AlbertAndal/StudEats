@@ -295,7 +295,7 @@
                                          data-meal-id="{{ $meal->id }}"
                                          data-meal-name="{{ $meal->name }}"
                                          data-meal-description="{{ $meal->description }}"
-                                         data-meal-calories="{{ $meal->nutritionalInfo->calories ?? 'N/A' }}"
+                                         data-meal-calories="{{ optional($meal->nutritionalInfo)->calories ?? 'N/A' }}"
                                          data-meal-cost="₱{{ number_format($displayCost, 2) }}"
                                          aria-label="Select {{ $meal->name }} for your meal plan">
                                         
@@ -303,7 +303,7 @@
                                         <div class="relative mb-3">
                                             @if($meal->image_path)
                                                 <div class="w-full h-32 bg-gray-100 rounded-md overflow-hidden group-hover:shadow-md transition-shadow duration-300">
-                                                    <img src="{{ $meal->image_url }}" 
+                                                    <img src="{{ $meal->image_url ?? asset('images/placeholder-meal.jpg') }}" 
                                                          alt="{{ $meal->name }}" 
                                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                          loading="lazy"
@@ -365,13 +365,13 @@
                                                         </div>
                                                         @if(isset($bmiStatus) && $bmiStatus['calorie_multiplier'] != 1)
                                                             @php
-                                                                $originalCalories = $meal->nutritionalInfo->calories ?? 0;
+                                                                $originalCalories = optional($meal->nutritionalInfo)->calories ?? 0;
                                                                 $adjustedCalories = round($originalCalories * $bmiStatus['calorie_multiplier']);
                                                             @endphp
                                                             <div class="text-xs font-bold text-orange-600">{{ $adjustedCalories > 0 ? $adjustedCalories : '300' }}</div>
                                                             <div class="text-xs text-orange-500">cal</div>
                                                         @else
-                                                            <div class="text-xs font-bold text-orange-600">{{ $meal->nutritionalInfo->calories ?? '300' }}</div>
+                                                            <div class="text-xs font-bold text-orange-600">{{ optional($meal->nutritionalInfo)->calories ?? '300' }}</div>
                                                             <div class="text-xs text-orange-500">cal</div>
                                                         @endif
                                                     </div>
@@ -381,7 +381,7 @@
                                                         <div class="w-6 h-6 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mx-auto transition-colors duration-300">
                                                             <span class="text-sm">⏱️</span>
                                                         </div>
-                                                        <div class="text-xs font-bold text-blue-600">{{ $meal->cooking_time ?? '30' }}</div>
+                                                        <div class="text-xs font-bold text-blue-600">{{ optional($meal->recipe)->total_time ?? $meal->cooking_time ?? '30' }}</div>
                                                         <div class="text-xs text-blue-500">min</div>
                                                     </div>
                                                 </div>
