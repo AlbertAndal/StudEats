@@ -158,6 +158,12 @@ Route::get('/storage/{path}', function ($path) {
     $filePath = storage_path('app/public/' . $path);
     
     if (!file_exists($filePath)) {
+        \Log::warning('Storage file not found', [
+            'requested_path' => $path,
+            'full_path' => $filePath,
+            'storage_exists' => is_dir(storage_path('app/public')),
+            'files_in_meals' => is_dir(storage_path('app/public/meals')) ? array_slice(scandir(storage_path('app/public/meals')), 0, 5) : 'meals dir not found'
+        ]);
         abort(404, 'File not found');
     }
     
@@ -166,6 +172,8 @@ Route::get('/storage/{path}', function ($path) {
     return response()->file($filePath, [
         'Content-Type' => $mimeType,
         'Cache-Control' => 'public, max-age=31536000, immutable',
+        'Access-Control-Allow-Origin' => '*',
+        'Cross-Origin-Resource-Policy' => 'cross-origin',
     ]);
 })->where('path', '.*')->name('storage.serve');
 
