@@ -45,17 +45,26 @@ class Meal extends Model
             return $this->image_path;
         }
 
-        // Use Storage facade for production compatibility (Laravel Cloud)
+        // Use Storage facade which respects APP_URL in production
         try {
-            return Storage::disk('public')->url($this->image_path);
+            $url = Storage::disk('public')->url($this->image_path);
+            
+            // Ensure URL is absolute for Laravel Cloud
+            if (!str_starts_with($url, 'http')) {
+                $url = config('app.url') . $url;
+            }
+            
+            return $url;
         } catch (\Exception $e) {
             \Log::warning('Failed to generate storage URL for meal image', [
                 'meal_id' => $this->id,
                 'image_path' => $this->image_path,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'app_url' => config('app.url')
             ]);
-            // Fallback to asset helper
-            return asset('storage/' . $this->image_path);
+            
+            // Fallback to absolute URL
+            return config('app.url') . '/storage/' . $this->image_path;
         }
     }
 
