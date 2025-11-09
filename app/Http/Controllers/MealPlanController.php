@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class MealPlanController extends Controller
 {
@@ -61,7 +62,7 @@ class MealPlanController extends Controller
                     $userBMICategory = $user->getBMICategory();
                 }
             } catch (\Exception $e) {
-                \Log::warning('BMI calculation failed for user: ' . $user->id, [
+                Log::warning('BMI calculation failed for user: ' . $user->id, [
                     'error' => $e->getMessage()
                 ]);
             }
@@ -73,7 +74,7 @@ class MealPlanController extends Controller
             try {
                 $mealsQuery->forBMICategory($userBMICategory);
             } catch (\Exception $e) {
-                \Log::warning('BMI category filtering failed: ' . $e->getMessage());
+                Log::warning('BMI category filtering failed: ' . $e->getMessage());
                 // Continue without BMI filtering
             }
 
@@ -91,7 +92,7 @@ class MealPlanController extends Controller
                     $bmiStatus = $user->getBMIStatus();
                 }
             } catch (\Exception $e) {
-                \Log::warning('BMI status calculation failed for user: ' . $user->id, [
+                Log::warning('BMI status calculation failed for user: ' . $user->id, [
                     'error' => $e->getMessage()
                 ]);
             }
@@ -106,7 +107,7 @@ class MealPlanController extends Controller
             return view('meal-plans.create', compact('meals', 'bmiStatus', 'existingMealTypes'));
                 
         } catch (\Exception $e) {
-            \Log::error('Meal plan create error: ' . $e->getMessage(), [
+            Log::error('Meal plan create error: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
                 'url' => request()->fullUrl(),
                 'trace' => $e->getTraceAsString()

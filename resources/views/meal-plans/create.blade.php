@@ -381,7 +381,7 @@
                                                         <div class="w-6 h-6 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center mx-auto transition-colors duration-300">
                                                             <span class="text-sm">⏱️</span>
                                                         </div>
-                                                        <div class="text-xs font-bold text-blue-600">{{ $meal->prep_time ?? '30' }}</div>
+                                                        <div class="text-xs font-bold text-blue-600">{{ $meal->cooking_time ?? '30' }}</div>
                                                         <div class="text-xs text-blue-500">min</div>
                                                     </div>
                                                 </div>
