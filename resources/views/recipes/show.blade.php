@@ -53,7 +53,7 @@
                     <!-- Recipe Image -->
                     @if($meal->image_path)
                         <div class="relative bg-white overflow-hidden shadow-sm rounded-lg group">
-                            <img src="{{ Storage::url($meal->image_path) }}" 
+                            <img src="{{ $meal->image_url }}" 
                                  alt="{{ $meal->name }}" 
                                  class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0"></div>
@@ -371,7 +371,7 @@
                                 <a href="{{ route('recipes.show', $similar->id) }}" class="block">
                                     @if($similar->image_path)
                                         <div class="relative overflow-hidden">
-                                            <img src="{{ Storage::url($similar->image_path) }}" 
+                                            <img src="{{ $similar->image_url }}" 
                                                  alt="{{ $similar->name }}" 
                                                  class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>

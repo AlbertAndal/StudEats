@@ -12,39 +12,44 @@ class RecipeController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Meal::with(['recipe', 'nutritionalInfo']);
+        try {
+            $query = Meal::with(['recipe', 'nutritionalInfo']);
 
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('cuisine_type', 'like', "%{$search}%");
-            });
+            // Search functionality
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('cuisine_type', 'like', "%{$search}%");
+                });
+            }
+
+            // Filter by cuisine type
+            if ($request->filled('cuisine_type') && $request->cuisine_type !== '') {
+                $query->where('cuisine_type', $request->cuisine_type);
+            }
+
+            // Filter by difficulty
+            if ($request->filled('difficulty') && $request->difficulty !== '') {
+                $query->where('difficulty', $request->difficulty);
+            }
+
+            // Featured recipes at the top
+            $query->orderBy('is_featured', 'desc')->latest();
+
+            $recipes = $query->paginate(12)->withQueryString();
+
+            $cuisineTypes = Meal::select('cuisine_type')
+                ->distinct()
+                ->whereNotNull('cuisine_type')
+                ->pluck('cuisine_type');
+
+            return view('recipes.index', compact('recipes', 'cuisineTypes'));
+        } catch (\Exception $e) {
+            \Log::error('Recipes index error: ' . $e->getMessage());
+            return back()->with('error', 'Unable to load recipes. Please try again.');
         }
-
-        // Filter by cuisine type
-        if ($request->filled('cuisine_type') && $request->cuisine_type !== '') {
-            $query->where('cuisine_type', $request->cuisine_type);
-        }
-
-        // Filter by difficulty
-        if ($request->filled('difficulty') && $request->difficulty !== '') {
-            $query->where('difficulty', $request->difficulty);
-        }
-
-        // Featured recipes at the top
-        $query->orderBy('is_featured', 'desc')->latest();
-
-        $recipes = $query->paginate(12)->withQueryString();
-
-        $cuisineTypes = Meal::select('cuisine_type')
-            ->distinct()
-            ->whereNotNull('cuisine_type')
-            ->pluck('cuisine_type');
-
-        return view('recipes.index', compact('recipes', 'cuisineTypes'));
     }
 
     /**

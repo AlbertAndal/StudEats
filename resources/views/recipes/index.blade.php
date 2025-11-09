@@ -128,7 +128,7 @@
                             <!-- Recipe Image -->
                             <div class="relative h-48 overflow-hidden bg-gray-100">
                                 @if($recipe->image_path)
-                                    <img src="{{ Storage::url($recipe->image_path) }}" 
+                                    <img src="{{ $recipe->image_url }}" 
                                          alt="{{ $recipe->name }}" 
                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                 @else

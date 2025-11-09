@@ -43,8 +43,8 @@
                     @foreach($recipes as $recipe)
                         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition">
                             <a href="{{ route('recipes.show', $recipe->id) }}" class="block">
-                                @if($recipe->recipe_image)
-                                    <img src="{{ Storage::url($recipe->recipe_image) }}" 
+                                @if($recipe->image_path)
+                                    <img src="{{ $recipe->image_url }}" 
                                          alt="{{ $recipe->name }}" 
                                          class="w-full h-48 object-cover">
                                 @else
