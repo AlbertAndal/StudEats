@@ -54,6 +54,30 @@ echo ""
 echo "🔗 Creating storage symlink..."
 run_command "php artisan storage:link --force"
 
+# Verify symlink points to expected target
+echo "🧪 Verifying storage symlink integrity..."
+if [ -L "public/storage" ]; then
+    TARGET=$(readlink public/storage || echo "(unreadable)")
+    EXPECTED="$(pwd)/storage/app/public"
+    echo "   -> Symlink target: $TARGET"
+    echo "   -> Expected:      $EXPECTED"
+    if [ "$TARGET" != "$EXPECTED" ]; then
+        echo "   ⚠️  Symlink target mismatch. Recreating..."
+        rm public/storage || true
+        run_command "php artisan storage:link --force"
+    else
+        echo "   ✅ Symlink target correct"
+    fi
+else
+    echo "   ❌ Symlink missing after creation attempt. Retrying..."
+    run_command "php artisan storage:link --force"
+fi
+
+# Quick meal image sample check (first record)
+echo "🔍 Sampling a meal image path for existence check..."
+php artisan tinker --execute="if(\App\Models\Meal::whereNotNull('image_path')->exists()){ $m=\App\Models\Meal::whereNotNull('image_path')->first(); echo 'Sample Meal ID: '.$m->id."\n"; echo 'Image Path: '.$m->image_path."\n"; echo 'Disk Exists: '.(Storage::disk('public')->exists($m->image_path)?'YES':'NO')."\n"; } else { echo 'No meals with images found.'; }" || echo "⚠️ Meal image sample check failed"
+
+
 # Seed essential data
 echo ""
 echo "🌱 Seeding essential data..."
