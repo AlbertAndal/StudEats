@@ -353,6 +353,137 @@ Route::get('/font-test', function () {
     return view('font-test');
 })->name('font.test');
 
+// Storage Symlink Creation Route (for deployment servers without artisan access)
+Route::get('/create-symlink', function () {
+    try {
+        $target = storage_path('app/public');
+        $link = public_path('storage');
+        
+        // Check if symlink already exists
+        if (file_exists($link)) {
+            // If it's a directory (not a symlink), remove it
+            if (is_dir($link) && !is_link($link)) {
+                \Log::info('Removing existing storage directory (not a symlink)', ['path' => $link]);
+                // Don't delete - let user do it manually for safety
+                return response()->json([
+                    'status' => 'action_required',
+                    'message' => 'A "public/storage" directory exists but is not a symlink. Please delete it manually first.',
+                    'instructions' => 'Delete the public/storage folder on your server, then visit this URL again.',
+                    'path' => $link,
+                    'is_link' => false,
+                    'is_dir' => true,
+                ], 400);
+            }
+            
+            // If it's already a symlink, check if it points to the correct location
+            if (is_link($link)) {
+                $currentTarget = readlink($link);
+                if ($currentTarget === $target) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Storage symlink already exists and is correctly configured.',
+                        'link' => $link,
+                        'target' => $target,
+                        'already_exists' => true,
+                    ]);
+                } else {
+                    // Remove incorrect symlink
+                    unlink($link);
+                    \Log::info('Removed incorrect symlink', [
+                        'link' => $link,
+                        'old_target' => $currentTarget,
+                        'new_target' => $target
+                    ]);
+                }
+            }
+        }
+        
+        // Create the symlink
+        if (!file_exists($target)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Storage target directory does not exist.',
+                'target' => $target,
+                'suggestion' => 'Ensure storage/app/public directory exists on your server.',
+            ], 500);
+        }
+        
+        symlink($target, $link);
+        
+        \Log::info('Storage symlink created successfully', [
+            'link' => $link,
+            'target' => $target
+        ]);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Storage symlink created successfully! Your images should now be visible.',
+            'link' => $link,
+            'target' => $target,
+            'created' => true,
+            'test_image' => asset('storage/meals/test.jpg'),
+            'instructions' => 'If images still don\'t show, check file permissions on storage/app/public',
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Failed to create storage symlink', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to create storage symlink: ' . $e->getMessage(),
+            'suggestion' => 'Try running "php artisan storage:link" from terminal if available.',
+            'alternative' => 'Or contact your hosting provider for assistance.',
+        ], 500);
+    }
+});
+
+// Verify Storage Symlink Status
+Route::get('/verify-symlink', function () {
+    $link = public_path('storage');
+    $target = storage_path('app/public');
+    
+    $status = [
+        'link_path' => $link,
+        'target_path' => $target,
+        'link_exists' => file_exists($link),
+        'link_is_link' => is_link($link),
+        'link_is_dir' => is_dir($link),
+        'target_exists' => file_exists($target),
+        'target_is_dir' => is_dir($target),
+        'target_is_writable' => is_writable($target),
+    ];
+    
+    if (is_link($link)) {
+        $status['symlink_target'] = readlink($link);
+        $status['symlink_correct'] = (readlink($link) === $target);
+    }
+    
+    // Check for sample images
+    $mealsDir = $target . '/meals';
+    if (is_dir($mealsDir)) {
+        $files = array_diff(scandir($mealsDir), ['.', '..']);
+        $status['sample_images_count'] = count($files);
+        $status['sample_images'] = array_slice($files, 0, 5);
+    }
+    
+    // Test image URL generation
+    $testMeal = \App\Models\Meal::whereNotNull('image_path')->first();
+    if ($testMeal) {
+        $status['test_meal'] = [
+            'id' => $testMeal->id,
+            'name' => $testMeal->name,
+            'image_path' => $testMeal->image_path,
+            'image_url' => $testMeal->image_url,
+            'file_exists' => file_exists($target . '/' . $testMeal->image_path),
+        ];
+    }
+    
+    return response()->json($status, 200, [], JSON_PRETTY_PRINT);
+});
+
 // Laravel Cloud Debug Route (remove after use)
 Route::get('/debug-deployment', function () {
     return response()->json([

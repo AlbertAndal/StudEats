@@ -96,6 +96,12 @@ $user->weeklyMealPlans(Carbon::parse('2025-09-15'));
 - Vite manifest errors → run `npm run build` or `composer run dev`
 - OTP expiration → check queue processing and email delivery
 - BMI calculations require height/weight in proper units (cm/kg vs ft/lbs)
+- **Images not showing after deployment:**
+  - Visit `/create-symlink` to create storage symlink via web browser
+  - Or run `php artisan storage:link --force` in terminal
+  - Check symlink status at `/verify-symlink`
+  - Ensure `public/storage` is a symlink (not a directory)
+  - See `STORAGE-SYMLINK-DEPLOYMENT-GUIDE.md` for detailed troubleshooting
 
 <laravel-boost-guidelines>
 [Previous Laravel Boost Guidelines content remains unchanged]
