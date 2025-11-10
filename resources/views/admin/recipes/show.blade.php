@@ -276,7 +276,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs text-gray-500 uppercase tracking-wide">Calories per Serving</span>
-                                    <span class="font-semibold text-gray-900">{{ $recipe->calories }} kcal</span>
+                                    <span class="font-semibold text-gray-900">{{ $recipe->calories }} cal</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs text-gray-500 uppercase tracking-wide">Total Price</span>
