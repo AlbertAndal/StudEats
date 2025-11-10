@@ -1,5 +1,5 @@
                     
-                    <svg class="w-5 h-5 text-green-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M16 13a2 2 0 1 0 0-4"/></svg>
+                    
 @extends('layouts.app')
 
 @section('title', 'Meal Plans')
