@@ -78,7 +78,7 @@
         </div>
 
         <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
-             data-intro="Track your daily calories consumed today. Monitor if you're meeting your personalized calorie target!"
+             data-intro="Track your daily calories consumed today. Monitor if your planned meals meet your personalized calorie target!<br><br>🟢 <strong>Green</strong>: On target (within 50 calories)<br>🔵 <strong>Blue</strong>: Under target (calories remaining)<br>🟠 <strong>Orange</strong>: Over target (excess calories)"
              data-step="4">
             <div class="flex items-center justify-between">
                 <div class="flex-1">
