@@ -308,7 +308,7 @@
                                         <dt class="text-xs font-medium text-green-600 uppercase tracking-wider">Calories</dt>
                                         <dd class="text-3xl font-bold text-green-700 mt-1">
                                             {{ number_format($meal->nutritionalInfo->calories) }}
-                                            <span class="text-base font-normal text-green-600">kcal</span>
+                                            <span class="text-base font-normal text-green-600">cal</span>
                                         </dd>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3 mt-4">
