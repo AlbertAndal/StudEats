@@ -324,7 +324,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getProfilePhotoUrlAttribute(): ?string
     {
-        if (!$this->profile_photo) {
+        if (! $this->profile_photo) {
             return null;
         }
 
@@ -333,14 +333,52 @@ class User extends Authenticatable implements MustVerifyEmail
             return $this->profile_photo;
         }
 
-        // Use Storage facade for reliable URL generation
-        // This works with both local storage and cloud storage
+        // Use default disk to allow S3/persistent storage without code changes
+        $diskName = config('filesystems.default', 'public');
+        $disk = \Illuminate\Support\Facades\Storage::disk($diskName);
+
+        // Optional override (e.g. CDN) via env STUD_EATS_IMAGE_BASE_URL
+        $overrideBase = rtrim(env('STUD_EATS_IMAGE_BASE_URL', ''), '/');
+
         try {
-            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->profile_photo);
-        } catch (\Exception $e) {
-            // Fallback to asset helper if Storage fails
-            return asset('storage/' . $this->profile_photo);
+            $rawUrl = method_exists($disk, 'url') ? $disk->url($this->profile_photo) : null;
+            if ($rawUrl && str_starts_with($rawUrl, '/')) {
+                $rawUrl = rtrim(config('app.url'), '/').$rawUrl;
+            }
+
+            if ($overrideBase && $rawUrl) {
+                $parsed = parse_url($rawUrl);
+                $path = $parsed['path'] ?? '/';
+                if (str_starts_with($path, '/storage/')) {
+                    $path = substr($path, 9);
+                }
+                $rawUrl = $overrideBase.'/'.ltrim($path, '/');
+            }
+
+            if ($diskName === 'public') {
+                if (! $disk->exists($this->profile_photo)) {
+                    \Log::notice('Profile photo missing on public disk', [
+                        'user_id' => $this->id,
+                        'path' => $this->profile_photo,
+                    ]);
+
+                    return null;
+                }
+            }
+
+            if ($rawUrl) {
+                return $rawUrl;
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Profile photo URL generation failed', [
+                'user_id' => $this->id,
+                'path' => $this->profile_photo,
+                'disk' => $diskName,
+                'error' => $e->getMessage(),
+            ]);
         }
+
+        return rtrim(config('app.url'), '/').'/storage/'.$this->profile_photo;
     }
 
     /**
@@ -348,8 +386,8 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarUrl(): string
     {
-        return $this->getProfilePhotoUrlAttribute() ?? 
-               'https://ui-avatars.com/api/?name=' . urlencode($this->name) . 
+        return $this->getProfilePhotoUrlAttribute() ??
+               'https://ui-avatars.com/api/?name='.urlencode($this->name).
                '&color=ffffff&background=10b981&size=200&font-size=0.6&bold=true';
     }
 
@@ -358,7 +396,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function hasProfilePhoto(): bool
     {
-        return !empty($this->profile_photo);
+        return ! empty($this->profile_photo);
     }
 
     /**
@@ -366,23 +404,25 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function deleteProfilePhoto(): bool
     {
-        if (!$this->profile_photo) {
+        if (! $this->profile_photo) {
             return true;
         }
 
         // Don't delete external URLs
         if (str_starts_with($this->profile_photo, 'http')) {
             $this->update(['profile_photo' => null]);
+
             return true;
         }
 
-        $path = storage_path('app/public/' . $this->profile_photo);
-        
+        $path = storage_path('app/public/'.$this->profile_photo);
+
         if (file_exists($path)) {
             unlink($path);
         }
 
         $this->update(['profile_photo' => null]);
+
         return true;
     }
 
@@ -398,130 +438,130 @@ class User extends Authenticatable implements MustVerifyEmail
                 'icon' => '🥬',
                 'description' => 'No meat, fish, or poultry',
                 'category' => 'Diet Types',
-                'color' => 'bg-green-100 text-green-800 border-green-200'
+                'color' => 'bg-green-100 text-green-800 border-green-200',
             ],
             'vegan' => [
                 'label' => 'Vegan',
                 'icon' => '🌱',
                 'description' => 'No animal products',
                 'category' => 'Diet Types',
-                'color' => 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                'color' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
             ],
             'pescatarian' => [
                 'label' => 'Pescatarian',
                 'icon' => '🐟',
                 'description' => 'Fish but no meat',
                 'category' => 'Diet Types',
-                'color' => 'bg-teal-100 text-teal-800 border-teal-200'
+                'color' => 'bg-teal-100 text-teal-800 border-teal-200',
             ],
             'keto' => [
                 'label' => 'Keto',
                 'icon' => '🥑',
                 'description' => 'Very low carb, high fat',
                 'category' => 'Diet Types',
-                'color' => 'bg-indigo-100 text-indigo-800 border-indigo-200'
+                'color' => 'bg-indigo-100 text-indigo-800 border-indigo-200',
             ],
             'paleo' => [
                 'label' => 'Paleo',
                 'icon' => '🥩',
                 'description' => 'Whole foods, no processed',
                 'category' => 'Diet Types',
-                'color' => 'bg-amber-100 text-amber-800 border-amber-200'
+                'color' => 'bg-amber-100 text-amber-800 border-amber-200',
             ],
             'mediterranean' => [
                 'label' => 'Mediterranean',
                 'icon' => '🫒',
                 'description' => 'Heart-healthy, olive oil based',
                 'category' => 'Diet Types',
-                'color' => 'bg-cyan-100 text-cyan-800 border-cyan-200'
+                'color' => 'bg-cyan-100 text-cyan-800 border-cyan-200',
             ],
-            
+
             // Food Restrictions
             'gluten_free' => [
                 'label' => 'Gluten Free',
                 'icon' => '🌾',
                 'description' => 'No wheat, barley, rye',
                 'category' => 'Restrictions',
-                'color' => 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                'color' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
             ],
             'dairy_free' => [
                 'label' => 'Dairy Free',
                 'icon' => '🥛',
                 'description' => 'No milk products',
                 'category' => 'Restrictions',
-                'color' => 'bg-blue-100 text-blue-800 border-blue-200'
+                'color' => 'bg-blue-100 text-blue-800 border-blue-200',
             ],
             'nut_free' => [
                 'label' => 'Nut Free',
                 'icon' => '🥜',
                 'description' => 'No tree nuts or peanuts',
                 'category' => 'Restrictions',
-                'color' => 'bg-orange-100 text-orange-800 border-orange-200'
+                'color' => 'bg-orange-100 text-orange-800 border-orange-200',
             ],
             'shellfish_free' => [
                 'label' => 'Shellfish Free',
                 'icon' => '🦐',
                 'description' => 'No shellfish',
                 'category' => 'Restrictions',
-                'color' => 'bg-red-100 text-red-800 border-red-200'
+                'color' => 'bg-red-100 text-red-800 border-red-200',
             ],
             'soy_free' => [
                 'label' => 'Soy Free',
                 'icon' => '🫘',
                 'description' => 'No soy products',
                 'category' => 'Restrictions',
-                'color' => 'bg-lime-100 text-lime-800 border-lime-200'
+                'color' => 'bg-lime-100 text-lime-800 border-lime-200',
             ],
             'egg_free' => [
                 'label' => 'Egg Free',
                 'icon' => '🥚',
                 'description' => 'No eggs or egg products',
                 'category' => 'Restrictions',
-                'color' => 'bg-rose-100 text-rose-800 border-rose-200'
+                'color' => 'bg-rose-100 text-rose-800 border-rose-200',
             ],
-            
+
             // Nutritional Goals
             'low_carb' => [
                 'label' => 'Low Carb',
                 'icon' => '⚡',
                 'description' => 'Reduced carbohydrates',
                 'category' => 'Goals',
-                'color' => 'bg-purple-100 text-purple-800 border-purple-200'
+                'color' => 'bg-purple-100 text-purple-800 border-purple-200',
             ],
             'high_protein' => [
                 'label' => 'High Protein',
                 'icon' => '💪',
                 'description' => 'Extra protein for fitness',
                 'category' => 'Goals',
-                'color' => 'bg-pink-100 text-pink-800 border-pink-200'
+                'color' => 'bg-pink-100 text-pink-800 border-pink-200',
             ],
             'low_sodium' => [
                 'label' => 'Low Sodium',
                 'icon' => '🧂',
                 'description' => 'Reduced salt intake',
                 'category' => 'Goals',
-                'color' => 'bg-slate-100 text-slate-800 border-slate-200'
+                'color' => 'bg-slate-100 text-slate-800 border-slate-200',
             ],
             'heart_healthy' => [
                 'label' => 'Heart Healthy',
                 'icon' => '❤️',
                 'description' => 'Good for cardiovascular health',
                 'category' => 'Goals',
-                'color' => 'bg-red-100 text-red-800 border-red-200'
+                'color' => 'bg-red-100 text-red-800 border-red-200',
             ],
             'diabetic_friendly' => [
                 'label' => 'Diabetic Friendly',
                 'icon' => '🩺',
                 'description' => 'Low glycemic index',
                 'category' => 'Goals',
-                'color' => 'bg-violet-100 text-violet-800 border-violet-200'
+                'color' => 'bg-violet-100 text-violet-800 border-violet-200',
             ],
             'weight_loss' => [
                 'label' => 'Weight Loss',
                 'icon' => '📉',
                 'description' => 'Calorie-controlled portions',
                 'category' => 'Goals',
-                'color' => 'bg-sky-100 text-sky-800 border-sky-200'
+                'color' => 'bg-sky-100 text-sky-800 border-sky-200',
             ],
         ];
     }
@@ -550,9 +590,10 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function hasDietaryPreference(string $preference): bool
     {
-        if (!is_string($this->dietary_preferences)) {
+        if (! is_string($this->dietary_preferences)) {
             return false;
         }
+
         return stripos($this->dietary_preferences, $preference) !== false;
     }
 
@@ -563,13 +604,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function addDietaryPreference(string $preference): bool
     {
         $current = is_string($this->dietary_preferences) ? $this->dietary_preferences : '';
-        
+
         if (stripos($current, $preference) === false) {
-            $updated = trim($current . ($current ? ', ' : '') . $preference);
+            $updated = trim($current.($current ? ', ' : '').$preference);
             $this->update(['dietary_preferences' => $updated]);
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -588,12 +630,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getDietaryPreferenceSummary(): array
     {
         $text = is_string($this->dietary_preferences) ? trim($this->dietary_preferences) : '';
-        
+
         $summary = [
-            'count' => !empty($text) ? 1 : 0,
-            'has_preferences' => !empty($text),
+            'count' => ! empty($text) ? 1 : 0,
+            'has_preferences' => ! empty($text),
             'display_preferences' => [],
-            'categories' => []
+            'categories' => [],
         ];
 
         if ($count > 0) {
@@ -604,7 +646,7 @@ class User extends Authenticatable implements MustVerifyEmail
                     $summary['display_preferences'][] = [
                         'key' => $pref,
                         'label' => $config[$pref]['label'],
-                        'icon' => $config[$pref]['icon']
+                        'icon' => $config[$pref]['icon'],
                     ];
                 }
             }
@@ -613,7 +655,7 @@ class User extends Authenticatable implements MustVerifyEmail
             foreach ($preferences as $pref) {
                 if (isset($config[$pref])) {
                     $category = $config[$pref]['category'];
-                    if (!isset($summary['categories'][$category])) {
+                    if (! isset($summary['categories'][$category])) {
                         $summary['categories'][$category] = 0;
                     }
                     $summary['categories'][$category]++;

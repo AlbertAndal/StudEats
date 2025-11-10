@@ -7,6 +7,10 @@ set -e  # Exit on any error, but with proper error handling
 echo "🚀 Laravel Cloud Post-Deploy Hook Starting..."
 echo "Timestamp: $(date)"
 
+echo ""
+echo "🧹 Full framework cache clear (optimize:clear)..."
+run_command "php artisan optimize:clear"
+
 # Function to run commands with error handling
 run_command() {
     echo "Running: $1"
