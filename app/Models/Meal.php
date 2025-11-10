@@ -45,28 +45,18 @@ class Meal extends Model
             return $this->image_path;
         }
 
-        // Check if file exists before generating URL
+        // Use Storage facade for reliable URL generation (Laravel Cloud compatible)
         try {
-            if (!Storage::disk('public')->exists($this->image_path)) {
-                \Log::warning('Meal image file not found', [
-                    'meal_id' => $this->id,
-                    'image_path' => $this->image_path
-                ]);
-                return null;
-            }
+            return Storage::disk('public')->url($this->image_path);
         } catch (\Exception $e) {
-            \Log::error('Error checking meal image file: ' . $e->getMessage(), [
+            \Log::warning('Failed to generate storage URL for meal image', [
                 'meal_id' => $this->id,
-                'image_path' => $this->image_path
+                'image_path' => $this->image_path,
+                'error' => $e->getMessage()
             ]);
-            return null;
+            // Fallback to asset helper
+            return asset('storage/' . $this->image_path);
         }
-
-        // Generate URL for existing file
-        $baseUrl = config('app.url', 'https://studeats.laravel.cloud');
-        $url = $baseUrl . '/storage/' . $this->image_path;
-        
-        return $url;
     }
 
     /**

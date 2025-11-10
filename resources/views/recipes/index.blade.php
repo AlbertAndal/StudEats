@@ -127,10 +127,19 @@
                         <a href="{{ route('recipes.show', $recipe->id) }}" class="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                             <!-- Recipe Image -->
                             <div class="relative h-48 overflow-hidden bg-gray-100">
-                                @if($recipe->image_path)
+                                @if($recipe->image_url)
                                     <img src="{{ $recipe->image_url }}" 
                                          alt="{{ $recipe->name }}" 
-                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                         onerror="this.onerror=null; this.style.display='none'; const fallback = this.nextElementSibling; if(fallback) fallback.style.display='flex';">
+                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100" style="display:none;">
+                                        <div class="text-center">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-2">
+                                                {{ strtoupper(substr($recipe->name, 0, 2)) }}
+                                            </div>
+                                            <p class="text-gray-500 text-sm">Image not available</p>
+                                        </div>
+                                    </div>
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
                                         <span class="text-6xl">🍽️</span>

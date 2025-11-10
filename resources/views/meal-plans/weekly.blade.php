@@ -130,7 +130,11 @@
                                             <img src="{{ $mealPlan->meal->image_url }}" 
                                                  alt="{{ $mealPlan->meal->name }}"
                                                  class="w-full h-24 object-cover"
-                                                 loading="lazy">
+                                                 loading="lazy"
+                                                 onerror="this.onerror=null; this.style.display='none'; const fallback = this.nextElementSibling; if(fallback) fallback.style.display='flex';">
+                                            <div class="w-full h-24 flex items-center justify-center bg-gradient-to-br from-orange-400 to-pink-500" style="display:none;">
+                                                <span class="text-white font-bold text-lg">{{ strtoupper(substr($mealPlan->meal->name, 0, 2)) }}</span>
+                                            </div>
                                         </div>
                                     @else
                                         <div class="mb-1.5 rounded overflow-hidden bg-gradient-to-br {{ $mealBgColors[$mealType] }} border border-current/10">

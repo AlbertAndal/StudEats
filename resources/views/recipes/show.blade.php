@@ -55,7 +55,16 @@
                         <div class="relative bg-white overflow-hidden shadow-sm rounded-lg group">
                             <img src="{{ $meal->image_url }}" 
                                  alt="{{ $meal->name }}" 
-                                 class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300">
+                                 class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 onerror="this.onerror=null; this.style.display='none'; const fallback = this.nextElementSibling; if(fallback) fallback.style.display='flex';">
+                            <div class="w-full h-96 flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100" style="display:none;">
+                                <div class="text-center">
+                                    <div class="w-24 h-24 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
+                                        {{ strtoupper(substr($meal->name, 0, 2)) }}
+                                    </div>
+                                    <p class="text-gray-500">Image not available</p>
+                                </div>
+                            </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0"></div>
                             @if($meal->nutritionalInfo)
                                 <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between">
@@ -373,7 +382,16 @@
                                         <div class="relative overflow-hidden">
                                             <img src="{{ $similar->image_url }}" 
                                                  alt="{{ $similar->name }}" 
-                                                 class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                                                 class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                                                 onerror="this.onerror=null; this.style.display='none'; const fallback = this.nextElementSibling; if(fallback) fallback.style.display='flex';">
+                                            <div class="w-full h-48 flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100" style="display:none;">
+                                                <div class="text-center">
+                                                    <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-2">
+                                                        {{ strtoupper(substr($similar->name, 0, 2)) }}
+                                                    </div>
+                                                    <p class="text-gray-500 text-sm">Image not available</p>
+                                                </div>
+                                            </div>
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                         </div>
                                     @else

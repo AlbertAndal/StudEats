@@ -303,11 +303,14 @@
                                         <div class="relative mb-3">
                                             @if($meal->image_path)
                                                 <div class="w-full h-32 bg-gray-100 rounded-md overflow-hidden group-hover:shadow-md transition-shadow duration-300">
-                                                    <img src="{{ $meal->image_url ?? asset('images/placeholder-meal.jpg') }}" 
+                                                    <img src="{{ $meal->image_url }}" 
                                                          alt="{{ $meal->name }}" 
                                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                          loading="lazy"
-                                                         onerror="this.src='{{ asset('images/placeholder-meal.jpg') }}'">
+                                                         onerror="this.onerror=null; this.style.display='none'; const fallback = this.nextElementSibling; if(fallback) fallback.style.display='flex';">
+                                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-400 to-pink-500" style="display:none;">
+                                                        <span class="text-white font-bold text-xl">{{ strtoupper(substr($meal->name, 0, 2)) }}</span>
+                                                    </div>
                                                 </div>
                                             @else
                                                 <div class="w-full h-32 bg-gradient-to-br from-green-100 to-blue-100 rounded-md flex items-center justify-center group-hover:shadow-md transition-shadow duration-300">
