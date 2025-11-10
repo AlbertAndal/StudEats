@@ -366,17 +366,8 @@
                                                         <div class="w-6 h-6 bg-orange-100 group-hover:bg-orange-200 rounded-full flex items-center justify-center mx-auto transition-colors duration-300">
                                                             <span class="text-sm">🔥</span>
                                                         </div>
-                                                        @if(isset($bmiStatus) && $bmiStatus['calorie_multiplier'] != 1)
-                                                            @php
-                                                                $originalCalories = optional($meal->nutritionalInfo)->calories ?? 0;
-                                                                $adjustedCalories = round($originalCalories * $bmiStatus['calorie_multiplier']);
-                                                            @endphp
-                                                            <div class="text-xs font-bold text-orange-600">{{ $adjustedCalories > 0 ? $adjustedCalories : '300' }}</div>
-                                                            <div class="text-xs text-orange-500">cal</div>
-                                                        @else
-                                                            <div class="text-xs font-bold text-orange-600">{{ optional($meal->nutritionalInfo)->calories ?? '300' }}</div>
-                                                            <div class="text-xs text-orange-500">cal</div>
-                                                        @endif
+                                                        <div class="text-xs font-bold text-orange-600">{{ optional($meal->nutritionalInfo)->calories ?? '300' }}</div>
+                                                        <div class="text-xs text-orange-500">cal</div>
                                                     </div>
                                                     
                                                     <!-- Prep Time -->
@@ -502,23 +493,29 @@
                             </div>
                             
                             <div class="flex items-center justify-between">
-                                <span class="text-sm font-medium text-gray-600">Daily Calories</span>
+                                <span class="text-sm font-medium text-gray-600">Daily Calorie Target</span>
                                 <span class="text-lg font-bold text-green-600">{{ number_format($bmiStatus['daily_calories']) }} cal</span>
                             </div>
                             
-                            <div class="pt-3 border-t border-gray-200">
+                            @if($bmiStatus['calorie_multiplier'] != 1)
+                            <div class="bg-blue-50 border border-blue-200 rounded-md p-2 mt-2">
                                 <div class="flex items-start">
-                                    <svg class="w-4 h-4 text-blue-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
-                                    <div>
-                                        <p class="text-xs text-gray-600">{{ $bmiStatus['recommendation'] }}</p>
-                                        @if($bmiStatus['calorie_multiplier'] != 1)
-                                            <p class="text-xs text-blue-600 mt-1">
-                                                Meal calories are {{ $bmiStatus['calorie_multiplier'] > 1 ? 'increased' : 'reduced' }} by {{ round(abs(($bmiStatus['calorie_multiplier'] - 1) * 100)) }}% for your health goals.
-                                            </p>
-                                        @endif
-                                    </div>
+                                    <p class="text-xs text-blue-700">
+                                        Your daily calorie target is {{ $bmiStatus['calorie_multiplier'] > 1 ? 'increased' : 'reduced' }} by <strong>{{ round(abs(($bmiStatus['calorie_multiplier'] - 1) * 100)) }}%</strong> based on your BMI for optimal health.
+                                    </p>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            <div class="pt-3 border-t border-gray-200">
+                                <div class="flex items-start">
+                                    <svg class="w-4 h-4 text-gray-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <p class="text-xs text-gray-600">{{ $bmiStatus['recommendation'] }}</p>
                                 </div>
                             </div>
                         </div>
