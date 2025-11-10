@@ -78,15 +78,41 @@
         </div>
 
         <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
-             data-intro="Track your total calories consumed this week. Stay on track with your health goals!"
+             data-intro="Track your daily calories consumed today. Monitor if you're meeting your personalized calorie target!"
              data-step="4">
             <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Weekly Calories</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ number_format($weeklySummary['totalCalories']) }} cal</p>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-600">Daily Calories</p>
+                    <div class="flex items-baseline space-x-2">
+                        <p class="text-2xl font-bold text-gray-900">{{ number_format($dailySummary['totalCalories']) }}</p>
+                        <span class="text-sm text-gray-500">/ {{ number_format($dailySummary['targetCalories']) }} cal</span>
+                    </div>
+                    @if($dailySummary['isOnTarget'])
+                        <p class="text-xs text-green-600 mt-1 font-medium">✓ On target</p>
+                    @elseif($dailySummary['isUnder'])
+                        <p class="text-xs text-blue-600 mt-1 font-medium">{{ number_format(abs($dailySummary['difference'])) }} cal remaining</p>
+                    @else
+                        <p class="text-xs text-orange-600 mt-1 font-medium">{{ number_format($dailySummary['difference']) }} cal over</p>
+                    @endif
                 </div>
                 <div class="text-purple-600 bg-purple-100 p-2 rounded-lg">
-                    <x-icon name="bolt" class="w-8 h-8" variant="outline" aria-label="Weekly calories icon" />
+                    <x-icon name="bolt" class="w-8 h-8" variant="outline" aria-label="Daily calories icon" />
+                </div>
+            </div>
+            <!-- Progress Bar -->
+            <div class="mt-3">
+                <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                    <span>Progress</span>
+                    <span class="font-medium">{{ $dailySummary['percentage'] }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="h-2 rounded-full transition-all duration-300 
+                        @if($dailySummary['isOnTarget']) bg-green-500
+                        @elseif($dailySummary['isUnder']) bg-blue-500
+                        @else bg-orange-500
+                        @endif"
+                        style="width: {{ min($dailySummary['percentage'], 100) }}%">
+                    </div>
                 </div>
             </div>
         </div>

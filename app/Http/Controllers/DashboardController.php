@@ -64,29 +64,26 @@ class DashboardController extends Controller
         // Get user's BMI status for dashboard display
         $bmiStatus = $user->getBMIStatus();
         
-        // Calculate weekly summary
-        $startOfWeek = Carbon::now()->startOfWeek();
-        $endOfWeek = Carbon::now()->endOfWeek();
+        // Calculate daily calorie summary
+        $dailyCalorieTarget = $user->getRecommendedDailyCalories();
+        $todayTotalCalories = $todayMeals->sum(function($mealPlan) {
+            return $mealPlan->meal->nutritionalInfo->calories ?? 0;
+        });
         
-        $weeklyMeals = MealPlan::where('user_id', $user->id)
-            ->whereBetween('scheduled_date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
-            ->with(['meal.nutritionalInfo'])
-            ->get();
+        // Calculate calorie difference and percentage
+        $calorieDifference = $todayTotalCalories - $dailyCalorieTarget;
+        $caloriePercentage = $dailyCalorieTarget > 0 
+            ? round(($todayTotalCalories / $dailyCalorieTarget) * 100) 
+            : 0;
         
-        $weeklySummary = [
-            'totalCalories' => $weeklyMeals->sum(function($mealPlan) {
-                return $mealPlan->meal->nutritionalInfo->calories ?? 0;
-            }),
-            'totalCost' => $weeklyMeals->sum(function($mealPlan) {
-                return $mealPlan->meal->cost ?? 0;
-            }),
-            'mealCount' => $weeklyMeals->count(),
-            'averageCalories' => $weeklyMeals->count() > 0 ? round($weeklyMeals->avg(function($mealPlan) {
-                return $mealPlan->meal->nutritionalInfo->calories ?? 0;
-            })) : 0,
-            'averageCost' => $weeklyMeals->count() > 0 ? round($weeklyMeals->avg(function($mealPlan) {
-                return $mealPlan->meal->cost ?? 0;
-            }), 2) : 0,
+        $dailySummary = [
+            'totalCalories' => $todayTotalCalories,
+            'targetCalories' => $dailyCalorieTarget,
+            'difference' => $calorieDifference,
+            'percentage' => $caloriePercentage,
+            'isUnder' => $calorieDifference < 0,
+            'isOver' => $calorieDifference > 0,
+            'isOnTarget' => abs($calorieDifference) <= 50, // Within 50 calories is considered on target
         ];
         
         return view('dashboard.index', compact(
@@ -94,7 +91,7 @@ class DashboardController extends Controller
             'todayMeals',
             'featuredMeal',
             'suggestedMeals',
-            'weeklySummary',
+            'dailySummary',
             'bmiStatus'
         ));
     }
