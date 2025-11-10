@@ -55,6 +55,7 @@ input[type=number].no-spinners {
                     </a>
                     <button type="submit" 
                             form="recipe-form"
+                            onclick="return validateIngredientsBeforeSubmit();"
                             class="inline-flex items-center px-5 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200 shadow-sm">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -267,7 +268,7 @@ input[type=number].no-spinners {
                                                 $price = '';
                                             }
                                         @endphp
-                                        <div class="grid grid-cols-12 gap-3 ingredient-item">
+                                        <div class="grid grid-cols-12 gap-3 ingredient-item ingredient-row">
                                             <div class="col-span-4">
                                                 <input type="text" name="ingredient_names[]" 
                                                        value="{{ $name }}"
@@ -307,8 +308,10 @@ input[type=number].no-spinners {
                                                        placeholder="0.00" readonly>
                                             </div>
                                             <div class="col-span-1 flex items-center justify-center">
-                                                <button type="button" onclick="this.parentElement.parentElement.remove(); updateIngredientCount();" 
-                                                        class="w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold">
+                                                <button type="button" 
+                                                        onclick="console.log('Delete clicked!'); if(typeof removeIngredient === 'function') { removeIngredient(this); } else { console.error('removeIngredient not found!'); alert('Function not found: removeIngredient'); }" 
+                                                        class="w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold"
+                                                        title="Remove ingredient">
                                                     ×
                                                 </button>
                                             </div>
@@ -327,6 +330,15 @@ input[type=number].no-spinners {
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                                     </svg>
                                     Add Ingredient
+                                </button>
+                                
+                                <button type="button" 
+                                        onclick="console.log('Update Recipe Ingredients clicked'); if(typeof validateIngredientsBeforeUpdate === 'function') { validateIngredientsBeforeUpdate(); } else { console.error('validateIngredientsBeforeUpdate not found!'); alert('Function not available'); }"
+                                        class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    Update Recipe Ingredients
                                 </button>
                                 
                                 <button type="button" 
@@ -562,9 +574,9 @@ input[type=number].no-spinners {
                     </div>
 
                     <!-- Quick Stats -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden sticky top-96 z-10">
-                        <div class="px-5 py-3 border-b border-gray-200 bg-gray-50">
-                            <h4 class="text-base font-semibold text-gray-900">Quick Stats</h4>
+                    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden sticky top-4">
+                        <div class="px-5 py-3.5 border-b border-gray-100">
+                            <h4 class="text-sm font-semibold text-gray-900">Quick Stats</h4>
                         </div>
                         <div class="p-5">
                             <div class="grid grid-cols-2 gap-4">
@@ -627,6 +639,136 @@ input[type=number].no-spinners {
             </ul>
         </div>
     @endif
+<!-- Ingredient Required Modal -->
+<div id="ingredientRequiredModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="ingredientRequiredModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-yellow-100 rounded-full">
+                        <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Ingredients Required</h3>
+                    <p class="text-sm text-gray-600">
+                        Please add at least one ingredient before calculating nutrition or updating the recipe.
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-end mt-6">
+                <button onclick="closeIngredientRequiredModal()" 
+                        class="px-6 py-2.5 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-lg">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Ingredient Modal -->
+<div id="deleteIngredientModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="deleteIngredientModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Ingredient</h3>
+                    <p class="text-sm text-gray-600">
+                        Are you sure you want to remove <span class="font-semibold text-gray-900">'<span id="deleteIngredientName"></span>'</span> from the recipe?
+                    </p>
+                    <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-xs text-red-700">
+                            <strong>Warning:</strong> This action cannot be undone. The ingredient will be permanently removed from the recipe.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeDeleteIngredientModal()" 
+                        class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+                <button onclick="confirmDeleteIngredient()" 
+                        class="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 shadow-lg">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Missing Field Modal -->
+<div id="missingFieldModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="missingFieldModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-orange-100 rounded-full">
+                        <svg class="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-7.5H21m-4.5 0V5.25m0 0V3.75a.75.75 0 00-.75-.75h-7.5a.75.75 0 00-.75.75v1.5m7.5 0H9.75m0 0h-.375A1.125 1.125 0 008.25 5.25v15A1.125 1.125 0 009.375 21.5h4.5A1.125 1.125 0 0015 20.375V21.5H9.375z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Incomplete Ingredients</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        Please complete all fields for ingredient row(s): <span class="font-semibold text-orange-700" id="incompleteRowsList"></span>
+                    </p>
+                    <div class="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                        <p class="text-xs text-orange-700">
+                            Each ingredient needs: <strong>Name</strong>, <strong>Quantity</strong>, and <strong>Unit</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end mt-6">
+                <button onclick="closeMissingFieldModal()" 
+                        class="px-6 py-2.5 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-lg">
+                    Fix Fields
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Validation Success Modal -->
+<div id="validationSuccessModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="validationSuccessModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">All Ingredients Valid</h3>
+                    <p class="text-sm text-gray-600">
+                        Great! All ingredient fields are properly filled out. Your recipe is ready to be updated.
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-end mt-6">
+                <button onclick="closeValidationSuccessModal()" 
+                        class="px-6 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 shadow-lg">
+                    Perfect!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('styles')
@@ -686,6 +828,342 @@ input[type=number].no-spinners {
 @endpush
 
 <script>
+// CRITICAL: Define removeIngredient function FIRST for immediate availability
+function removeIngredient(button) {
+    console.log('Remove ingredient button clicked', button);
+    
+    try {
+        const row = button.closest('.ingredient-row, .ingredient-item');
+        
+        if (!row) {
+            console.error('Could not find ingredient row to remove');
+            alert('Error: Could not find ingredient row to remove');
+            return;
+        }
+        
+        console.log('Found row:', row);
+        
+        // Get ingredient name for modal display
+        const nameInput = row.querySelector('input[name*="[name]"], input[name="ingredient_names[]"]');
+        const ingredientName = nameInput ? nameInput.value || 'this ingredient' : 'this ingredient';
+        
+        console.log('Ingredient name:', ingredientName);
+        
+        // Check if modal exists
+        const modal = document.getElementById('deleteIngredientModal');
+        if (!modal) {
+            console.error('Delete modal not found! Using fallback confirm.');
+            // Fallback to confirm dialog
+            if (confirm(`Remove "${ingredientName}" from the recipe?`)) {
+                row.remove();
+                if (typeof updateIngredientCount === 'function') {
+                    updateIngredientCount();
+                }
+            }
+            return;
+        }
+        
+        console.log('Modal found, preparing to show modal...');
+        
+        // Store reference for modal callback
+        window.pendingDeleteButton = button;
+        
+        // Show modal
+        if (typeof showDeleteIngredientModal === 'function') {
+            showDeleteIngredientModal(ingredientName, button, function() {
+                console.log('Modal callback: removing ingredient');
+                if (window.pendingDeleteButton) {
+                    const row = window.pendingDeleteButton.closest('.ingredient-row, .ingredient-item');
+                    if (row) {
+                        row.remove();
+                        if (typeof updateIngredientCount === 'function') {
+                            updateIngredientCount();
+                        }
+                    }
+                    window.pendingDeleteButton = null;
+                }
+            });
+        } else {
+            console.error('showDeleteIngredientModal function not found!');
+            // Fallback
+            if (confirm(`Remove "${ingredientName}" from the recipe?`)) {
+                row.remove();
+                if (typeof updateIngredientCount === 'function') {
+                    updateIngredientCount();
+                }
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error in removeIngredient:', error);
+        alert('Error removing ingredient: ' + error.message);
+    }
+}
+
+// Make function globally accessible immediately
+window.removeIngredient = removeIngredient;
+
+// Define modal functions early
+function showDeleteIngredientModal(ingredientName, element, callback) {
+    console.log('showDeleteIngredientModal called with:', { ingredientName, element, callback });
+    
+    const modal = document.getElementById('deleteIngredientModal');
+    const modalContent = document.getElementById('deleteIngredientModalContent');
+    const nameSpan = document.getElementById('deleteIngredientName');
+    
+    console.log('Modal elements found:', { modal: !!modal, modalContent: !!modalContent, nameSpan: !!nameSpan });
+    
+    if (!modal || !modalContent || !nameSpan) {
+        console.error('Modal elements missing! Falling back to confirm dialog.');
+        if (callback && confirm(`Remove "${ingredientName}" from the recipe?`)) {
+            callback();
+        }
+        return false;
+    }
+    
+    // Set ingredient name
+    if (ingredientName) {
+        nameSpan.textContent = ingredientName;
+        console.log('Set ingredient name to:', ingredientName);
+    }
+    
+    // Store callback
+    window.deleteIngredientCallback = callback;
+    console.log('Set callback function');
+    
+    // Show modal
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    console.log('Modal display set to flex, starting animation...');
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+        console.log('Modal animation completed');
+    }, 10);
+    
+    return true;
+}
+
+function closeDeleteIngredientModal() {
+    const modal = document.getElementById('deleteIngredientModal');
+    const modalContent = document.getElementById('deleteIngredientModalContent');
+    
+    if (modal && modalContent) {
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+function confirmDeleteIngredient() {
+    console.log('Delete confirmed');
+    if (window.deleteIngredientCallback) {
+        window.deleteIngredientCallback();
+    }
+    closeDeleteIngredientModal();
+}
+
+// Make modal functions globally accessible
+window.showDeleteIngredientModal = showDeleteIngredientModal;
+window.closeDeleteIngredientModal = closeDeleteIngredientModal;
+window.confirmDeleteIngredient = confirmDeleteIngredient;
+
+// Additional modal functions for validation
+function showIngredientRequiredModal() {
+    console.log('Showing ingredient required modal');
+    const modal = document.getElementById('ingredientRequiredModal');
+    const modalContent = document.getElementById('ingredientRequiredModalContent');
+    
+    if (modal && modalContent) {
+        modal.style.display = 'flex';
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            modalContent.style.transform = 'scale(1)';
+        }, 10);
+    } else {
+        alert('Please add at least one ingredient before updating the recipe.');
+    }
+}
+
+function closeIngredientRequiredModal() {
+    const modal = document.getElementById('ingredientRequiredModal');
+    const modalContent = document.getElementById('ingredientRequiredModalContent');
+    
+    if (modal && modalContent) {
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+function showMissingFieldModal() {
+    console.log('Showing missing field modal');
+    const modal = document.getElementById('missingFieldModal');
+    const modalContent = document.getElementById('missingFieldModalContent');
+    
+    if (modal && modalContent) {
+        modal.style.display = 'flex';
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            modalContent.style.transform = 'scale(1)';
+        }, 10);
+    } else {
+        alert('Please complete all ingredient fields before updating.');
+    }
+}
+
+function closeMissingFieldModal() {
+    const modal = document.getElementById('missingFieldModal');
+    const modalContent = document.getElementById('missingFieldModalContent');
+    
+    if (modal && modalContent) {
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+function showValidationSuccessModal() {
+    console.log('Showing validation success modal');
+    const modal = document.getElementById('validationSuccessModal');
+    const modalContent = document.getElementById('validationSuccessModalContent');
+    
+    if (modal && modalContent) {
+        modal.style.display = 'flex';
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            modalContent.style.transform = 'scale(1)';
+        }, 10);
+    } else {
+        alert('All ingredients are valid! Recipe is ready to be updated.');
+    }
+}
+
+function closeValidationSuccessModal() {
+    const modal = document.getElementById('validationSuccessModal');
+    const modalContent = document.getElementById('validationSuccessModalContent');
+    
+    if (modal && modalContent) {
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+function validateIngredientsBeforeUpdate() {
+    console.log('Validating ingredients before update...');
+    
+    const ingredientRows = document.querySelectorAll('.ingredient-row, .ingredient-item');
+    console.log('Found ingredient rows:', ingredientRows.length);
+    
+    if (ingredientRows.length === 0) {
+        console.log('No ingredients found, showing required modal');
+        showIngredientRequiredModal();
+        return false;
+    }
+    
+    let hasIncomplete = false;
+    const incompleteRows = [];
+    
+    ingredientRows.forEach((row, index) => {
+        const nameInput = row.querySelector('input[name="ingredient_names[]"], input[name*="[name]"]');
+        const quantityInput = row.querySelector('input[name="ingredient_quantities[]"], input[name*="[quantity]"]');
+        const unitSelect = row.querySelector('select[name="ingredient_units[]"], select[name*="[unit]"]');
+        
+        const name = nameInput?.value?.trim();
+        const quantity = quantityInput?.value?.trim();
+        const unit = unitSelect?.value?.trim();
+        
+        console.log(`Row ${index + 1}:`, { name, quantity, unit });
+        
+        if (!name || !quantity || !unit) {
+            hasIncomplete = true;
+            incompleteRows.push(index + 1);
+        }
+    });
+    
+    if (hasIncomplete) {
+        console.log('Incomplete rows found:', incompleteRows);
+        const incompleteList = document.getElementById('incompleteRowsList');
+        if (incompleteList) {
+            incompleteList.textContent = incompleteRows.join(', ');
+        }
+        showMissingFieldModal();
+        return false;
+    }
+    
+    console.log('All ingredients are valid!');
+    showValidationSuccessModal();
+    return true;
+}
+
+// Make validation functions globally accessible
+window.validateIngredientsBeforeUpdate = validateIngredientsBeforeUpdate;
+window.showIngredientRequiredModal = showIngredientRequiredModal;
+window.closeIngredientRequiredModal = closeIngredientRequiredModal;
+window.showMissingFieldModal = showMissingFieldModal;
+window.closeMissingFieldModal = closeMissingFieldModal;
+window.showValidationSuccessModal = showValidationSuccessModal;
+window.closeValidationSuccessModal = closeValidationSuccessModal;
+
+console.log('EARLY: All modal functions defined and available globally');
+
+// Add immediate test button
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - adding test button and checking modal');
+    
+    // Check for modal elements
+    const modal = document.getElementById('deleteIngredientModal');
+    const nameSpan = document.getElementById('deleteIngredientName');
+    
+    console.log('Modal check on DOM load:', {
+        modal: !!modal,
+        nameSpan: !!nameSpan,
+        modalFunctionExists: typeof showDeleteIngredientModal
+    });
+    
+    if (modal) {
+        console.log('✅ Modal found! Testing modal show...');
+        // Quick test - show and hide modal
+        setTimeout(() => {
+            console.log('Testing modal display...');
+            modal.style.display = 'flex';
+            modal.style.opacity = '1';
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                console.log('Modal test completed - modal should work now');
+            }, 1000);
+        }, 500);
+    } else {
+        console.error('❌ Modal not found in DOM!');
+    }
+});
+
 // Grid-based ingredient management functions
 function addRecipeIngredient() {
     const container = document.getElementById('recipe-ingredients');
@@ -695,7 +1173,7 @@ function addRecipeIngredient() {
     }
     
     const newRow = document.createElement('div');
-    newRow.className = 'grid grid-cols-12 gap-3 ingredient-item';
+    newRow.className = 'grid grid-cols-12 gap-3 ingredient-item ingredient-row';
     newRow.innerHTML = `
         <div class="col-span-4">
             <input type="text" name="ingredient_names[]" 
@@ -732,8 +1210,9 @@ function addRecipeIngredient() {
                    placeholder="0.00" readonly>
         </div>
         <div class="col-span-1 flex items-center justify-center">
-            <button type="button" onclick="this.parentElement.parentElement.remove(); updateIngredientCount();" 
-                    class="w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold">
+            <button type="button" onclick="removeIngredient(this)" 
+                    class="w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold"
+                    title="Remove ingredient">
                 ×
             </button>
         </div>
@@ -800,7 +1279,7 @@ function parseEditBulkIngredients(text) {
                 const container = document.getElementById('recipe-ingredients');
                 if (container) {
                     const newRow = document.createElement('div');
-                    newRow.className = 'grid grid-cols-12 gap-3 ingredient-item';
+                    newRow.className = 'grid grid-cols-12 gap-3 ingredient-item ingredient-row';
                     newRow.innerHTML = `
                         <div class="col-span-4">
                             <input type="text" name="ingredient_names[]" 
@@ -840,8 +1319,9 @@ function parseEditBulkIngredients(text) {
                                    placeholder="0.00" readonly>
                         </div>
                         <div class="col-span-1 flex items-center justify-center">
-                            <button type="button" onclick="this.parentElement.parentElement.remove(); updateIngredientCount();" 
-                                    class="w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold">
+                            <button type="button" onclick="removeIngredient(this)" 
+                                    class="w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold"
+                                    title="Remove ingredient">
                                 ×
                             </button>
                         </div>
@@ -944,7 +1424,7 @@ async function calculateRecipeNutrition() {
     });
     
     if (ingredients.length === 0) {
-        alert('Please add at least one ingredient.');
+        showIngredientRequiredModal();
         return;
     }
     
@@ -1937,21 +2417,20 @@ document.addEventListener('DOMContentLoaded', function() {
 // Legacy functions for backward compatibility
 function addIngredient() {
     const template = `
-        <div class="ingredient-row flex gap-3 items-start">
-            <div class="flex-1">
-                <input type="text" name="ingredient_names[]" placeholder="e.g. Chicken breast, Garlic" 
-                       class="ingredient-name w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                       onchange="validateIngredientRow(this);">
+        <div class="grid grid-cols-12 gap-3 ingredient-item ingredient-row">
+            <div class="col-span-4">
+                <input type="text" name="ingredient_names[]" 
+                       class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300 recipe-ing-name" 
+                       placeholder="e.g., Chicken breast, Rice, Garlic">
             </div>
-            <div class="w-20">
-                <input type="text" name="ingredient_quantities[]" placeholder="2" 
-                       required
-                       class="ingredient-quantity w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
-                       oninput="validateIngredientRow(this);">
+            <div class="col-span-2">
+                <input type="number" name="ingredient_quantities[]" 
+                       class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-center transition-all duration-200 bg-white hover:border-gray-300 recipe-ing-qty" 
+                       placeholder="500" min="0.01" step="0.01" onchange="calculateRowTotal(this)">
             </div>
-            <div class="w-20">
-                <select name="ingredient_units[]" class="ingredient-unit w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center">
-                    <option value="">Unit</option>
+            <div class="col-span-2">
+                <select name="ingredient_units[]" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300 recipe-ing-unit">
+                    <option value="">Select unit...</option>
                     <option value="kg">kg</option>
                     <option value="g">g</option>
                     <option value="lb">lb</option>
@@ -1963,42 +2442,75 @@ function addIngredient() {
                     <option value="l">l</option>
                 </select>
             </div>
-            <button type="button" onclick="removeIngredient(this)" 
-                    class="w-8 h-8 flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-red-200 hover:border-red-300"
-                    title="Remove ingredient">
-                ×
-            </button>
+            <div class="col-span-2">
+                <input type="number" name="ingredient_prices[]" 
+                       class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white recipe-ing-price" 
+                       placeholder="0.00" min="0" step="0.01" onchange="calculateRowTotal(this)">
+            </div>
+            <div class="col-span-2">
+                <input type="number" name="ingredient_totals[]" 
+                       class="w-full px-3 py-3 text-sm border border-gray-200 rounded-lg bg-gray-100 text-center text-gray-600 recipe-ing-total" 
+                       placeholder="0.00" readonly>
+            </div>
+            <div class="col-span-1 flex items-center justify-center">
+                <button type="button" onclick="removeIngredient(this)" 
+                        class="w-10 h-10 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center font-semibold"
+                        title="Remove ingredient">
+                    ×
+                </button>
+            </div>
         </div>
     `;
-    document.getElementById('ingredients-list').insertAdjacentHTML('beforeend', template);
+    document.getElementById('recipe-ingredients').insertAdjacentHTML('beforeend', template);
 }
 
-function removeIngredient(button) {
-    console.log('Remove ingredient button clicked', button);
-    const row = button.closest('.ingredient-row');
-    console.log('Found row to remove:', row);
-    
-    if (row) {
-        row.remove();
-        console.log('Ingredient row removed successfully');
-        
-        // Check if there are any ingredients left
-        const remainingRows = document.querySelectorAll('.ingredient-row');
-        console.log('Remaining ingredient rows:', remainingRows.length);
-        
-        // If no ingredients left, you could optionally show a message or add a default row
-        // But the headers will remain visible regardless
-    } else {
-        console.error('Could not find ingredient row to remove');
-    }
-}
+// removeIngredient function defined earlier in script - duplicate removed to prevent conflicts
 
 // Ensure function is globally accessible
 window.removeIngredient = removeIngredient;
 window.addIngredient = addIngredient;
 
+// Debug logging
 console.log('Core functions loaded: addIngredient=', typeof addIngredient, 'removeIngredient=', typeof removeIngredient);
 console.log('Window functions: window.addIngredient=', typeof window.addIngredient, 'window.removeIngredient=', typeof window.removeIngredient);
+
+// Test the modal function exists
+console.log('Modal functions:', {
+    showDeleteIngredientModal: typeof showDeleteIngredientModal,
+    actuallyRemoveIngredient: typeof actuallyRemoveIngredient,
+    pendingDeleteButton: typeof pendingDeleteButton
+});
+
+// Global test function to debug modal
+window.testDeleteModal = function() {
+    console.log('Testing delete modal...');
+    showDeleteIngredientModal('Test Ingredient', null, function() {
+        console.log('Test delete callback executed');
+    });
+};
+
+// Global test function to check if modal elements exist
+window.testModalElements = function() {
+    const modal = document.getElementById('deleteIngredientModal');
+    const modalContent = document.getElementById('deleteIngredientModalContent');
+    const nameSpan = document.getElementById('deleteIngredientName');
+    
+    console.log('Modal elements test:', {
+        modal: !!modal,
+        modalContent: !!modalContent,
+        nameSpan: !!nameSpan,
+        modalDisplay: modal ? modal.style.display : 'N/A',
+        modalHTML: modal ? 'exists' : 'missing'
+    });
+    
+    if (modal) {
+        console.log('Modal found! Testing show...');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+    } else {
+        console.error('Modal element not found in DOM!');
+    }
+};
 
 // Additional helper function for creating ingredient rows programmatically
 function createIngredientRow(name = '', quantity = '', unit = '', price = '') {
@@ -2121,42 +2633,7 @@ function createIngredientRow(name = '', quantity = '', unit = '', price = '') {
     return wrapper;
 }
 
-// Simple ingredient management compatible with current structure
-function addIngredient() {
-    const template = `
-        <div class="ingredient-row flex gap-3 items-start">
-            <div class="flex-1">
-                <input type="text" name="ingredient_names[]" placeholder="e.g. Chicken breast, Garlic" 
-                       class="ingredient-name w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                       onchange="validateIngredientRow(this);">
-            </div>
-            <div class="w-20">
-                <input type="text" name="ingredient_quantities[]" placeholder="2" 
-                       required
-                       class="ingredient-quantity w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center"
-                       oninput="validateIngredientRow(this);">
-            </div>
-            <div class="w-20">
-                <select name="ingredient_units[]" class="ingredient-unit w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center">
-                    <option value="">Unit</option>
-                    <option value="kg">kg</option>
-                    <option value="g">g</option>
-                    <option value="lb">lb</option>
-                    <option value="oz">oz</option>
-                    <option value="cup">cup</option>
-                    <option value="tbsp">tbsp</option>
-                    <option value="tsp">tsp</option>
-                    <option value="ml">ml</option>
-                    <option value="l">l</option>
-                </select>
-            </div>
-            <button type="button" onclick="removeIngredient(this)" 
-                    class="w-8 h-8 flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-red-200 hover:border-red-300"
-                    title="Remove ingredient">
-                ×
-            </button>
-        </div>
-    `;
+// Note: addIngredient function defined above in legacy section
 
 console.log('Functions defined: addIngredient=', typeof addIngredient, 'removeIngredient=', typeof removeIngredient);
 
@@ -2691,6 +3168,230 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize ingredient count on page load
     updateIngredientCount();
+});
+
+// Global Modal Functions for Recipe Edit
+function showIngredientRequiredModal() {
+    const modal = document.getElementById('ingredientRequiredModal');
+    const modalContent = document.getElementById('ingredientRequiredModalContent');
+    
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeIngredientRequiredModal() {
+    const modal = document.getElementById('ingredientRequiredModal');
+    const modalContent = document.getElementById('ingredientRequiredModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+let deleteIngredientCallback = null;
+// showDeleteIngredientModal function already defined earlier - duplicate removed
+}
+
+function closeDeleteIngredientModal() {
+    const modal = document.getElementById('deleteIngredientModal');
+    const modalContent = document.getElementById('deleteIngredientModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        deleteIngredientCallback = null;
+    }, 300);
+}
+
+// confirmDeleteIngredient function already defined earlier - duplicate removed
+
+function showIngredientValidationModal() {
+    // Check for incomplete ingredients
+    const ingredients = document.querySelectorAll('#recipe-ingredients .ingredient-item');
+    let hasIncomplete = false;
+    let incompleteRows = [];
+    
+    ingredients.forEach((row, index) => {
+        const name = row.querySelector('input[name="ingredient_names[]"]')?.value?.trim();
+        const quantity = row.querySelector('input[name="ingredient_quantities[]"]')?.value;
+        const unit = row.querySelector('select[name="ingredient_units[]"]')?.value;
+        
+        if (!name || !quantity || !unit) {
+            hasIncomplete = true;
+            incompleteRows.push(index + 1);
+        }
+    });
+    
+    if (hasIncomplete) {
+        showMissingFieldModal(incompleteRows);
+    } else {
+        showValidationSuccessModal();
+    }
+}
+
+function showMissingFieldModal(incompleteRows) {
+    const modal = document.getElementById('missingFieldModal');
+    const modalContent = document.getElementById('missingFieldModalContent');
+    const rowsList = document.getElementById('incompleteRowsList');
+    
+    rowsList.textContent = incompleteRows.join(', ');
+    
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeMissingFieldModal() {
+    const modal = document.getElementById('missingFieldModal');
+    const modalContent = document.getElementById('missingFieldModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+function showValidationSuccessModal() {
+    const modal = document.getElementById('validationSuccessModal');
+    const modalContent = document.getElementById('validationSuccessModalContent');
+    
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeValidationSuccessModal() {
+    const modal = document.getElementById('validationSuccessModal');
+    const modalContent = document.getElementById('validationSuccessModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// Store the button reference for modal confirmation
+let pendingDeleteButton = null;
+
+// actuallyRemoveIngredient functionality integrated into modal callback - function removed
+
+// validateIngredientsBeforeUpdate function already defined earlier - duplicate removed
+
+// Event handlers for modal interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal debugging setup
+    console.log('=== FINAL MODAL DEBUG SETUP ===');
+    
+    const modal = document.getElementById('deleteIngredientModal');
+    console.log('Delete modal found:', !!modal);
+    
+    if (modal) {
+        console.log('Modal ready and accessible');
+    } else {
+        console.error('CRITICAL: Delete modal not found in DOM!');
+    }
+    
+    // Test function availability
+    console.log('Functions available:', {
+        removeIngredient: typeof window.removeIngredient,
+        showDeleteIngredientModal: typeof window.showDeleteIngredientModal || typeof showDeleteIngredientModal
+    });
+    
+    // Find and log all delete buttons
+    const deleteButtons = document.querySelectorAll('button[onclick*="removeIngredient"]');
+    console.log(`Found ${deleteButtons.length} delete buttons`);
+    
+    // Add test button for manual testing
+    if (!document.getElementById('test-delete-modal-btn')) {
+        const testBtn = document.createElement('button');
+        testBtn.id = 'test-delete-modal-btn';
+        testBtn.textContent = 'TEST MODAL';
+        testBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;';
+        testBtn.onclick = function() {
+            console.log('Manual test clicked - showing modal directly');
+            if (typeof showDeleteIngredientModal === 'function') {
+                showDeleteIngredientModal('Test Ingredient', null, function() {
+                    console.log('Test callback executed');
+                });
+            } else {
+                console.error('showDeleteIngredientModal function not found!');
+            }
+        };
+        document.body.appendChild(testBtn);
+        console.log('Added test button to page');
+    }
+    
+    console.log('=== END FINAL DEBUG ===');
+    
+    // Original event listeners
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeIngredientRequiredModal();
+            closeDeleteIngredientModal();
+            closeMissingFieldModal();
+            closeValidationSuccessModal();
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'ingredientRequiredModal') {
+            closeIngredientRequiredModal();
+        }
+        if (e.target && e.target.id === 'deleteIngredientModal') {
+            closeDeleteIngredientModal();
+        }
+        if (e.target && e.target.id === 'missingFieldModal') {
+            closeMissingFieldModal();
+        }
+        if (e.target && e.target.id === 'validationSuccessModal') {
+            closeValidationSuccessModal();
+        }
+    });
+    
+    // Force test the modal system after 1 second
+    setTimeout(function() {
+        console.log('=== FORCING MODAL TEST ===');
+        const modal = document.getElementById('deleteIngredientModal');
+        if (modal) {
+            console.log('Modal found, testing direct show...');
+            // Direct DOM manipulation test
+            modal.style.display = 'flex';
+            modal.style.opacity = '1';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(function() {
+                modal.style.display = 'none';
+                console.log('Test modal hidden automatically');
+            }, 3000);
+        } else {
+            console.error('CRITICAL: Modal not found in DOM!');
+        }
+    }, 1000);
 });
 </script>
 

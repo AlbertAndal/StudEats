@@ -417,11 +417,18 @@ input[type=number].no-spinners {
                         <h3 class="text-lg font-medium text-gray-900">Recipe Ingredients</h3>
                         <div class="mt-1 text-sm text-gray-600 flex items-center justify-between">
                             <span>Add ingredients manually or use bulk upload.</span>
-                            <button type="button" 
-                                    onclick="toggleFormatHelp()"
-                                    class="text-purple-600 hover:text-purple-700 font-medium">
-                                View bulk upload formats ↓
-                            </button>
+                            <div class="flex items-center space-x-3">
+                                <button type="button" 
+                                        onclick="toggleFormatHelp()"
+                                        class="text-purple-600 hover:text-purple-700 font-medium">
+                                    View bulk upload formats ↓
+                                </button>
+                                <button type="button" 
+                                        onclick="showIngredientInfoModal()"
+                                        class="text-blue-600 hover:text-blue-700 font-medium">
+                                    ℹ️ Ingredient Info
+                                </button>
+                            </div>
                         </div>
                         
                         <!-- Format Help Panel (Hidden by default) -->
@@ -542,6 +549,46 @@ input[type=number].no-spinners {
 </div>
 
 <script>
+// Define modal functions early to ensure availability
+function showDeleteConfirmationModal(ingredientName, onConfirm) {
+    const modal = document.getElementById('deleteConfirmationModal');
+    const modalContent = document.getElementById('deleteConfirmationModalContent');
+    const ingredientNameSpan = document.getElementById('deleteIngredientName');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    ingredientNameSpan.textContent = ingredientName || 'this ingredient';
+    
+    // Set up confirmation handler
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    newConfirmBtn.onclick = function() {
+        onConfirm();
+        closeDeleteConfirmationModal();
+    };
+    
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeDeleteConfirmationModal() {
+    const modal = document.getElementById('deleteConfirmationModal');
+    const modalContent = document.getElementById('deleteConfirmationModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
 let debounceTimer = null;
 let priceCache = new Map();
 
@@ -746,13 +793,13 @@ function validateIngredient(row) {
     
     // Validate required fields
     if (!nameInput.value.trim()) {
-        alert('Please enter ingredient name');
+        showIngredientNameModal();
         nameInput.focus();
         return false;
     }
     
     if (!quantityInput.value || parseFloat(quantityInput.value) <= 0) {
-        alert('Please enter a valid quantity');
+        showValidationModal('Please enter a valid quantity', 'Enter a quantity greater than 0 for this ingredient.');
         quantityInput.focus();
         return false;
     }
@@ -1077,26 +1124,36 @@ function parseBulkIngredients(text) {
 function removeIngredient(button) {
     const container = document.getElementById('ingredients-container');
     const row = button.closest('.ingredient-item');
+    const nameInput = row.querySelector('input[name="ingredient_names[]"]');
+    const ingredientName = nameInput ? nameInput.value.trim() : '';
     
-    if (container.querySelectorAll('.ingredient-item').length > 1) {
+    // Check if this is the last ingredient
+    if (container.querySelectorAll('.ingredient-item').length <= 1) {
+        console.log('Cannot delete the last ingredient');
+        showValidationModal('Cannot Delete Last Ingredient', 'You must have at least one ingredient in your recipe.');
+        return;
+    }
+    
+    // Show confirmation modal
+    showDeleteConfirmationModal(ingredientName || 'this ingredient', function() {
+        console.log('Confirmed deletion of ingredient:', ingredientName || 'unnamed ingredient');
         row.remove();
         updateTotalCost();
-    }
-    
-    toggleRemoveButtons();
-    
-    // Show placeholder if no ingredients left
-    if (container.querySelectorAll('.ingredient-item').length === 0) {
-        container.innerHTML = `
-            <div class="text-center py-6 text-gray-400">
-                <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6h.008v.008H15.75V12zm0 3h.008v.008H15.75V15zm0 3h.008v.008H15.75V18zm-12-3h3.75m0 0h3.75m0 0v3.75M5.25 15V9.75M5.25 15a2.25 2.25 0 01-2.25-2.25V9.75A2.25 2.25 0 015.25 7.5h3.75"/>
-                </svg>
-                <p class="text-sm font-medium text-gray-500">No ingredients added yet</p>
-                <p class="text-xs text-gray-400 mt-1">Click "Add Ingredient" to get started</p>
-            </div>
-        `;
-    }
+        toggleRemoveButtons();
+        
+        // Show placeholder if no ingredients left
+        if (container.querySelectorAll('.ingredient-item').length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-6 text-gray-400">
+                    <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6h.008v.008H15.75V12zm0 3h.008v.008H15.75V15zm0 3h.008v.008H15.75V18zm-12-3h3.75m0 0h3.75m0 0v3.75M5.25 15V9.75M5.25 15a2.25 2.25 0 01-2.25-2.25V9.75A2.25 2.25 0 715.25 7.5h3.75"/>
+                    </svg>
+                    <p class="text-sm font-medium text-gray-500">No ingredients added yet</p>
+                    <p class="text-xs text-gray-400 mt-1">Click "Add Ingredient" to get started</p>
+                </div>
+            `;
+        }
+    });
 }
 
 function toggleRemoveButtons() {
@@ -1230,10 +1287,388 @@ document.addEventListener('DOMContentLoaded', function() {
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-                submitBtn.innerHTML = '<svg class="animate-spin w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Creating Recipe...';
+                submitBtn.innerHTML = '<svg class="animate-spin w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Creating Recipe...';
             }
         });
     }
+
+    // Ingredient Info Modal Functions
+    function showIngredientInfoModal() {
+        const modal = document.getElementById('ingredientInfoModal');
+        const modalContent = document.getElementById('ingredientInfoModalContent');
+        
+        modal.style.display = 'flex';
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        // Animate in
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            modalContent.style.transform = 'scale(1)';
+        }, 10);
+    }
+
+    function closeIngredientInfoModal() {
+        const modal = document.getElementById('ingredientInfoModal');
+        const modalContent = document.getElementById('ingredientInfoModalContent');
+        
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeIngredientInfoModal();
+            closeValidationModal();
+            closeIngredientNameModal();
+            closeDeleteConfirmationModal();
+        }
+    });
+
+    // Close modal on backdrop click
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'ingredientInfoModal') {
+            closeIngredientInfoModal();
+        }
+        if (e.target && e.target.id === 'validationModal') {
+            closeValidationModal();
+        }
+        if (e.target && e.target.id === 'ingredientNameModal') {
+            closeIngredientNameModal();
+        }
+        if (e.target && e.target.id === 'deleteConfirmationModal') {
+            closeDeleteConfirmationModal();
+        }
+    });
+
+    // Validation Modal Functions
+    function showValidationModal(title, message) {
+        const modal = document.getElementById('validationModal');
+        const modalContent = document.getElementById('validationModalContent');
+        const titleElement = document.getElementById('validationModalTitle');
+        const messageElement = document.getElementById('validationModalMessage');
+        
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        
+        modal.style.display = 'flex';
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        // Animate in
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            modalContent.style.transform = 'scale(1)';
+        }, 10);
+    }
+
+    function closeValidationModal() {
+        const modal = document.getElementById('validationModal');
+        const modalContent = document.getElementById('validationModalContent');
+        
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    // Ingredient Name Modal Functions
+    function showIngredientNameModal() {
+        const modal = document.getElementById('ingredientNameModal');
+        const modalContent = document.getElementById('ingredientNameModalContent');
+        
+        modal.style.display = 'flex';
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        // Animate in
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            modalContent.style.transform = 'scale(1)';
+        }, 10);
+    }
+
+    function closeIngredientNameModal() {
+        const modal = document.getElementById('ingredientNameModal');
+        const modalContent = document.getElementById('ingredientNameModalContent');
+        
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
 });
+
+// Global Modal Functions (accessible from onclick attributes)
+
+// Ingredient Info Modal Functions
+function showIngredientInfoModal() {
+    const modal = document.getElementById('ingredientInfoModal');
+    const modalContent = document.getElementById('ingredientInfoModalContent');
+    
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    // Animate in
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeIngredientInfoModal() {
+    const modal = document.getElementById('ingredientInfoModal');
+    const modalContent = document.getElementById('ingredientInfoModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// Validation Modal Functions
+function showValidationModal(title, message) {
+    const modal = document.getElementById('validationModal');
+    const modalContent = document.getElementById('validationModalContent');
+    const titleElement = document.getElementById('validationModalTitle');
+    const messageElement = document.getElementById('validationModalMessage');
+    
+    titleElement.textContent = title;
+    messageElement.textContent = message;
+    
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    // Animate in
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeValidationModal() {
+    const modal = document.getElementById('validationModal');
+    const modalContent = document.getElementById('validationModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// Ingredient Name Modal Functions
+function showIngredientNameModal() {
+    const modal = document.getElementById('ingredientNameModal');
+    const modalContent = document.getElementById('ingredientNameModalContent');
+    
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    // Animate in
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function closeIngredientNameModal() {
+    const modal = document.getElementById('ingredientNameModal');
+    const modalContent = document.getElementById('ingredientNameModalContent');
+    
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
 </script>
+
+<!-- Ingredient Information Modal -->
+<div id="ingredientInfoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 transform transition-all duration-300" id="ingredientInfoModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-blue-100 rounded-full">
+                        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Ingredient Information</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Guidelines for entering ingredient names in the recipe form.
+                    </p>
+                    
+                    <!-- Information Content -->
+                    <div class="space-y-4">
+                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <h4 class="font-semibold text-green-800 mb-2">✅ Best Practices</h4>
+                            <ul class="text-sm text-green-700 space-y-1">
+                                <li>• Use specific ingredient names (e.g., "Chicken breast" not just "Chicken")</li>
+                                <li>• Include preparation when relevant (e.g., "Onion, diced" or "Garlic, minced")</li>
+                                <li>• Use common ingredient names for better price matching</li>
+                                <li>• Be consistent with naming across recipes</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <h4 class="font-semibold text-yellow-800 mb-2">📝 Examples</h4>
+                            <div class="text-sm text-yellow-700 space-y-1">
+                                <div><strong>Good:</strong> "Chicken breast, boneless"</div>
+                                <div><strong>Good:</strong> "Rice, jasmine"</div>
+                                <div><strong>Good:</strong> "Tomato, fresh"</div>
+                                <div><strong>Avoid:</strong> "Chicken (any type)"</div>
+                                <div><strong>Avoid:</strong> "Rice - whatever available"</div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <h4 class="font-semibold text-blue-800 mb-2">⚡ Automatic Features</h4>
+                            <ul class="text-sm text-blue-700 space-y-1">
+                                <li>• Prices are automatically fetched from market data</li>
+                                <li>• Nutritional information is calculated via USDA database</li>
+                                <li>• Total recipe cost is computed from ingredient costs</li>
+                                <li>• Cost per serving is calculated automatically</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Button -->
+            <div class="flex justify-end mt-6">
+                <button onclick="closeIngredientInfoModal()" 
+                        class="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg">
+                    Got it
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Validation Modal -->
+<div id="validationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="validationModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-yellow-100 rounded-full">
+                        <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 id="validationModalTitle" class="text-xl font-bold text-gray-900 mb-2">Validation Error</h3>
+                    <p id="validationModalMessage" class="text-sm text-gray-600">
+                        Please correct the highlighted field.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Action Button -->
+            <div class="flex justify-end mt-6">
+                <button onclick="closeValidationModal()" 
+                        class="px-6 py-2.5 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-lg">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ingredient Name Required Modal -->
+<div id="ingredientNameModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="ingredientNameModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Ingredient Name Required</h3>
+                    <p class="text-sm text-gray-600">
+                        Please enter an ingredient name before saving. All ingredients must have a name to continue.
+                    </p>
+                    <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-xs text-red-700">
+                            <strong>Tip:</strong> Use specific ingredient names like "Chicken breast, boneless" or "Rice, jasmine" for better results.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex justify-end mt-6">
+                <button onclick="closeIngredientNameModal()" 
+                        class="px-6 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 shadow-lg">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300" style="display: none; opacity: 0;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300" id="deleteConfirmationModalContent" style="transform: scale(0.95);">
+        <div class="p-6">
+            <!-- Icon and Title -->
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Ingredient</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        Are you sure you want to remove <strong id="deleteIngredientName" class="text-gray-900">this ingredient</strong> from the recipe?
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeDeleteConfirmationModal()" 
+                        class="px-4 py-2.5 text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-sm">
+                    Cancel
+                </button>
+                <button id="confirmDeleteBtn"
+                        class="px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 shadow-lg">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
