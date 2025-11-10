@@ -156,14 +156,16 @@ input[type=number].no-spinners {
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-800 mb-2">Calories *</label>
-                                    <input type="number" name="calories" value="{{ old('calories', $recipe->calories) }}" min="1" max="9999" required
-                                           class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white" placeholder="300">
+                                    <input type="number" name="calories" value="{{ old('calories', $recipe->calories) }}" min="1" max="9999" required readonly
+                                           class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg text-center bg-gray-100 text-gray-700 cursor-not-allowed" placeholder="Auto-calculated">
+                                    <p class="text-xs text-gray-500 mt-1">Automatically calculated from nutritional information</p>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-800 mb-2">Cost (₱) *</label>
-                                    <input type="number" name="cost" value="{{ old('cost', $recipe->cost) }}" min="0" max="9999.99" step="0.01" required
-                                           class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center transition-colors duration-200 bg-gray-50 focus:bg-white" placeholder="99.99">
+                                    <input type="number" name="cost" value="{{ old('cost', $recipe->cost) }}" min="0" max="9999.99" step="0.01" required readonly
+                                           class="w-full px-3 py-3 text-sm border border-gray-300 rounded-lg text-center bg-gray-100 text-gray-700 cursor-not-allowed" placeholder="Auto-calculated">
+                                    <p class="text-xs text-gray-500 mt-1">Automatically calculated from ingredient costs</p>
                                 </div>
                             </div>
 
