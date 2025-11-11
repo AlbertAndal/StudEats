@@ -6,12 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class ProfilePhotoController extends Controller
 {
     /**
-     * Upload and process profile photo directly to S3.
+     * Upload and process profile photo.
      */
     public function upload(Request $request)
     {
@@ -36,20 +35,36 @@ class ProfilePhotoController extends Controller
             }
 
             $file = $request->file('photo');
-            $filename = 'profile_photos/profile_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = 'profile_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             
-            // Store file directly to S3
-            $path = $file->storeAs('profile_photos', 'profile_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension(), 's3');
+            // Ensure directories exist
+            $tempDir = storage_path('app/public/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
             
-            // Update user's profile photo
-            $user->update(['profile_photo' => $path]);
+            $profilePhotosDir = storage_path('app/public/profile_photos');
+            if (!file_exists($profilePhotosDir)) {
+                mkdir($profilePhotosDir, 0755, true);
+            }
+            
+            // Store original file temporarily
+            $tempPath = $file->storeAs('temp', $filename, 'public');
+            $fullTempPath = storage_path('app/public/' . $tempPath);
+            
+            // Try to get image dimensions using basic functions
+            $imageInfo = @getimagesize($fullTempPath);
+            $width = $imageInfo ? $imageInfo[0] : 800;
+            $height = $imageInfo ? $imageInfo[1] : 600;
             
             return response()->json([
                 'success' => true,
-                'message' => 'Profile photo uploaded and updated successfully!',
+                'message' => 'Photo uploaded successfully. Please crop your image.',
                 'data' => [
-                    'photo_url' => $user->getProfilePhotoUrlAttribute(),
-                    'avatar_url' => $user->getAvatarUrl(),
+                    'temp_path' => $tempPath,
+                    'preview_url' => asset('storage/' . $tempPath),
+                    'width' => $width,
+                    'height' => $height,
                 ]
             ]);
 
@@ -67,17 +82,102 @@ class ProfilePhotoController extends Controller
     }
 
     /**
-     * Crop method - simplified since we're using direct S3 upload
-     * This method is kept for backward compatibility but now just returns the current photo
+     * Crop and save the profile photo.
      */
     public function crop(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'temp_path' => 'required|string',
+            'x' => 'required|numeric',
+            'y' => 'required|numeric',
+            'width' => 'required|numeric|min:50',
+            'height' => 'required|numeric|min:50',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid crop data.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         try {
             $user = Auth::user();
+            $tempPath = $request->temp_path;
+            $fullTempPath = storage_path('app/public/' . $tempPath);
+            
+            if (!file_exists($fullTempPath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Temporary file not found. Please upload again.'
+                ], 404);
+            }
+
+            // Check if Intervention Image is available and GD/Imagick is installed
+            if (class_exists('Intervention\Image\ImageManager') && 
+                (extension_loaded('gd') || extension_loaded('imagick'))) {
+                
+                // Use Intervention Image for advanced processing
+                $manager = new \Intervention\Image\ImageManager(
+                    extension_loaded('imagick') ? 
+                    new \Intervention\Image\Drivers\Imagick\Driver() : 
+                    new \Intervention\Image\Drivers\Gd\Driver()
+                );
+                
+                $image = $manager->read($fullTempPath);
+                
+                // Crop the image
+                $image->crop(
+                    (int) $request->width,
+                    (int) $request->height,
+                    (int) $request->x,
+                    (int) $request->y
+                );
+                
+                // Resize to standard profile photo size (400x400)
+                $image->resize(400, 400);
+                
+                // Create final filename
+                $finalFilename = 'profile_photos/profile_' . $user->id . '_' . time() . '.jpg';
+                $finalPath = storage_path('app/public/' . $finalFilename);
+                
+                // Ensure directory exists
+                $directory = dirname($finalPath);
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0755, true);
+                }
+                
+                // Save the cropped image
+                $image->toJpeg(85)->save($finalPath);
+                
+            } else {
+                // Fallback: Just copy the original file (basic functionality)
+                $finalFilename = 'profile_photos/profile_' . $user->id . '_' . time() . '.' . 
+                                pathinfo($fullTempPath, PATHINFO_EXTENSION);
+                $finalPath = storage_path('app/public/' . $finalFilename);
+                
+                // Ensure directory exists
+                $directory = dirname($finalPath);
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0755, true);
+                }
+                
+                // Copy the original file
+                copy($fullTempPath, $finalPath);
+            }
+            
+            // Update user's profile photo
+            $user->update(['profile_photo' => $finalFilename]);
+            
+            // Clean up temporary file
+            if (file_exists($fullTempPath)) {
+                unlink($fullTempPath);
+            }
             
             return response()->json([
                 'success' => true,
-                'message' => 'Photo processing completed.',
+                'message' => 'Profile photo updated successfully!',
                 'data' => [
                     'photo_url' => $user->getProfilePhotoUrlAttribute(),
                     'avatar_url' => $user->getAvatarUrl(),

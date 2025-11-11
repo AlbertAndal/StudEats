@@ -333,10 +333,10 @@ class User extends Authenticatable implements MustVerifyEmail
             return $this->profile_photo;
         }
 
-        // Use Storage facade for reliable URL generation (R2 Cloud Storage compatible)
+        // Use Storage facade for reliable URL generation
         // This works with both local storage and cloud storage
         try {
-            return \Illuminate\Support\Facades\Storage::disk('s3')->url($this->profile_photo);
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->profile_photo);
         } catch (\Exception $e) {
             // Fallback to asset helper if Storage fails
             return asset('storage/' . $this->profile_photo);
@@ -376,15 +376,10 @@ class User extends Authenticatable implements MustVerifyEmail
             return true;
         }
 
-        try {
-            // Delete from S3 cloud storage
-            \Illuminate\Support\Facades\Storage::disk('s3')->delete($this->profile_photo);
-        } catch (\Exception $e) {
-            \Log::warning('Failed to delete profile photo from cloud storage', [
-                'user_id' => $this->id,
-                'photo_path' => $this->profile_photo,
-                'error' => $e->getMessage()
-            ]);
+        $path = storage_path('app/public/' . $this->profile_photo);
+        
+        if (file_exists($path)) {
+            unlink($path);
         }
 
         $this->update(['profile_photo' => null]);

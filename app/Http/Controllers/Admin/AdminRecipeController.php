@@ -130,10 +130,10 @@ class AdminRecipeController extends Controller
                 if ($image->isValid()) {
                     // Generate unique filename
                     $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $imagePath = $image->storeAs('meals', $filename, 's3');
+                    $imagePath = $image->storeAs('meals', $filename, 'public');
                     
                     // Verify the file was stored successfully
-                    if (!Storage::disk('s3')->exists($imagePath)) {
+                    if (!Storage::disk('public')->exists($imagePath)) {
                         throw new \Exception('Failed to store image file');
                     }
                 } else {
@@ -269,16 +269,16 @@ class AdminRecipeController extends Controller
                 
                 if ($image->isValid()) {
                     // Delete old image
-                    if ($recipe->image_path && Storage::disk('s3')->exists($recipe->image_path)) {
-                        Storage::disk('s3')->delete($recipe->image_path);
+                    if ($recipe->image_path && Storage::disk('public')->exists($recipe->image_path)) {
+                        Storage::disk('public')->delete($recipe->image_path);
                     }
                     
                     // Store new image with unique filename
                     $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $imagePath = $image->storeAs('meals', $filename, 's3');
+                    $imagePath = $image->storeAs('meals', $filename, 'public');
                     
                     // Verify the file was stored successfully
-                    if (Storage::disk('s3')->exists($imagePath)) {
+                    if (Storage::disk('public')->exists($imagePath)) {
                         $validated['image_path'] = $imagePath;
                     } else {
                         throw new \Exception('Failed to store image file');
@@ -358,7 +358,7 @@ class AdminRecipeController extends Controller
         DB::transaction(function () use ($recipe) {
             // Delete image file
             if ($recipe->image_path) {
-                Storage::disk('s3')->delete($recipe->image_path);
+                Storage::disk('public')->delete($recipe->image_path);
             }
 
             AdminLog::createLog(
