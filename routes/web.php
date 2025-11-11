@@ -155,6 +155,16 @@ Route::get('/recipes/{meal}', [RecipeController::class, 'show'])->name('recipes.
 
 // Custom storage file serving for Laravel Cloud compatibility
 Route::get('/storage/{path}', function ($path) {
+    // Decode URL-encoded path and normalize slashes
+    $path = urldecode($path);
+    $path = str_replace(['\\', '//'], '/', $path);
+    
+    // Security: Prevent directory traversal attacks
+    if (str_contains($path, '..')) {
+        \Log::warning('Directory traversal attempt blocked', ['path' => $path]);
+        abort(403, 'Invalid path');
+    }
+    
     $filePath = storage_path('app/public/' . $path);
     
     if (!file_exists($filePath)) {
@@ -162,9 +172,16 @@ Route::get('/storage/{path}', function ($path) {
             'requested_path' => $path,
             'full_path' => $filePath,
             'storage_exists' => is_dir(storage_path('app/public')),
-            'files_in_meals' => is_dir(storage_path('app/public/meals')) ? array_slice(scandir(storage_path('app/public/meals')), 0, 5) : 'meals dir not found'
+            'meals_dir_exists' => is_dir(storage_path('app/public/meals')),
+            'sample_files' => is_dir(storage_path('app/public/meals')) ? array_slice(scandir(storage_path('app/public/meals')), 2, 5) : []
         ]);
         abort(404, 'File not found');
+    }
+    
+    // Ensure it's a file, not a directory
+    if (!is_file($filePath)) {
+        \Log::warning('Requested path is not a file', ['path' => $path]);
+        abort(404, 'Not a file');
     }
     
     $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
