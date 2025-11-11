@@ -46,9 +46,9 @@ class Meal extends Model
             return $this->image_path;
         }
 
-        // Use Storage facade for reliable URL generation (Laravel Cloud compatible)
+        // Use Storage facade for reliable URL generation (R2 Cloud Storage compatible)
         try {
-            return Storage::disk('public')->url($this->image_path);
+            return Storage::disk('s3')->url($this->image_path);
         } catch (\Exception $e) {
             \Log::warning('Failed to generate storage URL for meal image', [
                 'meal_id' => $this->id,
