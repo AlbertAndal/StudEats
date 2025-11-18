@@ -15,11 +15,16 @@
             </h1>
             <p class="mt-2 text-gray-600">Plan and manage your daily meals with ease</p>
         </div>
-        <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col sm:flex-row gap-2">
             <a href="{{ route('meal-plans.weekly') }}" 
                class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
                 <x-icon name="calendar-days" class="w-4 h-4 mr-2" />
                 Weekly View
+            </a>
+            <a href="{{ route('meal-plans.bulk-create') }}" 
+               class="inline-flex items-center justify-center px-4 py-2 border border-green-600 text-sm font-medium rounded-md text-green-600 bg-white hover:bg-green-50 transition-colors duration-200">
+                <x-icon name="calendar-plus" class="w-4 h-4 mr-2" />
+                Plan Full Day
             </a>
             <a href="{{ route('meal-plans.create') }}" 
                class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors duration-200">

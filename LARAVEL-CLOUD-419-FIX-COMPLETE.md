@@ -67,7 +67,7 @@ MAIL_FROM_NAME=StudEats
 
 # API Keys (if applicable)
 NUTRITION_API_URL=https://api.nal.usda.gov/fdc/v1
-NUTRITION_API_KEY=Qs1e7LNogSHAQI1GBnHA9vuWx2OwzJceO4FHhEdP
+NUTRITION_API_KEY=your_api_key_here
 
 # Vite
 VITE_APP_NAME=StudEats

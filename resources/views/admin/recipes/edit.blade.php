@@ -125,12 +125,22 @@ input[type=number].no-spinners {
                             <div class="grid grid-cols-6 gap-2">
                                 <div class="col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Cuisine *</label>
-                                    <select name="cuisine_type" required class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300">
-                                        <option value="">Select</option>
-                                        @foreach($cuisineTypes as $cuisine)
-                                            <option value="{{ $cuisine }}" {{ old('cuisine_type', $recipe->cuisine_type) === $cuisine ? 'selected' : '' }}>{{ ucfirst($cuisine) }}</option>
-                                        @endforeach
-                                    </select>
+                                    <div class="relative">
+                                        <select name="cuisine_type" id="cuisine_type_select" required class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all duration-200 bg-white hover:border-gray-300" onchange="handleCuisineChange()">
+                                            <option value="">Select or type new...</option>
+                                            @foreach($cuisineTypes as $cuisine)
+                                                <option value="{{ $cuisine }}" {{ old('cuisine_type', $recipe->cuisine_type) === $cuisine ? 'selected' : '' }}>{{ ucfirst($cuisine) }}</option>
+                                            @endforeach
+                                            <option value="_custom">➕ Add New Cuisine Type</option>
+                                        </select>
+                                        <input type="text" name="cuisine_type" id="cuisine_type_input" 
+                                               class="hidden w-full px-3 py-2.5 text-sm border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-green-50" 
+                                               placeholder="Enter new cuisine type (e.g., Mediterranean, Thai, Korean)"
+                                               value="{{ !in_array(old('cuisine_type', $recipe->cuisine_type), $cuisineTypes->toArray()) ? old('cuisine_type', $recipe->cuisine_type) : '' }}">
+                                        <button type="button" id="cuisine_cancel_btn" onclick="cancelCustomCuisine()" 
+                                                class="hidden absolute right-2 top-2 text-gray-400 hover:text-gray-600 text-lg font-bold" title="Cancel">×</button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Choose from existing types or create a new cuisine category</p>
                                 </div>
 
                                 <div class="col-span-2">
@@ -826,6 +836,24 @@ input[type=number].no-spinners {
         .ingredient-item > *:nth-child(4), 
         .ingredient-item > *:nth-child(5) { grid-column: span 1; }
     }
+    
+    /* Custom cuisine input styling */
+    #cuisine_type_input {
+        transition: all 0.3s ease;
+    }
+    #cuisine_type_input:focus {
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        border-color: #22c55e;
+    }
+    
+    /* Animation for smooth transitions */
+    .cuisine-transition {
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .cuisine-transition.hidden {
+        opacity: 0;
+        transform: translateY(-2px);
+    }
 </style>
 @endpush
 
@@ -1134,9 +1162,89 @@ window.closeValidationSuccessModal = closeValidationSuccessModal;
 
 console.log('EARLY: All modal functions defined and available globally');
 
+// Cuisine Type Management Functions
+function handleCuisineChange() {
+    const select = document.getElementById('cuisine_type_select');
+    const input = document.getElementById('cuisine_type_input');
+    const cancelBtn = document.getElementById('cuisine_cancel_btn');
+    
+    if (select.value === '_custom') {
+        // Show custom input, hide select
+        select.classList.add('hidden');
+        input.classList.remove('hidden');
+        input.setAttribute('name', 'cuisine_type');
+        input.focus();
+        cancelBtn.classList.remove('hidden');
+        
+        // Remove name attribute from select to prevent submission
+        select.removeAttribute('name');
+    } else if (select.value) {
+        // Ensure input is hidden and select is active
+        input.classList.add('hidden');
+        select.classList.remove('hidden');
+        cancelBtn.classList.add('hidden');
+        
+        // Set proper name attributes
+        select.setAttribute('name', 'cuisine_type');
+        input.removeAttribute('name');
+    }
+}
+
+function cancelCustomCuisine() {
+    const select = document.getElementById('cuisine_type_select');
+    const input = document.getElementById('cuisine_type_input');
+    const cancelBtn = document.getElementById('cuisine_cancel_btn');
+    
+    // Hide custom input, show select
+    input.classList.add('hidden');
+    input.value = '';
+    select.classList.remove('hidden');
+    cancelBtn.classList.add('hidden');
+    
+    // Reset select to empty option
+    select.value = '';
+    
+    // Set proper name attributes
+    select.setAttribute('name', 'cuisine_type');
+    input.removeAttribute('name');
+}
+
+// Initialize cuisine type form based on current value
+function initializeCuisineForm() {
+    const select = document.getElementById('cuisine_type_select');
+    const input = document.getElementById('cuisine_type_input');
+    const cancelBtn = document.getElementById('cuisine_cancel_btn');
+    
+    // Check if current value is not in the dropdown options
+    const currentValue = '{{ old('cuisine_type', $recipe->cuisine_type) }}';
+    const availableOptions = Array.from(select.options).map(opt => opt.value);
+    
+    if (currentValue && !availableOptions.includes(currentValue) && currentValue !== '_custom') {
+        // Current value is a custom cuisine type, show input field
+        input.value = currentValue;
+        select.classList.add('hidden');
+        input.classList.remove('hidden');
+        input.setAttribute('name', 'cuisine_type');
+        cancelBtn.classList.remove('hidden');
+        select.removeAttribute('name');
+    } else {
+        // Standard dropdown behavior
+        select.setAttribute('name', 'cuisine_type');
+        input.removeAttribute('name');
+    }
+}
+
+// Make functions globally accessible
+window.handleCuisineChange = handleCuisineChange;
+window.cancelCustomCuisine = cancelCustomCuisine;
+window.initializeCuisineForm = initializeCuisineForm;
+
 // Add immediate test button
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded - adding test button and checking modal');
+    
+    // Initialize cuisine form
+    initializeCuisineForm();
     
     // Check for modal elements
     const modal = document.getElementById('deleteIngredientModal');

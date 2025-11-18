@@ -283,6 +283,147 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Meal Filters -->
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                        <form method="GET" action="{{ route('meal-plans.create') }}" id="meal-filter-form" class="space-y-4">
+                            <!-- Preserve date and meal_id parameters -->
+                            <input type="hidden" name="date" value="{{ request('date') }}">
+                            <input type="hidden" name="meal_id" value="{{ request('meal_id') }}">
+                            @if(request('meal_type'))
+                                <input type="hidden" name="meal_type" value="{{ request('meal_type') }}">
+                            @endif
+                            
+                            <div class="flex flex-col lg:flex-row items-start lg:items-end gap-3">
+                                <!-- Filter Label -->
+                                <div class="flex items-center space-x-2 lg:flex-shrink-0">
+                                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
+                                    </svg>
+                                    <span class="text-sm font-medium text-gray-700 whitespace-nowrap">Filter:</span>
+                                </div>
+                                
+                                <!-- Filter Grid - Optimized for horizontal space -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 flex-1 w-full">
+                                    <!-- Search Input -->
+                                    <div class="sm:col-span-1">
+                                        <div class="relative">
+                                            <input type="text" 
+                                                   id="search" 
+                                                   name="search" 
+                                                   value="{{ request('search') }}" 
+                                                   placeholder="Search..."
+                                                   class="w-full px-2 py-1.5 pl-8 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-all duration-200">
+                                            <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                                                <svg class="h-3.5 w-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cuisine Filter -->
+                                    <div class="sm:col-span-1">
+                                        <div class="relative">
+                                            <select id="cuisine_type" 
+                                                    name="cuisine_type" 
+                                                    class="w-full px-2 py-1.5 pr-7 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-all duration-200 appearance-none bg-white">
+                                                <option value="">Cuisine</option>
+                                                @foreach($availableCuisines as $cuisine)
+                                                    <option value="{{ $cuisine }}" {{ request('cuisine_type') == $cuisine ? 'selected' : '' }}>{{ $cuisine }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                                                <svg class="h-3.5 w-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Budget Filter -->
+                                    <div class="sm:col-span-1 lg:col-span-1">
+                                        <div class="relative">
+                                            <input type="number" 
+                                                   id="budget" 
+                                                   name="budget" 
+                                                   value="{{ request('budget') }}" 
+                                                   placeholder="Budget"
+                                                   min="0"
+                                                   step="10"
+                                                   class="w-full px-2 py-1.5 pl-7 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-all duration-200">
+                                            <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                                                <span class="text-gray-400 text-sm">₱</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Price Range Filter -->
+                                    <div class="sm:col-span-1">
+                                        <div class="relative">
+                                            <select id="price_range" 
+                                                    name="price_range" 
+                                                    class="w-full px-2 py-1.5 pr-7 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-all duration-200 appearance-none bg-white">
+                                                <option value="">Price</option>
+                                                <option value="under_50" {{ request('price_range') == 'under_50' ? 'selected' : '' }}>< ₱50</option>
+                                                <option value="50_100" {{ request('price_range') == '50_100' ? 'selected' : '' }}>₱50-100</option>
+                                                <option value="100_200" {{ request('price_range') == '100_200' ? 'selected' : '' }}>₱100-200</option>
+                                                <option value="over_200" {{ request('price_range') == 'over_200' ? 'selected' : '' }}>> ₱200</option>
+                                            </select>
+                                            <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                                                <svg class="h-3.5 w-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Calorie Range Filter -->
+                                    <div class="sm:col-span-1">
+                                        <div class="relative">
+                                            <select id="calorie_range" 
+                                                    name="calorie_range" 
+                                                    class="w-full px-2 py-1.5 pr-7 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-all duration-200 appearance-none bg-white">
+                                                <option value="">Calories</option>
+                                                <option value="under_100" {{ request('calorie_range') == 'under_100' ? 'selected' : '' }}>< 100</option>
+                                                <option value="100_200" {{ request('calorie_range') == '100_200' ? 'selected' : '' }}>100-200</option>
+                                                <option value="200_300" {{ request('calorie_range') == '200_300' ? 'selected' : '' }}>200-300</option>
+                                                <option value="300_400" {{ request('calorie_range') == '300_400' ? 'selected' : '' }}>300-400</option>
+                                                <option value="400_500" {{ request('calorie_range') == '400_500' ? 'selected' : '' }}>400-500</option>
+                                                <option value="over_500" {{ request('calorie_range') == 'over_500' ? 'selected' : '' }}>> 500</option>
+                                            </select>
+                                            <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                                                <svg class="h-3.5 w-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Filter Actions -->
+                                <div class="flex items-center space-x-2 lg:flex-shrink-0">
+                                    <button type="submit" 
+                                            class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition-all duration-200 whitespace-nowrap">
+                                        <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
+                                        </svg>
+                                        Filter
+                                    </button>
+                                    
+                                    @if(request()->hasAny(['search', 'cuisine_type', 'budget', 'price_range', 'calorie_range']))
+                                        <a href="{{ route('meal-plans.create', array_filter(['date' => request('date'), 'meal_id' => request('meal_id'), 'meal_type' => request('meal_type')])) }}" 
+                                           class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-all duration-200 whitespace-nowrap">
+                                            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                            Clear
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                     <div class="p-6">
                         @if($meals->count() > 0)
                             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -300,7 +441,7 @@
                                          aria-label="Select {{ $meal->name }} for your meal plan">
                                         
                                         <!-- Meal Image/Icon -->
-                                        <div class="relative mb-3">
+                                        <div class="relative mb-4">
                                             @if($meal->image_path)
                                                 <div class="w-full h-32 bg-gray-100 rounded-md overflow-hidden group-hover:shadow-md transition-shadow duration-300">
                                                     <img src="{{ $meal->image_url }}" 
@@ -317,6 +458,14 @@
                                                     <span class="text-4xl opacity-70">🍽️</span>
                                                 </div>
                                             @endif
+                                            
+                                            <!-- Price Badge - positioned within image bounds -->
+                                            <div class="absolute top-2 right-2 bg-green-600 group-hover:bg-green-700 text-white px-1.5 py-0.5 rounded-md shadow-md transition-colors duration-300 z-10">
+                                                <div class="flex items-center gap-0.5">
+                                                    <span class="text-xs">₱</span>
+                                                    <span class="text-xs font-bold">{{ number_format($displayCost, 0) }}</span>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <!-- Meal Info -->

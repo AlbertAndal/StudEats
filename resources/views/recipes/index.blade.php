@@ -41,7 +41,7 @@
                 </div>
                 <div class="p-6">
                     <form method="GET" action="{{ route('recipes.index') }}" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                             <!-- Search -->
                             <div>
                                 <label for="search" class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Search</label>
@@ -67,11 +67,67 @@
                                     <select name="cuisine_type" id="cuisine_type" 
                                             class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm transition-all">
                                         <option value="">All Cuisines</option>
-                                        @foreach($cuisineTypes as $type)
+                                        @foreach($availableCuisines as $type)
                                             <option value="{{ $type }}" {{ request('cuisine_type') == $type ? 'selected' : '' }}>
                                                 {{ ucfirst($type) }}
                                             </option>
                                         @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Meal Type Filter -->
+                            <div>
+                                <label for="meal_type" class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Meal Type</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-lg">⏰</span>
+                                    </div>
+                                    <select name="meal_type" id="meal_type" 
+                                            class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm transition-all">
+                                        <option value="">All Meal Types</option>
+                                        <option value="breakfast" {{ request('meal_type') == 'breakfast' ? 'selected' : '' }}>🍳 Breakfast</option>
+                                        <option value="lunch" {{ request('meal_type') == 'lunch' ? 'selected' : '' }}>🍽️ Lunch</option>
+                                        <option value="dinner" {{ request('meal_type') == 'dinner' ? 'selected' : '' }}>🍴 Dinner</option>
+                                        <option value="snack" {{ request('meal_type') == 'snack' ? 'selected' : '' }}>🍪 Snack</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Price Range Filter -->
+                            <div>
+                                <label for="price_range" class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Price Range</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-lg">💰</span>
+                                    </div>
+                                    <select name="price_range" id="price_range" 
+                                            class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm transition-all">
+                                        <option value="">All Prices</option>
+                                        <option value="under_50" {{ request('price_range') == 'under_50' ? 'selected' : '' }}>Under ₱50</option>
+                                        <option value="50_100" {{ request('price_range') == '50_100' ? 'selected' : '' }}>₱50 - ₱100</option>
+                                        <option value="100_200" {{ request('price_range') == '100_200' ? 'selected' : '' }}>₱100 - ₱200</option>
+                                        <option value="over_200" {{ request('price_range') == 'over_200' ? 'selected' : '' }}>Over ₱200</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Calorie Range Filter -->
+                            <div>
+                                <label for="calorie_range" class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Calorie Range</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-lg">🔥</span>
+                                    </div>
+                                    <select name="calorie_range" id="calorie_range" 
+                                            class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm transition-all">
+                                        <option value="">All Calories</option>
+                                        <option value="under_100" {{ request('calorie_range') == 'under_100' ? 'selected' : '' }}>Under 100 cal</option>
+                                        <option value="100_200" {{ request('calorie_range') == '100_200' ? 'selected' : '' }}>100 - 200 cal</option>
+                                        <option value="200_300" {{ request('calorie_range') == '200_300' ? 'selected' : '' }}>200 - 300 cal</option>
+                                        <option value="300_400" {{ request('calorie_range') == '300_400' ? 'selected' : '' }}>300 - 400 cal</option>
+                                        <option value="400_500" {{ request('calorie_range') == '400_500' ? 'selected' : '' }}>400 - 500 cal</option>
+                                        <option value="over_500" {{ request('calorie_range') == 'over_500' ? 'selected' : '' }}>Over 500 cal</option>
                                     </select>
                                 </div>
                             </div>
@@ -86,7 +142,7 @@
                                 </button>
                             </div>
                         </div>
-                        @if(request('search') || request('cuisine_type'))
+                        @if(request('search') || request('cuisine_type') || request('price_range') || request('calorie_range'))
                             <div class="flex items-center justify-between pt-2 border-t border-gray-200">
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs text-gray-500">Active filters:</span>

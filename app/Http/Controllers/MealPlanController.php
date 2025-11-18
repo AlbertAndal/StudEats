@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class MealPlanController extends Controller
 {
@@ -75,30 +76,122 @@ class MealPlanController extends Controller
             try {
                 $mealsQuery = Meal::query();
                 
-                // Apply budget filter
-                $budget = $user->daily_budget ?? 500;
-                if ($budget && is_numeric($budget)) {
-                    $mealsQuery->withinBudget((float)$budget);
-                }
+                // Only apply filters if explicitly requested through filter form
+                $hasAnyFilters = request()->hasAny(['search', 'cuisine_type', 'budget', 'price_range', 'calorie_range']);
+                
+                // If no explicit filters, show all meals (only apply basic budget constraint)
+                if (!$hasAnyFilters) {
+                    // Apply basic budget filter to prevent showing extremely expensive meals
+                    $budget = $user->daily_budget ?? 1000; // Increased default to show more meals
+                    if ($budget && is_numeric($budget)) {
+                        $mealsQuery->where('cost', '<=', (float)$budget * 2); // Allow up to 2x daily budget
+                    }
+                } else {
+                    // Apply all explicit filters when filtering is requested
+                    
+                    // Search functionality
+                    if (request('search')) {
+                        $search = request('search');
+                        $mealsQuery->where(function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%")
+                              ->orWhere('description', 'like', "%{$search}%")
+                              ->orWhere('cuisine_type', 'like', "%{$search}%");
+                        });
+                    }
 
-                // Safely apply BMI filtering - only if not 'normal' or 'unknown'
-                if (!in_array($userBMICategory, ['normal', 'unknown'])) {
-                    try {
-                        $mealsQuery->forBMICategory($userBMICategory);
-                    } catch (\Exception $e) {
-                        Log::warning('BMI category filtering failed: ' . $e->getMessage(), [
-                            'bmi_category' => $userBMICategory,
-                            'error' => $e->getMessage()
-                        ]);
-                        // Continue without BMI filtering - don't break the query
+                    // Filter by cuisine type
+                    if (request('cuisine_type')) {
+                        $mealsQuery->where('cuisine_type', request('cuisine_type'));
+                    }
+
+                    // Filter by budget
+                    if (request('budget')) {
+                        $budgetFilter = (float)request('budget');
+                        $mealsQuery->where('cost', '<=', $budgetFilter);
+                    }
+
+                    // Apply user's daily budget filter if no explicit budget filter
+                    if (!request('budget')) {
+                        $budget = $user->daily_budget ?? 1000;
+                        if ($budget && is_numeric($budget)) {
+                            $mealsQuery->where('cost', '<=', (float)$budget);
+                        }
+                    }
+
+                    // Apply BMI filtering only when explicitly filtering
+                    if (!in_array($userBMICategory, ['normal', 'unknown'])) {
+                        try {
+                            $mealsQuery->forBMICategory($userBMICategory);
+                        } catch (\Exception $e) {
+                            Log::warning('BMI category filtering failed: ' . $e->getMessage(), [
+                                'bmi_category' => $userBMICategory,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+                    }
+
+                    // Filter by meal type when explicitly filtering
+                    if (request('meal_type')) {
+                        $mealType = request('meal_type');
+                        if (in_array($mealType, ['breakfast', 'lunch', 'dinner', 'snack'])) {
+                            $mealsQuery->byMealType($mealType);
+                        }
                     }
                 }
 
-                // Filter by meal type if specified
-                if (request('meal_type')) {
-                    $mealType = request('meal_type');
-                    if (in_array($mealType, ['breakfast', 'lunch', 'dinner', 'snack'])) {
-                        $mealsQuery->byMealType($mealType);
+                // Filter by price range if specified
+                if (request('price_range')) {
+                    $priceRange = request('price_range');
+                    switch ($priceRange) {
+                        case 'under_50':
+                            $mealsQuery->where('cost', '<', 50);
+                            break;
+                        case '50_100':
+                            $mealsQuery->whereBetween('cost', [50, 100]);
+                            break;
+                        case '100_200':
+                            $mealsQuery->whereBetween('cost', [100, 200]);
+                            break;
+                        case 'over_200':
+                            $mealsQuery->where('cost', '>', 200);
+                            break;
+                    }
+                }
+
+                // Filter by calorie range if specified
+                if (request('calorie_range')) {
+                    $calorieRange = request('calorie_range');
+                    switch ($calorieRange) {
+                        case 'under_100':
+                            $mealsQuery->whereHas('nutritionalInfo', function ($query) {
+                                $query->where('calories', '<', 100);
+                            });
+                            break;
+                        case '100_200':
+                            $mealsQuery->whereHas('nutritionalInfo', function ($query) {
+                                $query->whereBetween('calories', [100, 200]);
+                            });
+                            break;
+                        case '200_300':
+                            $mealsQuery->whereHas('nutritionalInfo', function ($query) {
+                                $query->whereBetween('calories', [200, 300]);
+                            });
+                            break;
+                        case '300_400':
+                            $mealsQuery->whereHas('nutritionalInfo', function ($query) {
+                                $query->whereBetween('calories', [300, 400]);
+                            });
+                            break;
+                        case '400_500':
+                            $mealsQuery->whereHas('nutritionalInfo', function ($query) {
+                                $query->whereBetween('calories', [400, 500]);
+                            });
+                            break;
+                        case 'over_500':
+                            $mealsQuery->whereHas('nutritionalInfo', function ($query) {
+                                $query->where('calories', '>', 500);
+                            });
+                            break;
                     }
                 }
 
@@ -122,6 +215,14 @@ class MealPlanController extends Controller
             if (!$meals) {
                 $meals = collect();
             }
+
+            // Get available cuisine types from database
+            $availableCuisines = Meal::whereNotNull('cuisine_type')
+                ->where('cuisine_type', '!=', '')
+                ->distinct()
+                ->pluck('cuisine_type')
+                ->sort()
+                ->values();
 
             // Safely get BMI status
             $bmiStatus = null;
@@ -147,7 +248,12 @@ class MealPlanController extends Controller
                 $existingMealTypes = [];
             }
 
-            return view('meal-plans.create', compact('meals', 'bmiStatus', 'existingMealTypes'));
+            return view('meal-plans.create', compact(
+            'meals',
+            'bmiStatus',
+            'existingMealTypes',
+            'availableCuisines'
+        ));
                 
         } catch (\Exception $e) {
             Log::error('Meal plan create error: ' . $e->getMessage(), [
@@ -167,9 +273,116 @@ class MealPlanController extends Controller
         }
     }
 
-    /**
-     * Store a newly created meal plan.
+        /**
+     * Show the form for bulk creating meal plans for entire day.
      */
+    public function bulkCreate()
+    {
+        try {
+            $user = Auth::user();
+            
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'Please login to create meal plans.');
+            }
+
+            // Get all available meals grouped by meal type
+            $meals = Meal::with(['nutritionalInfo', 'recipe'])
+                ->where('cost', '<=', ($user->daily_budget ?? 1000) * 2) // Allow flexible budget
+                ->orderBy('meal_type')
+                ->orderBy('name')
+                ->get();
+
+            return view('meal-plans.bulk-create', compact('meals'));
+        } catch (\Exception $e) {
+            Log::error('Bulk meal plan create error: ' . $e->getMessage());
+            return redirect()->route('meal-plans.index')
+                ->with('error', 'Unable to load bulk meal planning. Please try again.');
+        }
+    }
+
+    /**
+     * Store bulk meal plans for entire day.
+     */
+    public function bulkStore(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'Please login to create meal plans.');
+            }
+
+            $request->validate([
+                'scheduled_date' => 'required|date',
+                'breakfast_meal_id' => 'required|exists:meals,id',
+                'lunch_meal_id' => 'required|exists:meals,id', 
+                'dinner_meal_id' => 'required|exists:meals,id',
+                'snack_meal_id' => 'nullable|exists:meals,id',
+            ]);
+
+            $scheduledDate = $request->scheduled_date;
+            $userTz = $user->timezone ?? config('app.timezone');
+
+            // Check for existing meal plans on this date
+            $existingPlans = $user->mealPlansForDate($scheduledDate)->get();
+            if ($existingPlans->isNotEmpty()) {
+                return back()->with('error', 'You already have meal plans for this date. Please choose a different date or edit existing plans.');
+            }
+
+            DB::beginTransaction();
+
+            // Create meal plans for each meal type
+            $mealPlans = [];
+            $mealTypes = [
+                'breakfast' => ['time' => '08:00', 'meal_id' => $request->breakfast_meal_id],
+                'lunch' => ['time' => '12:00', 'meal_id' => $request->lunch_meal_id],
+                'dinner' => ['time' => '18:00', 'meal_id' => $request->dinner_meal_id],
+            ];
+
+            // Add snack if selected
+            if ($request->snack_meal_id) {
+                $mealTypes['snack'] = ['time' => '15:00', 'meal_id' => $request->snack_meal_id];
+            }
+
+            foreach ($mealTypes as $mealType => $data) {
+                $mealPlan = MealPlan::create([
+                    'user_id' => $user->id,
+                    'meal_id' => $data['meal_id'],
+                    'scheduled_date' => $scheduledDate,
+                    'scheduled_time' => $data['time'],
+                    'meal_type' => $mealType,
+                    'status' => 'planned',
+                    'created_at' => now($userTz),
+                    'updated_at' => now($userTz),
+                ]);
+                
+                $mealPlans[] = $mealPlan;
+            }
+
+            DB::commit();
+
+            // Send notification email
+            try {
+                $this->emailService->sendBulkMealPlanConfirmation($user, $mealPlans, $scheduledDate);
+            } catch (\Exception $e) {
+                Log::warning('Failed to send bulk meal plan confirmation email: ' . $e->getMessage());
+            }
+
+            return redirect()->route('meal-plans.index', ['date' => $scheduledDate])
+                ->with('success', 'Your daily meal plan has been created successfully! Check your email for confirmation.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Bulk meal plan creation failed: ' . $e->getMessage(), [
+                'user_id' => $user->id ?? null,
+                'date' => $request->scheduled_date ?? null,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->with('error', 'Failed to create meal plan. Please try again.')
+                ->withInput();
+        }
+    }
     public function store(Request $request)
     {
         $request->validate([

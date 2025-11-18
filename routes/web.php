@@ -238,8 +238,10 @@ Route::middleware(['auth', 'verified', 'no.super.admin'])->group(function () {
     // Meal Plans
     Route::get('/meal-plans', [MealPlanController::class, 'index'])->name('meal-plans.index');
     Route::get('/meal-plans/create', [MealPlanController::class, 'create'])->name('meal-plans.create');
+    Route::get('/meal-plans/bulk-create', [MealPlanController::class, 'bulkCreate'])->name('meal-plans.bulk-create');
     Route::get('/meal-plans/weekly', [MealPlanController::class, 'weekly'])->name('meal-plans.weekly');
     Route::post('/meal-plans', [MealPlanController::class, 'store'])->name('meal-plans.store');
+    Route::post('/meal-plans/bulk-store', [MealPlanController::class, 'bulkStore'])->name('meal-plans.bulk-store');
     Route::get('/meal-plans/{mealPlan}', [MealPlanController::class, 'show'])->name('meal-plans.show');
     Route::get('/meal-plans/{mealPlan}/edit', [MealPlanController::class, 'edit'])->name('meal-plans.edit');
     Route::put('/meal-plans/{mealPlan}', [MealPlanController::class, 'update'])->name('meal-plans.update');

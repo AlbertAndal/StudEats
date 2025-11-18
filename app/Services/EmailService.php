@@ -290,4 +290,33 @@ class EmailService
             'note' => 'Email tracking requires a dedicated tracking system for detailed statistics',
         ];
     }
+
+    /**
+     * Send bulk meal plan confirmation email.
+     */
+    public function sendBulkMealPlanConfirmation($user, $mealPlans, $date): bool
+    {
+        try {
+            // For now, just log the bulk meal plan creation
+            Log::info('Bulk meal plan created successfully', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'date' => $date,
+                'meal_count' => count($mealPlans),
+                'meal_types' => collect($mealPlans)->pluck('meal_type')->toArray(),
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to send bulk meal plan confirmation', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'date' => $date,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return false;
+        }
+    }
 }

@@ -35,17 +35,78 @@ class RecipeController extends Controller
                 $query->where('difficulty', $request->difficulty);
             }
 
+            // Filter by meal type
+            if ($request->filled('meal_type') && $request->meal_type !== '') {
+                $query->where('meal_type', $request->meal_type);
+            }
+
+            // Filter by price range
+            if ($request->filled('price_range') && $request->price_range !== '') {
+                switch ($request->price_range) {
+                    case 'under_50':
+                        $query->where('cost', '<', 50);
+                        break;
+                    case '50_100':
+                        $query->whereBetween('cost', [50, 100]);
+                        break;
+                    case '100_200':
+                        $query->whereBetween('cost', [100, 200]);
+                        break;
+                    case 'over_200':
+                        $query->where('cost', '>', 200);
+                        break;
+                }
+            }
+
+            // Filter by calorie range
+            if ($request->filled('calorie_range') && $request->calorie_range !== '') {
+                switch ($request->calorie_range) {
+                    case 'under_100':
+                        $query->whereHas('nutritionalInfo', function($q) {
+                            $q->where('calories', '<', 100);
+                        });
+                        break;
+                    case '100_200':
+                        $query->whereHas('nutritionalInfo', function($q) {
+                            $q->whereBetween('calories', [100, 200]);
+                        });
+                        break;
+                    case '200_300':
+                        $query->whereHas('nutritionalInfo', function($q) {
+                            $q->whereBetween('calories', [200, 300]);
+                        });
+                        break;
+                    case '300_400':
+                        $query->whereHas('nutritionalInfo', function($q) {
+                            $q->whereBetween('calories', [300, 400]);
+                        });
+                        break;
+                    case '400_500':
+                        $query->whereHas('nutritionalInfo', function($q) {
+                            $q->whereBetween('calories', [400, 500]);
+                        });
+                        break;
+                    case 'over_500':
+                        $query->whereHas('nutritionalInfo', function($q) {
+                            $q->where('calories', '>', 500);
+                        });
+                        break;
+                }
+            }
+
             // Featured recipes at the top
             $query->orderBy('is_featured', 'desc')->latest();
 
             $recipes = $query->paginate(12)->withQueryString();
 
-            $cuisineTypes = Meal::select('cuisine_type')
+            $availableCuisines = Meal::select('cuisine_type')
                 ->distinct()
                 ->whereNotNull('cuisine_type')
+                ->where('cuisine_type', '!=', '')
+                ->orderBy('cuisine_type')
                 ->pluck('cuisine_type');
 
-            return view('recipes.index', compact('recipes', 'cuisineTypes'));
+            return view('recipes.index', compact('recipes', 'availableCuisines'));
         } catch (\Exception $e) {
             \Log::error('Recipes index error: ' . $e->getMessage());
             return back()->with('error', 'Unable to load recipes. Please try again.');
