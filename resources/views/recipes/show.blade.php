@@ -185,22 +185,35 @@
                                         </svg>
                                     </div>
                                     <div>
+                                        @php
+                                            $rawInstructions = $meal->recipe->instructions;
+                                            $instructionSteps = json_decode($rawInstructions, true);
+                                            // Fallback: treat as newline-separated text if not valid JSON array
+                                            if (!is_array($instructionSteps)) {
+                                                $instructionSteps = preg_split('/\r\n|\r|\n/', $rawInstructions);
+                                                $instructionSteps = array_values(array_filter(array_map('trim', $instructionSteps), function($line){ return $line !== ''; }));
+                                            }
+                                        @endphp
                                         <h3 class="text-base font-semibold text-gray-900">Cooking Instructions</h3>
-                                        <p class="text-xs text-gray-500">{{ count(json_decode($meal->recipe->instructions, true) ?? []) }} steps</p>
+                                        <p class="text-xs text-gray-500">{{ count($instructionSteps) }} steps</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="p-6">
-                                <ol class="space-y-4">
-                                    @foreach(json_decode($meal->recipe->instructions, true) ?? [] as $index => $step)
-                                        <li class="flex gap-4 p-4 bg-gradient-to-r from-purple-50/30 to-white rounded-lg hover:shadow-sm transition-shadow">
-                                            <span class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm">
-                                                {{ $index + 1 }}
-                                            </span>
-                                            <p class="text-gray-700 pt-2 leading-relaxed">{{ $step }}</p>
-                                        </li>
-                                    @endforeach
-                                </ol>
+                                @if(count($instructionSteps) > 0)
+                                    <ol class="space-y-4">
+                                        @foreach($instructionSteps as $index => $step)
+                                            <li class="flex gap-4 p-4 bg-gradient-to-r from-purple-50/30 to-white rounded-lg hover:shadow-sm transition-shadow">
+                                                <span class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm">
+                                                    {{ $index + 1 }}
+                                                </span>
+                                                <p class="text-gray-700 pt-2 leading-relaxed">{{ $step }}</p>
+                                            </li>
+                                        @endforeach
+                                    </ol>
+                                @else
+                                    <p class="text-sm text-gray-500">No instructions provided for this recipe.</p>
+                                @endif
                             </div>
                         </div>
                     @endif
