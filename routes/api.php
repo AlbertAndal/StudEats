@@ -25,7 +25,46 @@ Route::get('/session-check', [SessionController::class, 'checkSession'])->name('
 Route::post('/session-refresh', [SessionController::class, 'refreshSession'])->name('api.session-refresh');
 Route::post('/csrf-validate', [SessionController::class, 'validateToken'])->name('api.csrf-validate');
 
-// Nutrition calculation API (no auth required for better UX)
+// Debug endpoint for checking API configuration (remove in production)
+Route::get('/debug/nutrition-config', function () {
+    return response()->json([
+        'api_key_loaded' => env('NUTRITION_API_KEY') ? 'YES' : 'NO',
+        'api_key_length' => env('NUTRITION_API_KEY') ? strlen(env('NUTRITION_API_KEY')) : 0,
+        'api_key_preview' => env('NUTRITION_API_KEY') ? substr(env('NUTRITION_API_KEY'), 0, 8) . '...' : 'NOT_SET',
+        'api_url' => env('NUTRITION_API_URL', 'NOT_SET'),
+        'environment' => app()->environment(),
+        'config_cached' => config('app.name') ? 'YES' : 'NO',
+        'timestamp' => now()->toISOString()
+    ]);
+});
+
+// Test nutrition API endpoint
+Route::post('/debug/test-nutrition', function (\Illuminate\Http\Request $request) {
+    try {
+        $service = app(\App\Services\NutritionApiService::class);
+        $testIngredient = $request->input('ingredient', 'chicken breast');
+        
+        $result = $service->searchFood($testIngredient);
+        
+        return response()->json([
+            'success' => true,
+            'test_ingredient' => $testIngredient,
+            'api_responded' => $result ? 'YES' : 'NO',
+            'result_count' => isset($result['foods']) ? count($result['foods']) : 0,
+            'first_result' => isset($result['foods'][0]['description']) ? $result['foods'][0]['description'] : 'N/A',
+            'raw_response' => $result
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ]);
+    }
+});
+
+// Nutrition API routes
 Route::post('/nutrition/calculate', [NutritionController::class, 'calculate'])->name('api.nutrition.calculate');
 Route::get('/nutrition/ingredients', [NutritionController::class, 'getIngredients'])->name('api.nutrition.ingredients');
 

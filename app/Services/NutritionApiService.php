@@ -25,6 +25,23 @@ class NutritionApiService
         // Example for USDA FoodData Central API
         $this->apiUrl = env('NUTRITION_API_URL', 'https://api.nal.usda.gov/fdc/v1');
         $this->apiKey = env('NUTRITION_API_KEY', 'YOUR_API_KEY_HERE');
+        
+        // Log API configuration status for debugging
+        Log::info('NutritionApiService initialized', [
+            'api_url' => $this->apiUrl,
+            'api_key_configured' => $this->apiKey && $this->apiKey !== 'YOUR_API_KEY_HERE',
+            'api_key_length' => strlen($this->apiKey),
+            'environment' => app()->environment()
+        ]);
+        
+        // Warn if API key is not properly configured
+        if (!$this->apiKey || $this->apiKey === 'YOUR_API_KEY_HERE') {
+            Log::warning('Nutrition API key not configured properly', [
+                'api_key_value' => $this->apiKey,
+                'environment' => app()->environment(),
+                'config_cached' => config('app.name') ? 'YES' : 'NO'
+            ]);
+        }
     }
     
     /**
@@ -39,19 +56,49 @@ class NutritionApiService
             $cacheKey = 'nutrition_search_' . md5($foodName);
             
             return Cache::remember($cacheKey, 3600, function () use ($foodName) {
-                $response = Http::timeout(3)->retry(1, 500)->get("{$this->apiUrl}/foods/search", [
+                Log::info('Making nutrition API request', [
+                    'food_name' => $foodName,
+                    'api_url' => $this->apiUrl,
+                    'api_key_configured' => $this->apiKey && $this->apiKey !== 'YOUR_API_KEY_HERE',
+                    'api_key_length' => strlen($this->apiKey)
+                ]);
+                
+                $response = Http::timeout(10)->retry(2, 1000)->get("{$this->apiUrl}/foods/search", [
                     'api_key' => $this->apiKey,
                     'query' => $foodName,
-                    'pageSize' => 1,
+                    'pageSize' => 5,
                     'dataType' => ['Foundation', 'SR Legacy'],
+                ]);
+                
+                Log::info('Nutrition API response received', [
+                    'food_name' => $foodName,
+                    'status_code' => $response->status(),
+                    'successful' => $response->successful(),
+                    'response_size' => strlen($response->body())
                 ]);
                 
                 if ($response->successful()) {
                     $data = $response->json();
                     
                     if (isset($data['foods']) && count($data['foods']) > 0) {
-                        return $data['foods'][0];
+                        Log::info('Nutrition API search successful', [
+                            'food_name' => $foodName,
+                            'results_count' => count($data['foods'])
+                        ]);
+                        return $data;
+                    } else {
+                        Log::warning('Nutrition API returned no results', [
+                            'food_name' => $foodName,
+                            'response_data' => $data
+                        ]);
                     }
+                } else {
+                    Log::error('Nutrition API request failed', [
+                        'food_name' => $foodName,
+                        'status_code' => $response->status(),
+                        'response_body' => $response->body(),
+                        'headers' => $response->headers()
+                    ]);
                 }
                 
                 return null;
@@ -59,7 +106,10 @@ class NutritionApiService
         } catch (\Exception $e) {
             Log::error('Nutrition API search error: ' . $e->getMessage(), [
                 'food_name' => $foodName,
-                'error_type' => get_class($e)
+                'error_type' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'api_key_configured' => $this->apiKey && $this->apiKey !== 'YOUR_API_KEY_HERE'
             ]);
             
             // Check if it's a timeout error

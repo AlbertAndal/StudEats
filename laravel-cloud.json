@@ -29,7 +29,9 @@
     "SESSION_SECURE_COOKIE": "true", 
     "SESSION_SAME_SITE": "lax",
     "SESSION_PARTITIONED_COOKIE": "false",
-    "SESSION_LIFETIME": "240"
+    "SESSION_LIFETIME": "240",
+    "NUTRITION_API_URL": "https://api.nal.usda.gov/fdc/v1",
+    "NUTRITION_API_KEY": "lkLXmcy1vDfajEkPgUrkjyCQa0rahi3XfRMQwhrp"
   },
   "schedule": {
     "commands": [
