@@ -85,7 +85,7 @@ class NutritionApiService
                             'food_name' => $foodName,
                             'results_count' => count($data['foods'])
                         ]);
-                        return $data;
+                        return $data['foods'][0]; // Return first food item, not entire array
                     } else {
                         Log::warning('Nutrition API returned no results', [
                             'food_name' => $foodName,
@@ -314,20 +314,26 @@ class NutritionApiService
         $nutrientMapping = [
             1008 => 'calories',    // Energy (kcal)
             1003 => 'protein',     // Protein
-            1005 => 'carbs',       // Carbohydrate
+            1005 => 'carbs',       // Carbohydrate, by difference
             1004 => 'fats',        // Total lipid (fat)
             1079 => 'fiber',       // Fiber, total dietary
-            2000 => 'sugar',       // Sugars, total
-            1258 => 'sodium',      // Saturated fatty acids (stored in sodium field for compatibility)
+            2000 => 'sugar',       // Total Sugars
+            1093 => 'sodium',      // Sodium, Na (mg) - fixed from saturated fat
         ];
         
         foreach ($foodDetails['foodNutrients'] as $nutrient) {
-            $nutrientId = $nutrient['nutrient']['id'] ?? null;
-            $amount = $nutrient['amount'] ?? 0;
+            $nutrientId = $nutrient['nutrientId'] ?? $nutrient['nutrient']['id'] ?? null;
+            $amount = $nutrient['value'] ?? $nutrient['amount'] ?? 0;
             
             if (isset($nutrientMapping[$nutrientId])) {
                 $field = $nutrientMapping[$nutrientId];
                 $nutrients[$field] = (float) $amount;
+                
+                Log::info('Nutrient mapped successfully', [
+                    'nutrient_id' => $nutrientId,
+                    'field' => $field,
+                    'amount' => $amount
+                ]);
             }
         }
         
