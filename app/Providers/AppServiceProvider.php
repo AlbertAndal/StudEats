@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Listeners\RecordUserLogin;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register login event listener
+        Event::listen(Login::class, RecordUserLogin::class);
+        
         // Set timezone for the application
         if (auth()->check()) {
             $userTimezone = auth()->user()->timezone ?? config('app.timezone');

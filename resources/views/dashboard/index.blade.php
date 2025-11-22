@@ -8,7 +8,13 @@
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Welcome back, {{ $user->name }}! 👋</h1>
+                <h1 class="text-3xl font-bold text-gray-900">
+                    @if($user->isFirstLogin())
+                        Welcome, {{ $user->name }}! 👋
+                    @else
+                        Welcome back, {{ $user->name }}! 👋
+                    @endif
+                </h1>
                 <p class="mt-2 text-gray-600">Here's your personalized meal planning dashboard</p>
             </div>
             <button onclick="startDashboardTour()" 

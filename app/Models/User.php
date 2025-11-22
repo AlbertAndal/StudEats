@@ -44,6 +44,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'timezone',
         'profile_photo',
         'email_verified_at',
+        'first_login_at',
+        'login_count',
+        'last_login_at',
     ];
 
     /**
@@ -69,6 +72,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'daily_budget' => 'decimal:2',
             'is_active' => 'boolean',
             'suspended_at' => 'datetime',
+            'first_login_at' => 'datetime',
+            'last_login_at' => 'datetime',
         ];
     }
 
@@ -622,5 +627,30 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $summary;
+    }
+
+    /**
+     * Check if this is the user's first login.
+     */
+    public function isFirstLogin(): bool
+    {
+        return $this->login_count === 0 || $this->first_login_at === null;
+    }
+
+    /**
+     * Record a login for this user.
+     */
+    public function recordLogin(): void
+    {
+        $now = now();
+        
+        if ($this->isFirstLogin()) {
+            $this->first_login_at = $now;
+        }
+        
+        $this->login_count = ($this->login_count ?? 0) + 1;
+        $this->last_login_at = $now;
+        
+        $this->save();
     }
 }
